@@ -8,7 +8,9 @@
 		}
 	},
 	"files": {
-		"includes": ["**/*.{ts,tsx,json}"]
+		"includes": [
+			"**/*.{ts,tsx,json}"
+		]
 	},
 	"linter": {
 		"enabled": true,
@@ -32,6 +34,7 @@
 				"noUnusedImports": "off",
 				"noChildrenProp": "off",
 				"useJsxKeyInIterable": "off",
+				"useUniqueElementIds": "off",
 				"useYield": "off"
 			},
 			"suspicious": {

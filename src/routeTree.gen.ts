@@ -16,6 +16,8 @@ import { Route as ConvexpostsRouteImport } from './routes/convexposts'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthedUserRouteImport } from './routes/_authed/user'
+import { Route as AuthSignUpRouteImport } from './routes/_auth/sign-up'
+import { Route as AuthSignInRouteImport } from './routes/_auth/sign-in'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
 
 const rootServerRouteImport = createServerRootRoute()
@@ -44,6 +46,16 @@ const AuthedUserRoute = AuthedUserRouteImport.update({
   path: '/user',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthSignUpRoute = AuthSignUpRouteImport.update({
+  id: '/_auth/sign-up',
+  path: '/sign-up',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSignInRoute = AuthSignInRouteImport.update({
+  id: '/_auth/sign-in',
+  path: '/sign-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -54,12 +66,16 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/convexposts': typeof ConvexpostsRoute
   '/tasks': typeof TasksRoute
+  '/sign-in': typeof AuthSignInRoute
+  '/sign-up': typeof AuthSignUpRoute
   '/user': typeof AuthedUserRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/convexposts': typeof ConvexpostsRoute
   '/tasks': typeof TasksRoute
+  '/sign-in': typeof AuthSignInRoute
+  '/sign-up': typeof AuthSignUpRoute
   '/user': typeof AuthedUserRoute
 }
 export interface FileRoutesById {
@@ -68,19 +84,23 @@ export interface FileRoutesById {
   '/_authed': typeof AuthedRouteWithChildren
   '/convexposts': typeof ConvexpostsRoute
   '/tasks': typeof TasksRoute
+  '/_auth/sign-in': typeof AuthSignInRoute
+  '/_auth/sign-up': typeof AuthSignUpRoute
   '/_authed/user': typeof AuthedUserRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/convexposts' | '/tasks' | '/user'
+  fullPaths: '/' | '/convexposts' | '/tasks' | '/sign-in' | '/sign-up' | '/user'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/convexposts' | '/tasks' | '/user'
+  to: '/' | '/convexposts' | '/tasks' | '/sign-in' | '/sign-up' | '/user'
   id:
     | '__root__'
     | '/'
     | '/_authed'
     | '/convexposts'
     | '/tasks'
+    | '/_auth/sign-in'
+    | '/_auth/sign-up'
     | '/_authed/user'
   fileRoutesById: FileRoutesById
 }
@@ -89,6 +109,8 @@ export interface RootRouteChildren {
   AuthedRoute: typeof AuthedRouteWithChildren
   ConvexpostsRoute: typeof ConvexpostsRoute
   TasksRoute: typeof TasksRoute
+  AuthSignInRoute: typeof AuthSignInRoute
+  AuthSignUpRoute: typeof AuthSignUpRoute
 }
 export interface FileServerRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatServerRoute
@@ -149,6 +171,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedUserRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_auth/sign-up': {
+      id: '/_auth/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof AuthSignUpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth/sign-in': {
+      id: '/_auth/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof AuthSignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 declare module '@tanstack/react-start/server' {
@@ -179,6 +215,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthedRoute: AuthedRouteWithChildren,
   ConvexpostsRoute: ConvexpostsRoute,
   TasksRoute: TasksRoute,
+  AuthSignInRoute: AuthSignInRoute,
+  AuthSignUpRoute: AuthSignUpRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

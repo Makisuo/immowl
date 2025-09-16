@@ -1,13 +1,18 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Navigate } from "@tanstack/react-router"
+import { Authenticated, AuthLoading, Unauthenticated } from "convex/react"
 
-export const Route = createFileRoute('/')({
-  component: Home,
+export const Route = createFileRoute("/")({
+	component: Home,
 })
 
 function Home() {
-  return (
-    <div className="p-2">
-      <h1>Tanstack Start Convex with Clerk</h1>
-    </div>
-  )
+	return (
+		<div>
+			<Unauthenticated>
+				<Navigate to="/sign-in" />
+			</Unauthenticated>
+			<Authenticated>Hello :D</Authenticated>
+			<AuthLoading>Loading...</AuthLoading>
+		</div>
+	)
 }

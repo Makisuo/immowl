@@ -2,8 +2,14 @@ import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react"
 import { fetchSession, getCookieName } from "@convex-dev/better-auth/react-start"
 import type { ConvexQueryClient } from "@convex-dev/react-query"
 import type { QueryClient } from "@tanstack/react-query"
-import { createRootRouteWithContext, Outlet, useRouteContext } from "@tanstack/react-router"
-import { createServerFn, Meta, Scripts } from "@tanstack/react-start"
+import {
+	createRootRouteWithContext,
+	HeadContent,
+	Outlet,
+	Scripts,
+	useRouteContext,
+} from "@tanstack/react-router"
+import { createServerFn } from "@tanstack/react-start"
 import { getCookie, getWebRequest } from "@tanstack/react-start/server"
 import type { ConvexReactClient } from "convex/react"
 import type * as React from "react"
@@ -68,9 +74,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang="en" className="dark">
 			<head>
-				<Meta />
+				<HeadContent />
 			</head>
-			<body className="bg-neutral-950 text-neutral-50">
+			<body className="min-h-screen">
 				{children}
 				<Scripts />
 			</body>
