@@ -1,15 +1,16 @@
-import { defineSchema, defineTable } from 'convex/server'
-import { v } from 'convex/values'
+import { defineSchema, defineTable } from "convex/server"
+import { v } from "convex/values"
 
 export default defineSchema({
-  posts: defineTable({
-    id: v.string(),
-    title: v.string(),
-    body: v.string(),
-  }).index('id', ['id']),
+	users: defineTable({
+		email: v.string(),
+	}).index("email", ["email"]),
 
-  tasks: defineTable({
-    text: v.string(),
-    isCompleted: v.boolean(),
-  }),
+	todos: defineTable({
+		text: v.string(),
+		completed: v.boolean(),
+		userId: v.id("users"),
+		createdAt: v.number(),
+		updatedAt: v.number(),
+	}).index("userId", ["userId"]),
 })
