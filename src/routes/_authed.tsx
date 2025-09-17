@@ -1,16 +1,20 @@
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, redirect } from "@tanstack/react-router"
+import { api } from "convex/_generated/api"
+import { fetchQuery } from "~/lib/auth.server"
 
 export const Route = createFileRoute("/_authed")({
-	beforeLoad: ({ context }) => {
-		if (!context.userId) {
-			throw new Error("Not authenticated")
-		}
-	},
-	errorComponent: ({ error }) => {
-		if (error.message === "Not authenticated") {
-			return <div className="flex items-center justify-center p-12">Sign IN</div>
+	beforeLoad: async () => {
+		const user = await fetchQuery(api.auth.getCurrentUser, {})
+
+		if (!user) {
+			throw redirect({
+				to: "/sign-in",
+				search: {
+					redirect: location.pathname,
+				},
+			})
 		}
 
-		throw error
+		return { user }
 	},
 })

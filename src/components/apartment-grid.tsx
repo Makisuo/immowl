@@ -1,11 +1,13 @@
 "use client"
 
-import { Bath, Bed, Heart, MapPin, Square, Star } from "lucide-react"
+import { Bath, Bed, Heart, LogOut, MapPin, Square, Star } from "lucide-react"
 import { useState } from "react"
+import { useRouter } from "@tanstack/react-router"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent } from "~/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select"
+import { useAuth } from "~/hooks/use-auth"
 
 // Mock apartment data
 const apartments = [
@@ -98,9 +100,16 @@ const apartments = [
 export function ApartmentGrid() {
 	const [favorites, setFavorites] = useState<number[]>([])
 	const [sortBy, setSortBy] = useState("price-low")
+	const router = useRouter()
+	const { user, signOut } = useAuth()
 
 	const toggleFavorite = (id: number) => {
 		setFavorites((prev) => (prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id]))
+	}
+
+	const handleSignOut = async () => {
+		await signOut()
+		router.navigate({ to: "/sign-in" })
 	}
 
 	const sortedApartments = [...apartments].sort((a, b) => {
@@ -120,6 +129,25 @@ export function ApartmentGrid() {
 
 	return (
 		<div className="space-y-6">
+			<div className="flex items-center justify-between mb-4">
+				<div className="flex items-center gap-4">
+					{user && (
+						<span className="text-sm text-muted-foreground">
+							Welcome, {user.name || user.email}
+						</span>
+					)}
+				</div>
+				<Button
+					variant="outline"
+					size="sm"
+					onClick={handleSignOut}
+					className="flex items-center gap-2"
+				>
+					<LogOut className="h-4 w-4" />
+					Sign Out
+				</Button>
+			</div>
+
 			<div className="flex items-center justify-between">
 				<div>
 					<h1 className="text-balance font-semibold text-2xl text-foreground">

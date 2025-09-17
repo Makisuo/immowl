@@ -1,18 +1,48 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
+import { useState } from "react"
 import { LogoIcon } from "~/components/logo"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
+import { authClient } from "~/lib/auth.client"
 
 export const Route = createFileRoute("/_auth/sign-up")({
 	component: RouteComponent,
 })
 
 function RouteComponent() {
+	const [error, setError] = useState("")
+	const [loading, setLoading] = useState(false)
+
+	const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault()
+		setLoading(true)
+		setError("")
+
+		const formData = new FormData(e.currentTarget)
+		const email = formData.get("email") as string
+		const password = formData.get("pwd") as string
+		const firstname = formData.get("firstname") as string
+		const lastname = formData.get("lastname") as string
+
+		try {
+			await authClient.signUp.email({
+				email,
+				password,
+				name: `${firstname} ${lastname}`.trim(),
+				callbackURL: "/",
+			})
+		} catch (err: any) {
+			setError(err?.message || "Registration failed. Please try again.")
+		} finally {
+			setLoading(false)
+		}
+	}
+
 	return (
 		<section className="flex min-h-screen bg-zinc-50 px-4 py-16 md:py-32 dark:bg-transparent">
 			<form
-				action=""
+				onSubmit={handleSignUp}
 				className="m-auto h-fit w-full max-w-sm rounded-[calc(var(--radius)+.125rem)] border bg-card p-0.5 shadow-md dark:[--color-muted:var(--color-zinc-900)]"
 			>
 				<div className="p-8 pb-6">
@@ -70,26 +100,43 @@ function RouteComponent() {
 					<hr className="my-4 border-dashed" />
 
 					<div className="space-y-5">
+						{error && (
+							<div className="rounded-md bg-red-50 p-3 text-red-600 text-sm dark:bg-red-900/20 dark:text-red-400">
+								{error}
+							</div>
+						)}
 						<div className="grid grid-cols-2 gap-3">
 							<div className="space-y-2">
 								<Label htmlFor="firstname" className="block text-sm">
 									Firstname
 								</Label>
-								<Input type="text" required name="firstname" id="firstname" />
+								<Input
+									type="text"
+									required
+									name="firstname"
+									id="firstname"
+									disabled={loading}
+								/>
 							</div>
 							<div className="space-y-2">
 								<Label htmlFor="lastname" className="block text-sm">
 									Lastname
 								</Label>
-								<Input type="text" required name="lastname" id="lastname" />
+								<Input
+									type="text"
+									required
+									name="lastname"
+									id="lastname"
+									disabled={loading}
+								/>
 							</div>
 						</div>
 
 						<div className="space-y-2">
 							<Label htmlFor="email" className="block text-sm">
-								Username
+								Email
 							</Label>
-							<Input type="email" required name="email" id="email" />
+							<Input type="email" required name="email" id="email" disabled={loading} />
 						</div>
 
 						<div className="space-y-2">
@@ -101,11 +148,14 @@ function RouteComponent() {
 								required
 								name="pwd"
 								id="pwd"
+								disabled={loading}
 								className="input sz-md variant-mixed"
 							/>
 						</div>
 
-						<Button className="w-full">Continue</Button>
+						<Button className="w-full" type="submit" disabled={loading}>
+							{loading ? "Creating account..." : "Continue"}
+						</Button>
 					</div>
 				</div>
 

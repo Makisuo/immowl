@@ -1,4 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
+import { useState } from "react"
+import { authClient } from "~/lib/auth.client"
 import { LogoIcon } from "~/components/logo"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
@@ -9,10 +11,35 @@ export const Route = createFileRoute("/_auth/sign-in")({
 })
 
 function RouteComponent() {
+	const router = useRouter()
+	const [error, setError] = useState("")
+	const [loading, setLoading] = useState(false)
+
+	const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault()
+		setLoading(true)
+		setError("")
+
+		const formData = new FormData(e.currentTarget)
+
+		try {
+			await authClient.signIn.email({
+				email: formData.get("email") as string,
+				password: formData.get("pwd") as string,
+			})
+
+			router.navigate({ to: "/" })
+		} catch (err: any) {
+			setError(err?.message || "Invalid email or password")
+		} finally {
+			setLoading(false)
+		}
+	}
+
 	return (
 		<section className="flex min-h-screen bg-zinc-50 px-4 py-16 md:py-32 dark:bg-transparent">
 			<form
-				action=""
+				onSubmit={handleSignIn}
 				className="m-auto h-fit w-full max-w-sm rounded-[calc(var(--radius)+.125rem)] border bg-card p-0.5 shadow-md dark:[--color-muted:var(--color-zinc-900)]"
 			>
 				<div className="p-8 pb-6">
@@ -70,11 +97,17 @@ function RouteComponent() {
 					<hr className="my-4 border-dashed" />
 
 					<div className="space-y-6">
+						{error && (
+							<div className="rounded-md bg-red-50 p-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
+								{error}
+							</div>
+						)}
+
 						<div className="space-y-2">
 							<Label htmlFor="email" className="block text-sm">
-								Username
+								Email
 							</Label>
-							<Input type="email" required name="email" />
+							<Input type="email" required name="email" id="email" disabled={loading} />
 						</div>
 
 						<div className="space-y-0.5">
@@ -83,23 +116,28 @@ function RouteComponent() {
 									Password
 								</Label>
 								<Button asChild variant="link" size="sm">
-									<Link
-										to="/forgot-password"
+									<a
+										href="#"
+										onClick={(e) => e.preventDefault()}
 										className="link intent-info variant-ghost text-sm"
 									>
 										Forgot your Password ?
-									</Link>
+									</a>
 								</Button>
 							</div>
 							<Input
 								type="password"
 								required
 								name="pwd"
+								id="pwd"
+								disabled={loading}
 								className="input sz-md variant-mixed"
 							/>
 						</div>
 
-						<Button className="w-full">Sign In</Button>
+						<Button className="w-full" type="submit" disabled={loading}>
+							{loading ? "Signing in..." : "Sign In"}
+						</Button>
 					</div>
 				</div>
 
