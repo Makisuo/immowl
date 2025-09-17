@@ -14,6 +14,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as ConvexpostsRouteImport } from './routes/convexposts'
 import { Route as AuthedRouteImport } from './routes/_authed'
+import { Route as AuthLayoutRouteImport } from './routes/_auth/layout'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthedUserRouteImport } from './routes/_authed/user'
 import { Route as AuthSignUpRouteImport } from './routes/_auth/sign-up'
@@ -36,6 +37,10 @@ const AuthedRoute = AuthedRouteImport.update({
   id: '/_authed',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthLayoutRoute = AuthLayoutRouteImport.update({
+  id: '/_auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -47,14 +52,14 @@ const AuthedUserRoute = AuthedUserRouteImport.update({
   getParentRoute: () => AuthedRoute,
 } as any)
 const AuthSignUpRoute = AuthSignUpRouteImport.update({
-  id: '/_auth/sign-up',
+  id: '/sign-up',
   path: '/sign-up',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthLayoutRoute,
 } as any)
 const AuthSignInRoute = AuthSignInRouteImport.update({
-  id: '/_auth/sign-in',
+  id: '/sign-in',
   path: '/sign-in',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthLayoutRoute,
 } as any)
 const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
   id: '/api/auth/$',
@@ -81,6 +86,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_auth': typeof AuthLayoutRouteWithChildren
   '/_authed': typeof AuthedRouteWithChildren
   '/convexposts': typeof ConvexpostsRoute
   '/tasks': typeof TasksRoute
@@ -96,6 +102,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/_auth'
     | '/_authed'
     | '/convexposts'
     | '/tasks'
@@ -106,11 +113,10 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthLayoutRoute: typeof AuthLayoutRouteWithChildren
   AuthedRoute: typeof AuthedRouteWithChildren
   ConvexpostsRoute: typeof ConvexpostsRoute
   TasksRoute: typeof TasksRoute
-  AuthSignInRoute: typeof AuthSignInRoute
-  AuthSignUpRoute: typeof AuthSignUpRoute
 }
 export interface FileServerRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatServerRoute
@@ -157,6 +163,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthLayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -176,14 +189,14 @@ declare module '@tanstack/react-router' {
       path: '/sign-up'
       fullPath: '/sign-up'
       preLoaderRoute: typeof AuthSignUpRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthLayoutRoute
     }
     '/_auth/sign-in': {
       id: '/_auth/sign-in'
       path: '/sign-in'
       fullPath: '/sign-in'
       preLoaderRoute: typeof AuthSignInRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthLayoutRoute
     }
   }
 }
@@ -199,6 +212,20 @@ declare module '@tanstack/react-start/server' {
   }
 }
 
+interface AuthLayoutRouteChildren {
+  AuthSignInRoute: typeof AuthSignInRoute
+  AuthSignUpRoute: typeof AuthSignUpRoute
+}
+
+const AuthLayoutRouteChildren: AuthLayoutRouteChildren = {
+  AuthSignInRoute: AuthSignInRoute,
+  AuthSignUpRoute: AuthSignUpRoute,
+}
+
+const AuthLayoutRouteWithChildren = AuthLayoutRoute._addFileChildren(
+  AuthLayoutRouteChildren,
+)
+
 interface AuthedRouteChildren {
   AuthedUserRoute: typeof AuthedUserRoute
 }
@@ -212,11 +239,10 @@ const AuthedRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthLayoutRoute: AuthLayoutRouteWithChildren,
   AuthedRoute: AuthedRouteWithChildren,
   ConvexpostsRoute: ConvexpostsRoute,
   TasksRoute: TasksRoute,
-  AuthSignInRoute: AuthSignInRoute,
-  AuthSignUpRoute: AuthSignUpRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
