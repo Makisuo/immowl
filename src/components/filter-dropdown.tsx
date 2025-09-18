@@ -9,15 +9,81 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "~/compon
 import { Label } from "~/components/ui/label"
 import { Separator } from "~/components/ui/separator"
 import { Slider } from "~/components/ui/slider"
+import { cn } from "~/lib/utils"
 
-export function FilterDropdown() {
-	const [priceRange, setPriceRange] = useState([1000, 3000])
-	const [selectedAmenities, setSelectedAmenities] = useState<string[]>([])
-	const [selectedBedrooms, setSelectedBedrooms] = useState<string>("Any")
-	const [selectedBathrooms, setSelectedBathrooms] = useState<string>("Any")
-	const [selectedPropertyType, setSelectedPropertyType] = useState<string>("Any")
-	const [selectedLeaseTerm, setSelectedLeaseTerm] = useState<string>("Any")
-	const [selectedPetPolicy, setSelectedPetPolicy] = useState<string>("Any")
+interface FilterDropdownProps {
+	buttonVariant?: "default" | "outline" | "ghost" | "destructive" | "secondary" | "link"
+	buttonClassName?: string
+	contentClassName?: string
+	compact?: boolean
+	showBadges?: boolean
+	align?: "start" | "center" | "end"
+	iconOnly?: boolean
+	// Optional controlled state props
+	priceRange?: number[]
+	setPriceRange?: (range: number[]) => void
+	selectedAmenities?: string[]
+	setSelectedAmenities?: (amenities: string[]) => void
+	selectedBedrooms?: string
+	setSelectedBedrooms?: (bedrooms: string) => void
+	selectedBathrooms?: string
+	setSelectedBathrooms?: (bathrooms: string) => void
+	selectedPropertyType?: string
+	setSelectedPropertyType?: (propertyType: string) => void
+	selectedLeaseTerm?: string
+	setSelectedLeaseTerm?: (leaseTerm: string) => void
+	selectedPetPolicy?: string
+	setSelectedPetPolicy?: (petPolicy: string) => void
+}
+
+export function FilterDropdown({
+	buttonVariant = "outline",
+	buttonClassName,
+	contentClassName,
+	compact = false,
+	showBadges = true,
+	align = "end",
+	iconOnly = false,
+	// Controlled state props
+	priceRange: priceRangeProp,
+	setPriceRange: setPriceRangeProp,
+	selectedAmenities: selectedAmenitiesProp,
+	setSelectedAmenities: setSelectedAmenitiesProp,
+	selectedBedrooms: selectedBedroomsProp,
+	setSelectedBedrooms: setSelectedBedroomsProp,
+	selectedBathrooms: selectedBathroomsProp,
+	setSelectedBathrooms: setSelectedBathroomsProp,
+	selectedPropertyType: selectedPropertyTypeProp,
+	setSelectedPropertyType: setSelectedPropertyTypeProp,
+	selectedLeaseTerm: selectedLeaseTermProp,
+	setSelectedLeaseTerm: setSelectedLeaseTermProp,
+	selectedPetPolicy: selectedPetPolicyProp,
+	setSelectedPetPolicy: setSelectedPetPolicyProp,
+}: FilterDropdownProps) {
+	// Use props if provided, otherwise use internal state
+	const [internalPriceRange, setInternalPriceRange] = useState([1000, 3000])
+	const [internalSelectedAmenities, setInternalSelectedAmenities] = useState<string[]>([])
+	const [internalSelectedBedrooms, setInternalSelectedBedrooms] = useState<string>("Any")
+	const [internalSelectedBathrooms, setInternalSelectedBathrooms] = useState<string>("Any")
+	const [internalSelectedPropertyType, setInternalSelectedPropertyType] = useState<string>("Any")
+	const [internalSelectedLeaseTerm, setInternalSelectedLeaseTerm] = useState<string>("Any")
+	const [internalSelectedPetPolicy, setInternalSelectedPetPolicy] = useState<string>("Any")
+
+	// Use props if provided, otherwise use internal state
+	const priceRange = priceRangeProp ?? internalPriceRange
+	const setPriceRange = setPriceRangeProp ?? setInternalPriceRange
+	const selectedAmenities = selectedAmenitiesProp ?? internalSelectedAmenities
+	const setSelectedAmenities = setSelectedAmenitiesProp ?? setInternalSelectedAmenities
+	const selectedBedrooms = selectedBedroomsProp ?? internalSelectedBedrooms
+	const setSelectedBedrooms = setSelectedBedroomsProp ?? setInternalSelectedBedrooms
+	const selectedBathrooms = selectedBathroomsProp ?? internalSelectedBathrooms
+	const setSelectedBathrooms = setSelectedBathroomsProp ?? setInternalSelectedBathrooms
+	const selectedPropertyType = selectedPropertyTypeProp ?? internalSelectedPropertyType
+	const setSelectedPropertyType = setSelectedPropertyTypeProp ?? setInternalSelectedPropertyType
+	const selectedLeaseTerm = selectedLeaseTermProp ?? internalSelectedLeaseTerm
+	const setSelectedLeaseTerm = setSelectedLeaseTermProp ?? setInternalSelectedLeaseTerm
+	const selectedPetPolicy = selectedPetPolicyProp ?? internalSelectedPetPolicy
+	const setSelectedPetPolicy = setSelectedPetPolicyProp ?? setInternalSelectedPetPolicy
 
 	const amenities = [
 		"Pet Friendly",
@@ -35,9 +101,10 @@ export function FilterDropdown() {
 	]
 
 	const toggleAmenity = (amenity: string) => {
-		setSelectedAmenities((prev) =>
-			prev.includes(amenity) ? prev.filter((a) => a !== amenity) : [...prev, amenity],
-		)
+		const newAmenities = selectedAmenities.includes(amenity)
+			? selectedAmenities.filter((a) => a !== amenity)
+			: [...selectedAmenities, amenity]
+		setSelectedAmenities(newAmenities)
 	}
 
 	const clearFilters = () => {
@@ -65,7 +132,7 @@ export function FilterDropdown() {
 	return (
 		<div className="flex items-center gap-4">
 			{/* Active filters display */}
-			{selectedAmenities.length > 0 && (
+			{showBadges && selectedAmenities.length > 0 && (
 				<div className="flex flex-wrap gap-2">
 					{selectedAmenities.slice(0, 3).map((amenity) => (
 						<Badge
@@ -94,23 +161,31 @@ export function FilterDropdown() {
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<Button
-						variant="outline"
-						className="flex items-center gap-2 border-gray-300 bg-white hover:bg-gray-50"
-					>
-						<Filter className="h-4 w-4" />
-						Filters
-						{getActiveFiltersCount() > 0 && (
-							<Badge
-								variant="secondary"
-								className="ml-1 rounded-full bg-blue-100 px-2 py-0 text-blue-700 text-xs"
-							>
-								{getActiveFiltersCount()}
-							</Badge>
+						variant={buttonVariant}
+						className={cn(
+							"flex items-center gap-2",
+							buttonVariant === "outline" && "border-gray-300 bg-white hover:bg-gray-50",
+							buttonClassName
 						)}
-						<ChevronDown className="h-4 w-4" />
+					>
+						<Filter className={cn("h-4 w-4", iconOnly && "text-slate-400")} />
+						{!iconOnly && (
+							<>
+								Filters
+								{getActiveFiltersCount() > 0 && (
+									<Badge
+										variant="secondary"
+										className="ml-1 rounded-full bg-blue-100 px-2 py-0 text-blue-700 text-xs"
+									>
+										{getActiveFiltersCount()}
+									</Badge>
+								)}
+								<ChevronDown className="h-4 w-4" />
+							</>
+						)}
 					</Button>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent className="w-80 bg-white p-4 dark:bg-gray-800" align="end">
+				<DropdownMenuContent className={cn("w-80 bg-white p-4 dark:bg-gray-800", contentClassName)} align={align}>
 					<div className="space-y-6">
 						{/* Header */}
 						<div className="flex items-center justify-between">
@@ -225,11 +300,11 @@ export function FilterDropdown() {
 											id={amenity}
 											checked={selectedAmenities.includes(amenity)}
 											onCheckedChange={() => toggleAmenity(amenity)}
-											className="rounded border-gray-300"
+											className="rounded"
 										/>
 										<Label
 											htmlFor={amenity}
-											className="cursor-pointer text-gray-700 text-xs dark:text-gray-300"
+											className="cursor-pointer text-muted-foreground text-xs"
 										>
 											{amenity}
 										</Label>
