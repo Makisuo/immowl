@@ -1,7 +1,73 @@
----
-description: Guidelines and best practices for building Convex projects, including database schema design, queries, mutations, and real-world examples
-globs: **/*.ts,**/*.tsx,**/*.js,**/*.jsx
----
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+This is a property rental/real estate application built with:
+- **Frontend**: TanStack Start (React-based framework) with TailwindCSS
+- **Backend**: Convex (serverless backend platform)
+- **Authentication**: Better Auth (Convex integration)
+- **Build Tool**: Vite with Bun package manager
+
+## Common Development Commands
+
+```bash
+# Start development server (runs Convex and web dev server concurrently)
+bun run dev
+
+# Development servers separately
+bun run dev:web    # Start Vite dev server on port 3000
+bun run dev:convex  # Start Convex dev server
+
+# Build and checks
+bun run build       # Build production bundle and run TypeScript checks
+bun run format      # Format code with Biome
+
+# Data seeding
+bun run seed        # Import sample data into Convex tasks table
+```
+
+## Architecture Overview
+
+### Convex Backend Structure
+- **Schema**: Properties and users tables with comprehensive property listing fields
+- **Components**: Better Auth, Resend (email), Workpool (for scraping)
+- **Functions**: Use new Convex function syntax with typed args and returns
+- **HTTP endpoints**: Defined in `convex/http.ts` using `httpAction`
+
+### Frontend Structure
+- **Routing**: TanStack Router with file-based routing in `src/routes/`
+- **Components**: Radix UI primitives with custom styling in `src/components/`
+- **State**: TanStack Query integrated with Convex queries
+
+### Key Convex Patterns
+
+Always use the new function syntax:
+```typescript
+import { query, mutation } from "./_generated/server";
+import { v } from "convex/values";
+
+export const myFunction = query({
+  args: { id: v.id("properties") },
+  returns: v.union(v.object({ /* ... */ }), v.null()),
+  handler: async (ctx, args) => {
+    // Implementation
+  },
+});
+```
+
+## Important Configuration Files
+- `convex/schema.ts`: Database schema with property listings
+- `convex/convex.config.ts`: Component integrations (auth, email, workpool)
+- `vite.config.ts`: Development server settings, TanStack Start configuration
+
+## Development Notes
+- Convex functions must use validators from `convex/values` (v.string(), v.number(), etc.)
+- Use `v.null()` validator for null returns, not JavaScript's `undefined`
+- External property sources tracked via `externalSource`, `externalId` fields
+- Properties support both internal (user-owned) and external (scraped) listings
+
 
 # Convex guidelines
 ## Function guidelines
@@ -673,4 +739,3 @@ export default function App() {
   return <div>Hello World</div>;
 }
 ```
-

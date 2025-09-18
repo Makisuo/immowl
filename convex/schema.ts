@@ -25,23 +25,22 @@ export default defineSchema({
 			v.literal("townhouse"),
 			v.literal("studio"),
 		),
-		bedrooms: v.number(),
-		bathrooms: v.number(),
-		squareFeet: v.optional(v.number()),
-		furnished: v.optional(v.boolean()), // Made optional for external imports
+		rooms: v.object({
+			bedrooms: v.number(),
+			bathrooms: v.number(),
+		}),
+		squareMeters: v.number(),
 
 		// Rental details
 		monthlyRent: v.number(),
-		securityDeposit: v.optional(v.number()), // Made optional for external imports
+		deposit: v.optional(v.number()), // Made optional for external imports
 		minimumLease: v.optional(v.number()), // in months, made optional
 		availableFrom: v.optional(v.number()),
 
 		amenities: v.optional(v.array(v.string())),
+
+		furnished: v.optional(v.boolean()), // Made optional for external imports
 		petFriendly: v.optional(v.boolean()),
-		smokingAllowed: v.optional(v.boolean()),
-		parkingIncluded: v.optional(v.boolean()),
-		utilitiesIncluded: v.optional(v.boolean()),
-		internetIncluded: v.optional(v.boolean()),
 
 		// Building features - all made optional for external imports
 		elevator: v.optional(v.boolean()),
@@ -53,8 +52,6 @@ export default defineSchema({
 		airConditioning: v.optional(v.boolean()),
 		heating: v.optional(v.boolean()),
 
-		// Images
-		images: v.optional(v.array(v.id("_storage"))), // Made optional for external imports
 		imageUrls: v.optional(v.array(v.string())), // External image URLs for scraped properties
 
 		// Owner info - made flexible for external sources
@@ -69,25 +66,9 @@ export default defineSchema({
 		lastSyncedAt: v.optional(v.number()), // Timestamp of last sync
 
 		// Additional fields that might come from external sources
-		yearBuilt: v.optional(v.number()),
-		lotSize: v.optional(v.number()),
-		propertyTax: v.optional(v.number()),
-		hoaFees: v.optional(v.number()),
-		walkScore: v.optional(v.number()),
-		schoolDistrict: v.optional(v.string()),
-		nearbyTransport: v.optional(v.array(v.string())),
-
-		// Flexible metadata for any additional data from external sources
-		metadata: v.optional(
-			v.object({
-				originalData: v.optional(v.string()), // JSON string of original scraped data
-				customFields: v.optional(v.record(v.string(), v.string())), // Key-value pairs for custom fields
-			}),
-		),
 
 		// Status
-		isActive: v.boolean(),
-		featured: v.optional(v.boolean()), // Made optional, defaults to false
-		isExternal: v.optional(v.boolean()), // Flag to identify external properties
+		status: v.union(v.literal("active"), v.literal("disabled")),
+		isExternal: v.boolean(), // Flag to identify external properties
 	}),
 })
