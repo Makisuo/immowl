@@ -79,7 +79,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			</head>
 			<body className="min-h-screen">
 				<AppHeader />
-				{children}
+				<main className="relative pt-24 md:pt-36">{children}</main>
+
 				<Scripts />
 			</body>
 		</html>
