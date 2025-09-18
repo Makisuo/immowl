@@ -1,6 +1,6 @@
 import { createFileRoute, Navigate } from "@tanstack/react-router"
-import { Authenticated, AuthLoading, Unauthenticated } from "convex/react"
-import { ApartmentGrid } from "~/components/apartment-grid"
+
+import HeroSection from "~/components/hero-section"
 
 export const Route = createFileRoute("/")({
 	component: Home,
@@ -9,13 +9,7 @@ export const Route = createFileRoute("/")({
 function Home() {
 	return (
 		<div>
-			<Unauthenticated>
-				<Navigate to="/sign-in" />
-			</Unauthenticated>
-			<Authenticated>
-				<ApartmentGrid />
-			</Authenticated>
-			<AuthLoading>Loading...</AuthLoading>
+			<HeroSection />
 		</div>
 	)
 }

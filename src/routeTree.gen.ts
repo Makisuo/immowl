@@ -11,9 +11,9 @@
 import { createServerRootRoute } from '@tanstack/react-start/server'
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TasksRouteImport } from './routes/tasks'
+import { Route as SearchRouteImport } from './routes/search'
 import { Route as ConvexpostsRouteImport } from './routes/convexposts'
-import { Route as AuthedRouteImport } from './routes/_authed'
+import { Route as AuthedLayoutRouteImport } from './routes/_authed/layout'
 import { Route as AuthLayoutRouteImport } from './routes/_auth/layout'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthedUserRouteImport } from './routes/_authed/user'
@@ -25,9 +25,9 @@ import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/
 
 const rootServerRouteImport = createServerRootRoute()
 
-const TasksRoute = TasksRouteImport.update({
-  id: '/tasks',
-  path: '/tasks',
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConvexpostsRoute = ConvexpostsRouteImport.update({
@@ -35,7 +35,7 @@ const ConvexpostsRoute = ConvexpostsRouteImport.update({
   path: '/convexposts',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthedRoute = AuthedRouteImport.update({
+const AuthedLayoutRoute = AuthedLayoutRouteImport.update({
   id: '/_authed',
   getParentRoute: () => rootRouteImport,
 } as any)
@@ -51,7 +51,7 @@ const IndexRoute = IndexRouteImport.update({
 const AuthedUserRoute = AuthedUserRouteImport.update({
   id: '/user',
   path: '/user',
-  getParentRoute: () => AuthedRoute,
+  getParentRoute: () => AuthedLayoutRoute,
 } as any)
 const AuthSignUpRoute = AuthSignUpRouteImport.update({
   id: '/sign-up',
@@ -82,7 +82,7 @@ const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/convexposts': typeof ConvexpostsRoute
-  '/tasks': typeof TasksRoute
+  '/search': typeof SearchRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/sign-in': typeof AuthSignInRoute
@@ -92,7 +92,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/convexposts': typeof ConvexpostsRoute
-  '/tasks': typeof TasksRoute
+  '/search': typeof SearchRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/sign-in': typeof AuthSignInRoute
@@ -103,9 +103,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_auth': typeof AuthLayoutRouteWithChildren
-  '/_authed': typeof AuthedRouteWithChildren
+  '/_authed': typeof AuthedLayoutRouteWithChildren
   '/convexposts': typeof ConvexpostsRoute
-  '/tasks': typeof TasksRoute
+  '/search': typeof SearchRoute
   '/_auth/forgot-password': typeof AuthForgotPasswordRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/_auth/sign-in': typeof AuthSignInRoute
@@ -117,7 +117,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/convexposts'
-    | '/tasks'
+    | '/search'
     | '/forgot-password'
     | '/reset-password'
     | '/sign-in'
@@ -127,7 +127,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/convexposts'
-    | '/tasks'
+    | '/search'
     | '/forgot-password'
     | '/reset-password'
     | '/sign-in'
@@ -139,7 +139,7 @@ export interface FileRouteTypes {
     | '/_auth'
     | '/_authed'
     | '/convexposts'
-    | '/tasks'
+    | '/search'
     | '/_auth/forgot-password'
     | '/_auth/reset-password'
     | '/_auth/sign-in'
@@ -150,9 +150,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthLayoutRoute: typeof AuthLayoutRouteWithChildren
-  AuthedRoute: typeof AuthedRouteWithChildren
+  AuthedLayoutRoute: typeof AuthedLayoutRouteWithChildren
   ConvexpostsRoute: typeof ConvexpostsRoute
-  TasksRoute: typeof TasksRoute
+  SearchRoute: typeof SearchRoute
 }
 export interface FileServerRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatServerRoute
@@ -178,11 +178,11 @@ export interface RootServerRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/tasks': {
-      id: '/tasks'
-      path: '/tasks'
-      fullPath: '/tasks'
-      preLoaderRoute: typeof TasksRouteImport
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/convexposts': {
@@ -196,7 +196,7 @@ declare module '@tanstack/react-router' {
       id: '/_authed'
       path: ''
       fullPath: ''
-      preLoaderRoute: typeof AuthedRouteImport
+      preLoaderRoute: typeof AuthedLayoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_auth': {
@@ -218,7 +218,7 @@ declare module '@tanstack/react-router' {
       path: '/user'
       fullPath: '/user'
       preLoaderRoute: typeof AuthedUserRouteImport
-      parentRoute: typeof AuthedRoute
+      parentRoute: typeof AuthedLayoutRoute
     }
     '/_auth/sign-up': {
       id: '/_auth/sign-up'
@@ -280,23 +280,24 @@ const AuthLayoutRouteWithChildren = AuthLayoutRoute._addFileChildren(
   AuthLayoutRouteChildren,
 )
 
-interface AuthedRouteChildren {
+interface AuthedLayoutRouteChildren {
   AuthedUserRoute: typeof AuthedUserRoute
 }
 
-const AuthedRouteChildren: AuthedRouteChildren = {
+const AuthedLayoutRouteChildren: AuthedLayoutRouteChildren = {
   AuthedUserRoute: AuthedUserRoute,
 }
 
-const AuthedRouteWithChildren =
-  AuthedRoute._addFileChildren(AuthedRouteChildren)
+const AuthedLayoutRouteWithChildren = AuthedLayoutRoute._addFileChildren(
+  AuthedLayoutRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthLayoutRoute: AuthLayoutRouteWithChildren,
-  AuthedRoute: AuthedRouteWithChildren,
+  AuthedLayoutRoute: AuthedLayoutRouteWithChildren,
   ConvexpostsRoute: ConvexpostsRoute,
-  TasksRoute: TasksRoute,
+  SearchRoute: SearchRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
