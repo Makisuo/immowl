@@ -2,7 +2,9 @@
 
 import type { Id } from "convex/_generated/dataModel"
 import { Bath, Bed, ChevronLeft, ChevronRight, Heart, MapPin, Square } from "lucide-react"
+import { motion } from "motion/react"
 import { useState } from "react"
+import { AnimatedGroup } from "~/components/ui/animated-group"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent } from "~/components/ui/card"
@@ -500,7 +502,36 @@ export function ApartmentGrid({
 					<p className="mt-2 text-muted-foreground text-sm">Try adjusting your search filters</p>
 				</div>
 			) : (
-				<div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+				<AnimatedGroup
+					preset="blur-slide"
+					className="grid grid-cols-1 gap-8 lg:grid-cols-2"
+					variants={{
+						container: {
+							visible: {
+								transition: {
+									staggerChildren: 0.08,
+									delayChildren: 0.1,
+								},
+							},
+						},
+						item: {
+							hidden: {
+								opacity: 0,
+								y: 30,
+								filter: "blur(8px)"
+							},
+							visible: {
+								opacity: 1,
+								y: 0,
+								filter: "blur(0px)",
+								transition: {
+									duration: 0.5,
+									ease: "easeOut",
+								}
+							},
+						},
+					}}
+				>
 					{apartments.map((apartment) => {
 						const currentIndex = currentImageIndex[apartment.id] || 0
 						const currentImage = apartment.images[currentIndex]
@@ -508,10 +539,28 @@ export function ApartmentGrid({
 						const showThumbnails = apartment.images.length > 3
 
 						return (
-							<Card
+							<motion.div
 								key={apartment.id}
-								className="group cursor-pointer overflow-hidden border-0 bg-white p-0 shadow-sm transition-all duration-300 hover:shadow-xl dark:bg-gray-800"
+								whileHover={{
+									scale: 1.02,
+									transition: { duration: 0.2 }
+								}}
+								whileInView={{
+									opacity: 1,
+									y: 0,
+									filter: "blur(0px)",
+								}}
+								initial={{
+									opacity: 0,
+									y: 20,
+									filter: "blur(4px)",
+								}}
+								viewport={{ once: true, margin: "-50px" }}
+								transition={{ duration: 0.4, ease: "easeOut" }}
 							>
+								<Card
+									className="group h-full cursor-pointer overflow-hidden border-0 bg-white p-0 shadow-sm transition-all duration-300 hover:shadow-xl dark:bg-gray-800"
+								>
 								<div className="relative">
 									<div className="flex">
 										<div className={`${showThumbnails ? "flex-1" : "w-full"} relative`}>
@@ -661,18 +710,24 @@ export function ApartmentGrid({
 										</div>
 									</div>
 								</CardContent>
-							</Card>
+								</Card>
+							</motion.div>
 						)
 					})}
-				</div>
+				</AnimatedGroup>
 			)}
 
 			{canLoadMore && (
-				<div className="flex items-center justify-center pt-8">
+				<motion.div
+					className="flex items-center justify-center pt-8"
+					initial={{ opacity: 0, y: 20 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.4, delay: 0.2 }}
+				>
 					<Button variant="outline" size="lg" onClick={loadMore} className="px-8">
 						Show More
 					</Button>
-				</div>
+				</motion.div>
 			)}
 		</div>
 	)
