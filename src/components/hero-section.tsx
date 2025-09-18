@@ -3,7 +3,6 @@ import { ArrowRight } from "lucide-react"
 import { PropertySearch } from "~/components/property-search"
 import { AnimatedGroup } from "~/components/ui/animated-group"
 import { TextEffect } from "~/components/ui/text-effect"
-import LightRays from "./LightRays"
 
 const transitionVariants = {
 	item: {
