@@ -12,7 +12,6 @@ import { createServerRootRoute } from '@tanstack/react-start/server'
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SearchRouteImport } from './routes/search'
-import { Route as ConvexpostsRouteImport } from './routes/convexposts'
 import { Route as AuthedLayoutRouteImport } from './routes/_authed/layout'
 import { Route as AuthLayoutRouteImport } from './routes/_auth/layout'
 import { Route as IndexRouteImport } from './routes/index'
@@ -28,11 +27,6 @@ const rootServerRouteImport = createServerRootRoute()
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConvexpostsRoute = ConvexpostsRouteImport.update({
-  id: '/convexposts',
-  path: '/convexposts',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthedLayoutRoute = AuthedLayoutRouteImport.update({
@@ -81,7 +75,6 @@ const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/convexposts': typeof ConvexpostsRoute
   '/search': typeof SearchRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/reset-password': typeof AuthResetPasswordRoute
@@ -91,7 +84,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/convexposts': typeof ConvexpostsRoute
   '/search': typeof SearchRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/reset-password': typeof AuthResetPasswordRoute
@@ -104,7 +96,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_auth': typeof AuthLayoutRouteWithChildren
   '/_authed': typeof AuthedLayoutRouteWithChildren
-  '/convexposts': typeof ConvexpostsRoute
   '/search': typeof SearchRoute
   '/_auth/forgot-password': typeof AuthForgotPasswordRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
@@ -116,7 +107,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/convexposts'
     | '/search'
     | '/forgot-password'
     | '/reset-password'
@@ -126,7 +116,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/convexposts'
     | '/search'
     | '/forgot-password'
     | '/reset-password'
@@ -138,7 +127,6 @@ export interface FileRouteTypes {
     | '/'
     | '/_auth'
     | '/_authed'
-    | '/convexposts'
     | '/search'
     | '/_auth/forgot-password'
     | '/_auth/reset-password'
@@ -151,7 +139,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthLayoutRoute: typeof AuthLayoutRouteWithChildren
   AuthedLayoutRoute: typeof AuthedLayoutRouteWithChildren
-  ConvexpostsRoute: typeof ConvexpostsRoute
   SearchRoute: typeof SearchRoute
 }
 export interface FileServerRoutesByFullPath {
@@ -183,13 +170,6 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/convexposts': {
-      id: '/convexposts'
-      path: '/convexposts'
-      fullPath: '/convexposts'
-      preLoaderRoute: typeof ConvexpostsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authed': {
@@ -296,7 +276,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthLayoutRoute: AuthLayoutRouteWithChildren,
   AuthedLayoutRoute: AuthedLayoutRouteWithChildren,
-  ConvexpostsRoute: ConvexpostsRoute,
   SearchRoute: SearchRoute,
 }
 export const routeTree = rootRouteImport

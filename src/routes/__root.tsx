@@ -13,6 +13,7 @@ import { createServerFn } from "@tanstack/react-start"
 import { getCookie, getWebRequest } from "@tanstack/react-start/server"
 import type { ConvexReactClient } from "convex/react"
 import type * as React from "react"
+import { AppHeader } from "~/components/header"
 import { authClient } from "~/lib/auth.client"
 import appCss from "~/styles/app.css?url"
 
@@ -77,6 +78,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<HeadContent />
 			</head>
 			<body className="min-h-screen">
+				<AppHeader />
 				{children}
 				<Scripts />
 			</body>

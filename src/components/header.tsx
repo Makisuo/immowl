@@ -1,9 +1,9 @@
 import { Link } from "@tanstack/react-router"
-import { Menu, X, User, LogOut } from "lucide-react"
+import { LogOut, Menu, User, X } from "lucide-react"
 import React from "react"
 import { Logo } from "~/components/logo"
-import { Button } from "~/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
+import { Button } from "~/components/ui/button"
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -12,8 +12,8 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu"
-import { cn } from "~/lib/utils"
 import { useAuth } from "~/hooks/use-auth"
+import { cn } from "~/lib/utils"
 
 const menuItems = [
 	{ name: "Search", href: "/search" },
@@ -22,7 +22,7 @@ const menuItems = [
 	{ name: "About", href: "#link" },
 ]
 
-export const HeroHeader = () => {
+export const AppHeader = () => {
 	const [menuState, setMenuState] = React.useState(false)
 	const [isScrolled, setIsScrolled] = React.useState(false)
 	const { user, isAuthenticated, signOut } = useAuth()
@@ -53,6 +53,7 @@ export const HeroHeader = () => {
 							<button
 								onClick={() => setMenuState(!menuState)}
 								aria-label={menuState === true ? "Close Menu" : "Open Menu"}
+								type="button"
 								className="-m-2.5 -mr-4 relative z-20 block cursor-pointer p-2.5 lg:hidden"
 							>
 								<Menu className="m-auto size-6 in-data-[state=active]:rotate-180 in-data-[state=active]:scale-0 in-data-[state=active]:opacity-0 duration-200" />
@@ -94,11 +95,22 @@ export const HeroHeader = () => {
 								{isAuthenticated && user ? (
 									<DropdownMenu>
 										<DropdownMenuTrigger asChild>
-											<Button variant="ghost" size="sm" className="relative h-8 w-8 rounded-full">
+											<Button
+												variant="ghost"
+												size="sm"
+												className="relative h-8 w-8 rounded-full"
+											>
 												<Avatar className="h-8 w-8">
-													<AvatarImage src={user.image || undefined} alt={user.name || "User"} />
+													<AvatarImage
+														src={user.image || undefined}
+														alt={user.name || "User"}
+													/>
 													<AvatarFallback>
-														{user.name ? user.name.charAt(0).toUpperCase() : <User className="h-4 w-4" />}
+														{user.name ? (
+															user.name.charAt(0).toUpperCase()
+														) : (
+															<User className="h-4 w-4" />
+														)}
 													</AvatarFallback>
 												</Avatar>
 											</Button>
@@ -106,8 +118,12 @@ export const HeroHeader = () => {
 										<DropdownMenuContent align="end" className="w-56">
 											<DropdownMenuLabel>
 												<div className="flex flex-col space-y-1">
-													<p className="text-sm font-medium leading-none">{user.name || "User"}</p>
-													<p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+													<p className="font-medium text-sm leading-none">
+														{user.name || "User"}
+													</p>
+													<p className="text-muted-foreground text-xs leading-none">
+														{user.email}
+													</p>
 												</div>
 											</DropdownMenuLabel>
 											<DropdownMenuSeparator />
@@ -118,7 +134,10 @@ export const HeroHeader = () => {
 												</Link>
 											</DropdownMenuItem>
 											<DropdownMenuSeparator />
-											<DropdownMenuItem onClick={() => signOut()} className="cursor-pointer">
+											<DropdownMenuItem
+												onClick={() => signOut()}
+												className="cursor-pointer"
+											>
 												<LogOut className="mr-2 h-4 w-4" />
 												<span>Sign out</span>
 											</DropdownMenuItem>
