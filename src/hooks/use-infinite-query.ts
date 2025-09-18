@@ -44,9 +44,11 @@ export function useInfiniteQuery<Query extends PaginatedQueryReference>(
 		}
 	}
 
-	return {
-		loadingFirstPage: paginatedQuery.status === "LoadingFirstPage",
-		query: (snap[queryName]?.queries[queryKey] ??
+	// If currently loading more, return the actual paginated query with LoadingMore status
+	// Otherwise return the cached version
+	const queryResult = paginatedQuery.status === "LoadingMore"
+		? paginatedQuery
+		: (snap[queryName]?.queries[queryKey] ??
 			(snap[queryName]?.lastKey
 				? snap[queryName]?.queries[snap[queryName]?.lastKey as string]
 				: {
@@ -54,6 +56,10 @@ export function useInfiniteQuery<Query extends PaginatedQueryReference>(
 						status: "LoadingFirstPage",
 						isLoading: true,
 						loadMore: (_numItems: number) => {},
-					})) as UsePaginatedQueryReturnType<Query>,
+					}))
+
+	return {
+		loadingFirstPage: paginatedQuery.status === "LoadingFirstPage",
+		query: queryResult as UsePaginatedQueryReturnType<Query>,
 	}
 }

@@ -46,6 +46,7 @@ function RouteComponent() {
 
 	const properties = query.results || []
 	const isLoading = query.status === "LoadingFirstPage"
+	const isLoadingMore = query.status === "LoadingMore"
 	const canLoadMore = query.status === "CanLoadMore"
 
 	return (
@@ -63,6 +64,7 @@ function RouteComponent() {
 				<ApartmentGrid
 					properties={properties}
 					isLoading={isLoading}
+					isLoadingMore={isLoadingMore}
 					sortBy={sortBy}
 					onSortChange={setSortBy}
 					totalCount={totalCount || 0}

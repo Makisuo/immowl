@@ -1,7 +1,7 @@
 "use client"
 
 import type { Id } from "convex/_generated/dataModel"
-import { Bath, Bed, ChevronLeft, ChevronRight, Heart, MapPin, Square } from "lucide-react"
+import { Bath, Bed, ChevronLeft, ChevronRight, Heart, Loader2, MapPin, Square } from "lucide-react"
 import { motion } from "motion/react"
 import { useState } from "react"
 import { AnimatedGroup } from "~/components/ui/animated-group"
@@ -9,6 +9,7 @@ import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent } from "~/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select"
+import { Skeleton } from "~/components/ui/skeleton"
 
 interface Property {
 	_id: Id<"properties">
@@ -34,6 +35,7 @@ interface Property {
 interface ApartmentGridProps {
 	properties: Property[]
 	isLoading?: boolean
+	isLoadingMore?: boolean
 	sortBy: "price-low" | "price-high" | "newest" | "available"
 	onSortChange: (value: "price-low" | "price-high" | "newest" | "available") => void
 	totalCount: number
@@ -409,6 +411,7 @@ const _mockApartments = [
 export function ApartmentGrid({
 	properties,
 	isLoading,
+	isLoadingMore,
 	sortBy,
 	onSortChange,
 	totalCount,
@@ -493,8 +496,35 @@ export function ApartmentGrid({
 			</div>
 
 			{isLoading ? (
-				<div className="flex justify-center py-12">
-					<p className="text-muted-foreground">Loading properties...</p>
+				<div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+					{[...Array(6)].map((_, index) => (
+						<Card key={`skeleton-${index}`} className="overflow-hidden border-0 bg-white shadow-sm dark:bg-gray-800">
+							<div className="relative">
+								<Skeleton className="h-96 w-full rounded-none" />
+							</div>
+							<CardContent className="space-y-3 p-4">
+								<div className="space-y-2">
+									<Skeleton className="h-5 w-3/4" />
+									<Skeleton className="h-4 w-1/2" />
+								</div>
+								<div className="flex items-center gap-4">
+									<Skeleton className="h-4 w-16" />
+									<Skeleton className="h-4 w-16" />
+									<Skeleton className="h-4 w-20" />
+								</div>
+								<div className="space-y-2 pt-1">
+									<div className="flex items-center justify-between">
+										<Skeleton className="h-6 w-24" />
+										<Skeleton className="h-5 w-20 rounded-full" />
+									</div>
+									<div className="flex items-center justify-between">
+										<Skeleton className="h-3 w-24" />
+										<Skeleton className="h-3 w-28" />
+									</div>
+								</div>
+							</CardContent>
+						</Card>
+					))}
 				</div>
 			) : apartments.length === 0 ? (
 				<div className="flex flex-col items-center justify-center py-12">
@@ -724,8 +754,21 @@ export function ApartmentGrid({
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.4, delay: 0.2 }}
 				>
-					<Button variant="outline" size="lg" onClick={loadMore} className="px-8">
-						Show More
+					<Button
+						variant="outline"
+						size="lg"
+						onClick={loadMore}
+						className="px-8"
+						disabled={isLoadingMore}
+					>
+						{isLoadingMore ? (
+							<>
+								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+								Loading...
+							</>
+						) : (
+							"Show More"
+						)}
 					</Button>
 				</motion.div>
 			)}
