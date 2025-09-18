@@ -73,11 +73,11 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
-		<html lang="en" className="dark">
+		<html lang="en" className="bg-background">
 			<head>
 				<HeadContent />
 			</head>
-			<body className="min-h-screen">
+			<body className="min-h-screen bg-background">
 				<AppHeader />
 				<main className="relative pt-24 md:pt-36">{children}</main>
 
