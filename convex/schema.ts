@@ -42,16 +42,6 @@ export default defineSchema({
 		furnished: v.optional(v.boolean()), // Made optional for external imports
 		petFriendly: v.optional(v.boolean()),
 
-		// Building features - all made optional for external imports
-		elevator: v.optional(v.boolean()),
-		laundryInUnit: v.optional(v.boolean()),
-		laundryInBuilding: v.optional(v.boolean()),
-		gym: v.optional(v.boolean()),
-		pool: v.optional(v.boolean()),
-		balcony: v.optional(v.boolean()),
-		airConditioning: v.optional(v.boolean()),
-		heating: v.optional(v.boolean()),
-
 		imageUrls: v.optional(v.array(v.string())), // External image URLs for scraped properties
 
 		// Owner info - made flexible for external sources
@@ -70,5 +60,10 @@ export default defineSchema({
 		// Status
 		status: v.union(v.literal("active"), v.literal("disabled")),
 		isExternal: v.boolean(), // Flag to identify external properties
-	}),
+	})
+		.index("by_status", ["status"])
+		.index("by_city", ["city"])
+		.index("by_property_type", ["propertyType"])
+		.index("by_status_and_city", ["status", "city"])
+		.index("by_status_and_property_type", ["status", "propertyType"]),
 })
