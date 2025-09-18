@@ -6,6 +6,7 @@ import { api } from "convex/_generated/api"
 import { useState } from "react"
 import { ApartmentGrid } from "~/components/apartment-grid"
 import { FilterDropdown } from "~/components/filter-dropdown"
+import { useInfiniteQuery } from "~/hooks/use-infinite-query"
 
 const searchSchema = type({
 	city: "string = 'Berlin'",
@@ -23,33 +24,35 @@ function RouteComponent() {
 	const { city, country, propertyType } = Route.useSearch()
 	const [sortBy, setSortBy] = useState<"price-low" | "price-high" | "newest" | "available">("newest")
 
-	// Query properties with pagination
-	const { data: propertiesData, isLoading } = useQuery(
-		convexQuery(api.properties.listProperties, {
+	// Use infinite query for properties
+	const { query } = useInfiniteQuery(
+		api.properties.listProperties,
+		{
 			city,
 			country,
 			propertyType: propertyType as "apartment",
 			sortBy,
-			paginationOpts: { numItems: 50, cursor: null },
-		}),
+		},
+		{ initialNumItems: 24 },
 	)
 
-	// Query total count for display
 	const { data: totalCount } = useQuery(
 		convexQuery(api.properties.getTotalCount, {
 			city,
 			country,
-			propertyType: propertyType as any,
+			propertyType: propertyType as "apartment",
 		}),
 	)
 
-	const properties = propertiesData?.page || []
+	const properties = query.results || []
+	const isLoading = query.status === "LoadingFirstPage"
+	const canLoadMore = query.status === "CanLoadMore"
 
 	return (
 		<div className="container mx-auto px-4 py-6">
 			<div className="mb-6 flex items-center justify-between">
 				<div className="flex items-center gap-4">
-					<h1 className="font-semibold text-foreground text-xl">Available Properties</h1>
+					<h1 className="font-semibold text-foreground text-xl">Available Properties in {city}</h1>
 					<span className="text-muted-foreground text-sm">
 						{isLoading ? "Loading..." : `${totalCount || 0} results`}
 					</span>
@@ -62,6 +65,9 @@ function RouteComponent() {
 					isLoading={isLoading}
 					sortBy={sortBy}
 					onSortChange={setSortBy}
+					totalCount={totalCount || 0}
+					canLoadMore={canLoadMore}
+					loadMore={() => query.loadMore(24)}
 				/>
 			</main>
 		</div>

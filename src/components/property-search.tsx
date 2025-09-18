@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 
 export function PropertySearch() {
 	const navigate = useNavigate()
-	const [city, setCity] = useState<string>("berlin")
+	const [city, setCity] = useState<string>("Berlin")
 	const [propertyType, setPropertyType] = useState<string>("apartment-rent")
 
 	// Filter states
@@ -26,18 +26,13 @@ export function PropertySearch() {
 			"apartment-rent": "apartment",
 			"apartment-buy": "apartment",
 			"house-rent": "house",
-			"house-buy": "house"
+			"house-buy": "house",
 		}
 
-		const searchParams: any = {
+		const searchParams = {
 			city,
-			country: "germany",
-			propertyType: propertyTypeMap[propertyType] || "apartment"
-		}
-
-		// Add amenities if any are selected
-		if (selectedAmenities.length > 0) {
-			searchParams.amenities = selectedAmenities
+			country: "DE",
+			propertyType: propertyTypeMap[propertyType] || "apartment",
 		}
 
 		// Navigate to search route with parameters
@@ -54,15 +49,18 @@ export function PropertySearch() {
 							<SelectTrigger className="h-16 w-full rounded-md border-0 bg-transparent! px-6 shadow-none outline-none transition-all hover:bg-accent! focus:ring-0 focus:ring-offset-0">
 								<div className="flex items-center gap-3">
 									<div className="h-4 w-6 flex-shrink-0 rounded-sm bg-gradient-to-b from-black via-red-600 to-yellow-400"></div>
-									<SelectValue placeholder="Select city" className="font-medium text-base" />
+									<SelectValue
+										placeholder="Select city"
+										className="font-medium text-base"
+									/>
 								</div>
 							</SelectTrigger>
 							<SelectContent className="z-[100]">
-								<SelectItem value="berlin">Berlin</SelectItem>
-								<SelectItem value="hamburg">Hamburg</SelectItem>
-								<SelectItem value="munich">Munich</SelectItem>
-								<SelectItem value="frankfurt">Frankfurt</SelectItem>
-								<SelectItem value="cologne">Cologne</SelectItem>
+								<SelectItem value="Berlin">Berlin</SelectItem>
+								<SelectItem value="Hamburg">Hamburg</SelectItem>
+								<SelectItem value="Munich">Munich</SelectItem>
+								<SelectItem value="Frankfurt">Frankfurt</SelectItem>
+								<SelectItem value="Cologne">Cologne</SelectItem>
 							</SelectContent>
 						</Select>
 					</div>
@@ -116,11 +114,7 @@ export function PropertySearch() {
 					{/* Search Button */}
 					<div className="flex-shrink-0 px-4">
 						<div key={1} className="rounded-full border bg-foreground/10 p-0.5">
-							<Button
-								size="lg"
-								className="rounded-full px-5 text-base"
-								onClick={handleSearch}
-							>
+							<Button size="lg" className="rounded-full px-5 text-base" onClick={handleSearch}>
 								<span className="text-nowrap">Search</span>
 							</Button>
 						</div>

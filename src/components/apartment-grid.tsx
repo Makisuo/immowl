@@ -34,6 +34,9 @@ interface ApartmentGridProps {
 	isLoading?: boolean
 	sortBy: "price-low" | "price-high" | "newest" | "available"
 	onSortChange: (value: "price-low" | "price-high" | "newest" | "available") => void
+	totalCount: number
+	canLoadMore: boolean
+	loadMore: () => void
 }
 
 // Mock data for fallback when no properties are loaded
@@ -401,11 +404,17 @@ const _mockApartments = [
 	},
 ]
 
-export function ApartmentGrid({ properties, isLoading, sortBy, onSortChange }: ApartmentGridProps) {
+export function ApartmentGrid({
+	properties,
+	isLoading,
+	sortBy,
+	onSortChange,
+	totalCount,
+	canLoadMore,
+	loadMore,
+}: ApartmentGridProps) {
 	const [favorites, setFavorites] = useState<string[]>([])
-	const [currentPage, setCurrentPage] = useState(1)
 	const [currentImageIndex, setCurrentImageIndex] = useState<Record<string, number>>({})
-	const itemsPerPage = 8
 
 	const toggleFavorite = (id: string) => {
 		setFavorites((prev) => (prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id]))
@@ -454,16 +463,6 @@ export function ApartmentGrid({ properties, isLoading, sortBy, onSortChange }: A
 		deposit: property.deposit || property.monthlyRent,
 	}))
 
-	const totalPages = Math.ceil(apartments.length / itemsPerPage)
-	const startIndex = (currentPage - 1) * itemsPerPage
-	const endIndex = startIndex + itemsPerPage
-	const currentApartments = apartments.slice(startIndex, endIndex)
-
-	const goToPage = (page: number) => {
-		setCurrentPage(page)
-		window.scrollTo({ top: 0, behavior: "smooth" })
-	}
-
 	return (
 		<div className="space-y-6">
 			<div className="flex items-center justify-between">
@@ -472,7 +471,7 @@ export function ApartmentGrid({ properties, isLoading, sortBy, onSortChange }: A
 						Properties for Rent
 					</h1>
 					<p className="mt-1 text-muted-foreground">
-						{isLoading ? "Loading..." : `${apartments.length} properties available`}
+						{isLoading ? "Loading..." : `${totalCount} properties available`}
 					</p>
 				</div>
 				<div className="flex items-center gap-3">
@@ -502,7 +501,7 @@ export function ApartmentGrid({ properties, isLoading, sortBy, onSortChange }: A
 				</div>
 			) : (
 				<div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-					{currentApartments.map((apartment) => {
+					{apartments.map((apartment) => {
 						const currentIndex = currentImageIndex[apartment.id] || 0
 						const currentImage = apartment.images[currentIndex]
 						const hasMultipleImages = apartment.images.length > 1
@@ -668,42 +667,10 @@ export function ApartmentGrid({ properties, isLoading, sortBy, onSortChange }: A
 				</div>
 			)}
 
-			{totalPages > 1 && (
-				<div className="flex items-center justify-center gap-2 pt-8">
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={() => goToPage(currentPage - 1)}
-						disabled={currentPage === 1}
-						className="flex items-center gap-1"
-					>
-						<ChevronLeft className="h-4 w-4" />
-						Previous
-					</Button>
-
-					<div className="flex items-center gap-1">
-						{Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-							<Button
-								key={page}
-								variant={currentPage === page ? "default" : "outline"}
-								size="sm"
-								onClick={() => goToPage(page)}
-								className="h-10 w-10"
-							>
-								{page}
-							</Button>
-						))}
-					</div>
-
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={() => goToPage(currentPage + 1)}
-						disabled={currentPage === totalPages}
-						className="flex items-center gap-1"
-					>
-						Next
-						<ChevronRight className="h-4 w-4" />
+			{canLoadMore && (
+				<div className="flex items-center justify-center pt-8">
+					<Button variant="outline" size="lg" onClick={loadMore} className="px-8">
+						Show More
 					</Button>
 				</div>
 			)}
