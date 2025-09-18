@@ -527,7 +527,7 @@ export function ApartmentGrid({
 													<Button
 														variant="ghost"
 														size="icon"
-														className="-translate-y-1/2 absolute top-1/2 left-2 h-8 w-8 rounded-full bg-black/50 text-white opacity-0 transition-opacity hover:bg-black/70 group-hover:opacity-100"
+														className="-translate-y-1/2 absolute top-1/2 left-2 h-8 w-8 rounded-full bg-black/50 text-white opacity-0 transition-opacity hover:bg-black/70 hover:text-white group-hover:opacity-100"
 														onClick={(e) => {
 															e.stopPropagation()
 															navigateImage(
@@ -542,7 +542,7 @@ export function ApartmentGrid({
 													<Button
 														variant="ghost"
 														size="icon"
-														className="-translate-y-1/2 absolute top-1/2 right-2 h-8 w-8 rounded-full bg-black/50 text-white opacity-0 transition-opacity hover:bg-black/70 group-hover:opacity-100"
+														className="-translate-y-1/2 absolute top-1/2 right-2 h-8 w-8 rounded-full bg-black/50 text-white opacity-0 transition-opacity hover:bg-black/70 hover:text-white group-hover:opacity-100"
 														onClick={(e) => {
 															e.stopPropagation()
 															navigateImage(
