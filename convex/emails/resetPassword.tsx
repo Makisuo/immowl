@@ -1,5 +1,4 @@
 import { Heading, Link, Text } from "@react-email/components"
-import React from "react"
 import { BaseEmail, styles } from "./components/BaseEmail"
 
 interface ResetPasswordEmailProps {

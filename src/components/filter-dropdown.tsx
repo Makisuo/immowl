@@ -40,7 +40,6 @@ export function FilterDropdown({
 	buttonVariant = "outline",
 	buttonClassName,
 	contentClassName,
-	compact = false,
 	showBadges = true,
 	align = "end",
 	iconOnly = false,
@@ -165,7 +164,7 @@ export function FilterDropdown({
 						className={cn(
 							"flex items-center gap-2",
 							buttonVariant === "outline" && "border-gray-300 bg-white hover:bg-gray-50",
-							buttonClassName
+							buttonClassName,
 						)}
 					>
 						<Filter className={cn("h-4 w-4", iconOnly && "text-slate-400")} />
@@ -185,7 +184,10 @@ export function FilterDropdown({
 						)}
 					</Button>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent className={cn("w-80 bg-white p-4 dark:bg-gray-800", contentClassName)} align={align}>
+				<DropdownMenuContent
+					className={cn("w-80 bg-white p-4 dark:bg-gray-800", contentClassName)}
+					align={align}
+				>
 					<div className="space-y-6">
 						{/* Header */}
 						<div className="flex items-center justify-between">

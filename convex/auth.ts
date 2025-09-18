@@ -1,9 +1,8 @@
 import { type AuthFunctions, createClient, type GenericCtx } from "@convex-dev/better-auth"
 import { convex } from "@convex-dev/better-auth/plugins"
-import { requireMutationCtx } from "@convex-dev/better-auth/utils"
 import { betterAuth } from "better-auth"
 import { anonymous, emailOTP, twoFactor } from "better-auth/plugins"
-import { asyncMap, withoutSystemFields } from "convex-helpers"
+import { withoutSystemFields } from "convex-helpers"
 import { components, internal } from "./_generated/api"
 import type { DataModel, Id } from "./_generated/dataModel"
 import { type MutationCtx, type QueryCtx, query } from "./_generated/server"
@@ -41,13 +40,7 @@ export const authComponent = createClient<DataModel, typeof betterAuthSchema>(co
 				if (!user) {
 					return
 				}
-				const todos = await ctx.db
-					.query("todos")
-					.withIndex("userId", (q) => q.eq("userId", user._id))
-					.collect()
-				await asyncMap(todos, async (todo) => {
-					await ctx.db.delete(todo._id)
-				})
+
 				await ctx.db.delete(user._id)
 			},
 		},

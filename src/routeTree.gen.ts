@@ -16,6 +16,7 @@ import { Route as AuthedLayoutRouteImport } from './routes/_authed/layout'
 import { Route as AuthLayoutRouteImport } from './routes/_auth/layout'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthedUserRouteImport } from './routes/_authed/user'
+import { Route as AuthedProfileRouteImport } from './routes/_authed/profile'
 import { Route as AuthSignUpRouteImport } from './routes/_auth/sign-up'
 import { Route as AuthSignInRouteImport } from './routes/_auth/sign-in'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
@@ -45,6 +46,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthedUserRoute = AuthedUserRouteImport.update({
   id: '/user',
   path: '/user',
+  getParentRoute: () => AuthedLayoutRoute,
+} as any)
+const AuthedProfileRoute = AuthedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => AuthedLayoutRoute,
 } as any)
 const AuthSignUpRoute = AuthSignUpRouteImport.update({
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof AuthResetPasswordRoute
   '/sign-in': typeof AuthSignInRoute
   '/sign-up': typeof AuthSignUpRoute
+  '/profile': typeof AuthedProfileRoute
   '/user': typeof AuthedUserRoute
 }
 export interface FileRoutesByTo {
@@ -89,6 +96,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof AuthResetPasswordRoute
   '/sign-in': typeof AuthSignInRoute
   '/sign-up': typeof AuthSignUpRoute
+  '/profile': typeof AuthedProfileRoute
   '/user': typeof AuthedUserRoute
 }
 export interface FileRoutesById {
@@ -101,6 +109,7 @@ export interface FileRoutesById {
   '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/_auth/sign-in': typeof AuthSignInRoute
   '/_auth/sign-up': typeof AuthSignUpRoute
+  '/_authed/profile': typeof AuthedProfileRoute
   '/_authed/user': typeof AuthedUserRoute
 }
 export interface FileRouteTypes {
@@ -112,6 +121,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sign-in'
     | '/sign-up'
+    | '/profile'
     | '/user'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sign-in'
     | '/sign-up'
+    | '/profile'
     | '/user'
   id:
     | '__root__'
@@ -132,6 +143,7 @@ export interface FileRouteTypes {
     | '/_auth/reset-password'
     | '/_auth/sign-in'
     | '/_auth/sign-up'
+    | '/_authed/profile'
     | '/_authed/user'
   fileRoutesById: FileRoutesById
 }
@@ -200,6 +212,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedUserRouteImport
       parentRoute: typeof AuthedLayoutRoute
     }
+    '/_authed/profile': {
+      id: '/_authed/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthedProfileRouteImport
+      parentRoute: typeof AuthedLayoutRoute
+    }
     '/_auth/sign-up': {
       id: '/_auth/sign-up'
       path: '/sign-up'
@@ -261,10 +280,12 @@ const AuthLayoutRouteWithChildren = AuthLayoutRoute._addFileChildren(
 )
 
 interface AuthedLayoutRouteChildren {
+  AuthedProfileRoute: typeof AuthedProfileRoute
   AuthedUserRoute: typeof AuthedUserRoute
 }
 
 const AuthedLayoutRouteChildren: AuthedLayoutRouteChildren = {
+  AuthedProfileRoute: AuthedProfileRoute,
   AuthedUserRoute: AuthedUserRoute,
 }
 
