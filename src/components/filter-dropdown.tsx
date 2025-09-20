@@ -67,12 +67,17 @@ export function FilterDropdown({
 	// Use props if provided, otherwise use internal state
 	const [internalPriceRange, setInternalPriceRange] = useState<[number, number]>([0, 5000])
 	const [internalSelectedAmenities, setInternalSelectedAmenities] = useState<string[]>([])
-	const [internalSelectedBedrooms, setInternalSelectedBedrooms] = useState<UISearchFilters["bedrooms"]>("Any")
-	const [internalSelectedBathrooms, setInternalSelectedBathrooms] = useState<UISearchFilters["bathrooms"]>("Any")
-	const [internalSelectedPropertyType, setInternalSelectedPropertyType] = useState<UISearchFilters["propertyType"]>("Any")
+	const [internalSelectedBedrooms, setInternalSelectedBedrooms] =
+		useState<UISearchFilters["bedrooms"]>("Any")
+	const [internalSelectedBathrooms, setInternalSelectedBathrooms] =
+		useState<UISearchFilters["bathrooms"]>("Any")
+	const [internalSelectedPropertyType, setInternalSelectedPropertyType] =
+		useState<UISearchFilters["propertyType"]>("Any")
 	const [internalSelectedLeaseTerm, setInternalSelectedLeaseTerm] = useState<string>("Any")
-	const [internalSelectedPetPolicy, setInternalSelectedPetPolicy] = useState<UISearchFilters["petFriendly"]>("Any")
-	const [internalSelectedFurnished, setInternalSelectedFurnished] = useState<UISearchFilters["furnished"]>("Any")
+	const [internalSelectedPetPolicy, setInternalSelectedPetPolicy] =
+		useState<UISearchFilters["petFriendly"]>("Any")
+	const [internalSelectedFurnished, setInternalSelectedFurnished] =
+		useState<UISearchFilters["furnished"]>("Any")
 
 	// Use props if provided, otherwise use internal state
 	const priceRange = priceRangeProp ?? internalPriceRange
@@ -285,17 +290,19 @@ export function FilterDropdown({
 								Property type
 							</Label>
 							<div className="grid grid-cols-2 gap-2">
-								{(["Any", "Apartment", "House", "Condo", "Townhouse", "Studio"] as const).map((type) => (
-									<Button
-										key={type}
-										variant={selectedPropertyType === type ? "default" : "outline"}
-										size="sm"
-										onClick={() => setSelectedPropertyType(type)}
-										className="h-8 text-xs"
-									>
-										{type}
-									</Button>
-								))}
+								{(["Any", "Apartment", "House", "Condo", "Townhouse", "Studio"] as const).map(
+									(type) => (
+										<Button
+											key={type}
+											variant={selectedPropertyType === type ? "default" : "outline"}
+											size="sm"
+											onClick={() => setSelectedPropertyType(type)}
+											className="h-8 text-xs"
+										>
+											{type}
+										</Button>
+									),
+								)}
 							</div>
 						</div>
 
@@ -316,7 +323,11 @@ export function FilterDropdown({
 											onClick={() => setSelectedPetPolicy(option)}
 											className="h-8 w-full text-xs"
 										>
-											{option === "Yes" ? "Pet Friendly" : option === "No" ? "No Pets" : option}
+											{option === "Yes"
+												? "Pet Friendly"
+												: option === "No"
+													? "No Pets"
+													: option}
 										</Button>
 									))}
 								</div>
@@ -334,7 +345,11 @@ export function FilterDropdown({
 											onClick={() => setSelectedFurnished(option)}
 											className="h-8 w-full text-xs"
 										>
-											{option === "Yes" ? "Furnished" : option === "No" ? "Unfurnished" : option}
+											{option === "Yes"
+												? "Furnished"
+												: option === "No"
+													? "Unfurnished"
+													: option}
 										</Button>
 									))}
 								</div>

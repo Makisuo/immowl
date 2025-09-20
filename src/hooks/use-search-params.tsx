@@ -47,9 +47,8 @@ const DEFAULT_FILTERS: UISearchFilters = {
 // Convert from URL search params to UI filters
 export function searchParamsToUIFilters(searchParams: SearchFilters): UISearchFilters {
 	// Explicitly handle undefined propertyType
-	const propertyType = searchParams.propertyType === undefined
-		? "Any"
-		: propertyTypeToUI(searchParams.propertyType)
+	const propertyType =
+		searchParams.propertyType === undefined ? "Any" : propertyTypeToUI(searchParams.propertyType)
 
 	return {
 		city: searchParams.city,
@@ -126,7 +125,9 @@ function propertyTypeToUI(type?: string): UISearchFilters["propertyType"] {
 	}
 }
 
-function propertyTypeFromUI(type: UISearchFilters["propertyType"]): SearchFilters["propertyType"] | undefined {
+function propertyTypeFromUI(
+	type: UISearchFilters["propertyType"],
+): SearchFilters["propertyType"] | undefined {
 	switch (type) {
 		case "Apartment":
 			return "apartment"
@@ -140,7 +141,7 @@ function propertyTypeFromUI(type: UISearchFilters["propertyType"]): SearchFilter
 			return "studio"
 		case "Any":
 		default:
-			return undefined  // Don't send propertyType when "Any" is selected
+			return undefined // Don't send propertyType when "Any" is selected
 	}
 }
 
@@ -212,7 +213,7 @@ export function useSearchFilters() {
 	const searchParams: SearchFilters = {
 		city: rawSearchParams.city || "Berlin",
 		country: rawSearchParams.country || "DE",
-		propertyType: rawSearchParams.propertyType,  // Keep undefined if not present
+		propertyType: rawSearchParams.propertyType, // Keep undefined if not present
 		sortBy: rawSearchParams.sortBy || "newest",
 		minPrice: rawSearchParams.minPrice,
 		maxPrice: rawSearchParams.maxPrice,
@@ -260,7 +261,7 @@ export function useSearchFilters() {
 			(searchParams.amenities && searchParams.amenities.length > 0) ||
 			searchParams.petFriendly !== undefined ||
 			searchParams.furnished !== undefined ||
-			searchParams.propertyType !== undefined  // Any specified property type is a filter
+			searchParams.propertyType !== undefined // Any specified property type is a filter
 		)
 	}
 
@@ -272,7 +273,7 @@ export function useSearchFilters() {
 		if (searchParams.amenities && searchParams.amenities.length > 0) count++
 		if (searchParams.petFriendly !== undefined) count++
 		if (searchParams.furnished !== undefined) count++
-		if (searchParams.propertyType !== undefined) count++  // Count any specified property type
+		if (searchParams.propertyType !== undefined) count++ // Count any specified property type
 		return count
 	}
 

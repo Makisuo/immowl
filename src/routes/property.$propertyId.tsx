@@ -419,9 +419,7 @@ function PropertyDetails() {
 						>
 							<X className="h-6 w-6" />
 						</Button>
-						<div
-							className="relative flex h-full w-full items-center justify-center p-8"
-						>
+						<div className="relative flex h-full w-full items-center justify-center p-8">
 							<img
 								src={images[currentImageIndex]}
 								alt={`${property.title} - View ${currentImageIndex + 1}`}

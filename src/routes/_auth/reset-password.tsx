@@ -126,7 +126,10 @@ function RouteComponent() {
 								disabled={loading}
 								value={passwords.confirmPassword}
 								onChange={(e) =>
-									setPasswords({ ...passwords, confirmPassword: e.target.value })
+									setPasswords({
+										...passwords,
+										confirmPassword: e.target.value,
+									})
 								}
 								placeholder="Confirm new password"
 								minLength={8}

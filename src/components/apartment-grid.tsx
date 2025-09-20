@@ -1,7 +1,7 @@
 "use client"
 
-import type { Id } from "convex/_generated/dataModel"
 import { Link } from "@tanstack/react-router"
+import type { Id } from "convex/_generated/dataModel"
 import { Bath, Bed, ChevronLeft, ChevronRight, Heart, Loader2, MapPin, Square } from "lucide-react"
 import { motion } from "motion/react"
 import { useState } from "react"
@@ -217,163 +217,169 @@ export function ApartmentGrid({
 								viewport={{ once: true, margin: "-50px" }}
 								transition={{ duration: 0.4, ease: "easeOut" }}
 							>
-								<Link to="/property/$propertyId" params={{ propertyId: apartment.id }} className="block">
+								<Link
+									to="/property/$propertyId"
+									params={{ propertyId: apartment.id }}
+									className="block"
+								>
 									<Card className="group h-full cursor-pointer overflow-hidden border-0 bg-white p-0 shadow-sm transition-all duration-300 hover:shadow-xl dark:bg-gray-800">
 										<div className="relative">
-										<div className="flex">
-											<div
-												className={`${showThumbnails ? "flex-1" : "w-full"} relative`}
-											>
-												<img
-													src={currentImage || "/placeholder.svg"}
-													alt={apartment.title}
-													className="h-96 w-full object-cover transition-transform duration-300"
-												/>
-
-												{/* Navigation arrows for multiple images */}
-												{hasMultipleImages && (
-													<>
-														<Button
-															variant="ghost"
-															size="icon"
-															className="-translate-y-1/2 absolute top-1/2 left-2 h-8 w-8 rounded-full bg-black/50 text-white opacity-0 transition-opacity hover:bg-black/70 hover:text-white group-hover:opacity-100"
-															onClick={(e) => {
-																e.preventDefault()
-																e.stopPropagation()
-																navigateImage(
-																	apartment.id,
-																	"prev",
-																	apartment.images.length,
-																)
-															}}
-														>
-															<ChevronLeft className="h-4 w-4" />
-														</Button>
-														<Button
-															variant="ghost"
-															size="icon"
-															className="-translate-y-1/2 absolute top-1/2 right-2 h-8 w-8 rounded-full bg-black/50 text-white opacity-0 transition-opacity hover:bg-black/70 hover:text-white group-hover:opacity-100"
-															onClick={(e) => {
-																e.preventDefault()
-																e.stopPropagation()
-																navigateImage(
-																	apartment.id,
-																	"next",
-																	apartment.images.length,
-																)
-															}}
-														>
-															<ChevronRight className="h-4 w-4" />
-														</Button>
-													</>
-												)}
-
-												{/* Image counter */}
-												{hasMultipleImages && (
-													<div className="absolute bottom-2 left-2 rounded bg-black/70 px-2 py-1 text-white text-xs">
-														{currentIndex + 1} / {apartment.images.length}
-													</div>
-												)}
-											</div>
-
-											{showThumbnails && (
-												<div className="flex h-96 w-24 flex-col">
-													{apartment.images.slice(1, 4).map((image, index) => (
-														<button
-															type="button"
-															key={index}
-															className={`w-24 flex-1 border-white/20 border-l bg-center bg-cover transition-opacity hover:opacity-80 ${
-																currentIndex === index + 1
-																	? "ring-2 ring-accent"
-																	: ""
-															}`}
-															style={{ backgroundImage: `url(${image})` }}
-															onClick={(e) => {
-																e.preventDefault()
-																e.stopPropagation()
-																setImage(apartment.id, index + 1)
-															}}
-														/>
-													))}
-												</div>
-											)}
-										</div>
-									</div>
-
-									<CardContent className="space-y-3 p-4">
-										<div className="space-y-1">
-											<div className="flex items-start justify-between">
-												<div className="flex-1">
-													<h3 className="text-balance font-medium text-foreground leading-tight dark:text-white">
-														{apartment.title}
-													</h3>
-													<div className="mt-1 flex items-center gap-1 text-gray-800 text-sm dark:text-gray-200">
-														<MapPin className="h-3 w-3" />
-														{apartment.address}, {apartment.city}
-													</div>
-												</div>
-												<Button
-													variant="ghost"
-													size="icon"
-													className="ml-2 flex-shrink-0 rounded-full bg-gray-50 shadow-sm transition-all duration-200 hover:scale-110 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600"
-													onClick={(e) => {
-														e.preventDefault()
-														e.stopPropagation()
-														toggleFavorite(apartment.id)
-													}}
+											<div className="flex">
+												<div
+													className={`${showThumbnails ? "flex-1" : "w-full"} relative`}
 												>
-													<Heart
-														className={`h-4 w-4 ${
-															favorites.includes(apartment.id)
-																? "fill-red-500 text-red-500"
-																: "text-gray-600 dark:text-gray-300"
-														}`}
+													<img
+														src={currentImage || "/placeholder.svg"}
+														alt={apartment.title}
+														className="h-96 w-full object-cover transition-transform duration-300"
 													/>
-												</Button>
+
+													{/* Navigation arrows for multiple images */}
+													{hasMultipleImages && (
+														<>
+															<Button
+																variant="ghost"
+																size="icon"
+																className="-translate-y-1/2 absolute top-1/2 left-2 h-8 w-8 rounded-full bg-black/50 text-white opacity-0 transition-opacity hover:bg-black/70 hover:text-white group-hover:opacity-100"
+																onClick={(e) => {
+																	e.preventDefault()
+																	e.stopPropagation()
+																	navigateImage(
+																		apartment.id,
+																		"prev",
+																		apartment.images.length,
+																	)
+																}}
+															>
+																<ChevronLeft className="h-4 w-4" />
+															</Button>
+															<Button
+																variant="ghost"
+																size="icon"
+																className="-translate-y-1/2 absolute top-1/2 right-2 h-8 w-8 rounded-full bg-black/50 text-white opacity-0 transition-opacity hover:bg-black/70 hover:text-white group-hover:opacity-100"
+																onClick={(e) => {
+																	e.preventDefault()
+																	e.stopPropagation()
+																	navigateImage(
+																		apartment.id,
+																		"next",
+																		apartment.images.length,
+																	)
+																}}
+															>
+																<ChevronRight className="h-4 w-4" />
+															</Button>
+														</>
+													)}
+
+													{/* Image counter */}
+													{hasMultipleImages && (
+														<div className="absolute bottom-2 left-2 rounded bg-black/70 px-2 py-1 text-white text-xs">
+															{currentIndex + 1} / {apartment.images.length}
+														</div>
+													)}
+												</div>
+
+												{showThumbnails && (
+													<div className="flex h-96 w-24 flex-col">
+														{apartment.images.slice(1, 4).map((image, index) => (
+															<button
+																type="button"
+																key={index}
+																className={`w-24 flex-1 border-white/20 border-l bg-center bg-cover transition-opacity hover:opacity-80 ${
+																	currentIndex === index + 1
+																		? "ring-2 ring-accent"
+																		: ""
+																}`}
+																style={{ backgroundImage: `url(${image})` }}
+																onClick={(e) => {
+																	e.preventDefault()
+																	e.stopPropagation()
+																	setImage(apartment.id, index + 1)
+																}}
+															/>
+														))}
+													</div>
+												)}
 											</div>
 										</div>
 
-										<div className="flex items-center gap-4 text-gray-700 text-sm dark:text-gray-300">
-											<div className="flex items-center gap-1">
-												<Bed className="h-4 w-4" />
-												{apartment.bedrooms === 0
-													? "Studio"
-													: `${apartment.bedrooms} bed`}
+										<CardContent className="space-y-3 p-4">
+											<div className="space-y-1">
+												<div className="flex items-start justify-between">
+													<div className="flex-1">
+														<h3 className="text-balance font-medium text-foreground leading-tight dark:text-white">
+															{apartment.title}
+														</h3>
+														<div className="mt-1 flex items-center gap-1 text-gray-800 text-sm dark:text-gray-200">
+															<MapPin className="h-3 w-3" />
+															{apartment.address}, {apartment.city}
+														</div>
+													</div>
+													<Button
+														variant="ghost"
+														size="icon"
+														className="ml-2 flex-shrink-0 rounded-full bg-gray-50 shadow-sm transition-all duration-200 hover:scale-110 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600"
+														onClick={(e) => {
+															e.preventDefault()
+															e.stopPropagation()
+															toggleFavorite(apartment.id)
+														}}
+													>
+														<Heart
+															className={`h-4 w-4 ${
+																favorites.includes(apartment.id)
+																	? "fill-red-500 text-red-500"
+																	: "text-gray-600 dark:text-gray-300"
+															}`}
+														/>
+													</Button>
+												</div>
 											</div>
-											<div className="flex items-center gap-1">
-												<Bath className="h-4 w-4" />
-												{apartment.bathrooms} bath
-											</div>
-											<div className="flex items-center gap-1">
-												<Square className="h-4 w-4" />
-												{apartment.sqft} sqft
-											</div>
-										</div>
 
-										<div className="space-y-2 pt-1">
-											<div className="flex items-center justify-between">
-												<div>
-													<span className="font-semibold text-foreground text-lg dark:text-white">
-														${apartment.price.toLocaleString()}
-													</span>
-													<span className="text-gray-700 text-sm dark:text-gray-300">
-														{" "}
-														/ month
+											<div className="flex items-center gap-4 text-gray-700 text-sm dark:text-gray-300">
+												<div className="flex items-center gap-1">
+													<Bed className="h-4 w-4" />
+													{apartment.bedrooms === 0
+														? "Studio"
+														: `${apartment.bedrooms} bed`}
+												</div>
+												<div className="flex items-center gap-1">
+													<Bath className="h-4 w-4" />
+													{apartment.bathrooms} bath
+												</div>
+												<div className="flex items-center gap-1">
+													<Square className="h-4 w-4" />
+													{apartment.sqft} sqft
+												</div>
+											</div>
+
+											<div className="space-y-2 pt-1">
+												<div className="flex items-center justify-between">
+													<div>
+														<span className="font-semibold text-foreground text-lg dark:text-white">
+															${apartment.price.toLocaleString()}
+														</span>
+														<span className="text-gray-700 text-sm dark:text-gray-300">
+															{" "}
+															/ month
+														</span>
+													</div>
+													<Badge
+														variant="outline"
+														className="border-border text-xs dark:border-gray-600 dark:text-gray-200"
+													>
+														{apartment.available}
+													</Badge>
+												</div>
+												<div className="flex items-center justify-between text-gray-600 text-xs dark:text-gray-400">
+													<span>Lease: {apartment.leaseTerms}</span>
+													<span>
+														Deposit: ${apartment.deposit.toLocaleString()}
 													</span>
 												</div>
-												<Badge
-													variant="outline"
-													className="border-border text-xs dark:border-gray-600 dark:text-gray-200"
-												>
-													{apartment.available}
-												</Badge>
 											</div>
-											<div className="flex items-center justify-between text-gray-600 text-xs dark:text-gray-400">
-												<span>Lease: {apartment.leaseTerms}</span>
-												<span>Deposit: ${apartment.deposit.toLocaleString()}</span>
-											</div>
-										</div>
-									</CardContent>
+										</CardContent>
 									</Card>
 								</Link>
 							</motion.div>
