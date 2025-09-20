@@ -126,25 +126,54 @@ export function ApartmentGrid({
 					{[...Array(6)].map((_, index) => (
 						<Card
 							key={`skeleton-${index}`}
-							className="overflow-hidden border-0 bg-white shadow-sm dark:bg-gray-800"
+							className="group h-full overflow-hidden border-0 bg-white p-0 shadow-sm dark:bg-gray-800"
 						>
 							<div className="relative">
-								<Skeleton className="h-96 w-full rounded-none" />
+								<div className="flex">
+									<div className="relative w-full">
+										<Skeleton className="h-96 w-full rounded-none" />
+										{/* Image counter skeleton */}
+										<div className="absolute bottom-2 left-2">
+											<Skeleton className="h-6 w-12 rounded" />
+										</div>
+									</div>
+								</div>
 							</div>
 							<CardContent className="space-y-3 p-4">
-								<div className="space-y-2">
-									<Skeleton className="h-5 w-3/4" />
-									<Skeleton className="h-4 w-1/2" />
+								<div className="space-y-1">
+									<div className="flex items-start justify-between">
+										<div className="flex-1">
+											<Skeleton className="h-5 w-3/4" />
+											<div className="mt-1 flex items-center gap-1">
+												<Skeleton className="h-3 w-3 rounded-full" />
+												<Skeleton className="h-4 w-1/2" />
+											</div>
+										</div>
+										{/* Heart button skeleton */}
+										<Skeleton className="ml-2 h-9 w-9 flex-shrink-0 rounded-full" />
+									</div>
 								</div>
 								<div className="flex items-center gap-4">
-									<Skeleton className="h-4 w-16" />
-									<Skeleton className="h-4 w-16" />
-									<Skeleton className="h-4 w-20" />
+									<div className="flex items-center gap-1">
+										<Skeleton className="h-4 w-4" />
+										<Skeleton className="h-4 w-12" />
+									</div>
+									<div className="flex items-center gap-1">
+										<Skeleton className="h-4 w-4" />
+										<Skeleton className="h-4 w-12" />
+									</div>
+									<div className="flex items-center gap-1">
+										<Skeleton className="h-4 w-4" />
+										<Skeleton className="h-4 w-16" />
+									</div>
 								</div>
 								<div className="space-y-2 pt-1">
 									<div className="flex items-center justify-between">
-										<Skeleton className="h-6 w-24" />
-										<Skeleton className="h-5 w-20 rounded-full" />
+										<div>
+											<Skeleton className="inline h-6 w-16" />
+											<Skeleton className="ml-1 inline h-4 w-12" />
+										</div>
+										<Skeleton className="h-5 w-24 rounded-full" />
 									</div>
 									<div className="flex items-center justify-between">
 										<Skeleton className="h-3 w-24" />

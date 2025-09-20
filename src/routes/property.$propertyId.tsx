@@ -53,7 +53,7 @@ function PropertyDetails() {
 
 	if (!property) {
 		return (
-			<div className="container mx-auto flex h-[60vh] flex-col items-center justify-center px-4">
+			<div className="container mx-auto flex h-[60vh] flex-col items-center justify-center px-4 py-6">
 				<h1 className="mb-4 font-bold text-3xl">Property Not Found</h1>
 				<p className="mb-8 text-muted-foreground">
 					The property you're looking for doesn't exist or has been removed.
@@ -94,33 +94,34 @@ function PropertyDetails() {
 	const squareFeet = Math.round(property.squareMeters * 10.764)
 
 	return (
-		<div className="min-h-screen bg-background">
-			{/* Header Navigation */}
-			<div className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-				<div className="container mx-auto flex h-16 items-center justify-between px-4">
+		<>
+			{/* Fixed action buttons */}
+			<div className="fixed top-24 right-4 z-[60] flex items-center gap-2 md:top-36 md:right-8">
+				<Button
+					variant="outline"
+					size="icon"
+					onClick={() => setIsFavorite(!isFavorite)}
+					className="bg-background shadow-md transition-colors hover:shadow-lg"
+				>
+					<Heart className={`h-4 w-4 ${isFavorite ? "fill-red-500 text-red-500" : ""}`} />
+				</Button>
+				<Button variant="outline" size="icon" className="bg-background shadow-md hover:shadow-lg">
+					<Share2 className="h-4 w-4" />
+				</Button>
+			</div>
+
+			<div className="container mx-auto px-4 py-6">
+				{/* Header Navigation */}
+				<div className="mb-6">
 					<Link to="/search">
 						<Button variant="ghost" size="sm">
 							<ArrowLeft className="mr-2 h-4 w-4" />
 							Back to Search
 						</Button>
 					</Link>
-					<div className="flex items-center gap-2">
-						<Button
-							variant="outline"
-							size="icon"
-							onClick={() => setIsFavorite(!isFavorite)}
-							className="transition-colors"
-						>
-							<Heart className={`h-4 w-4 ${isFavorite ? "fill-red-500 text-red-500" : ""}`} />
-						</Button>
-						<Button variant="outline" size="icon">
-							<Share2 className="h-4 w-4" />
-						</Button>
-					</div>
 				</div>
-			</div>
 
-			<div className="container mx-auto px-4 py-8">
+				<div>
 				<div className="grid gap-8 lg:grid-cols-3">
 					{/* Left Column - Images & Details */}
 					<div className="lg:col-span-2">
@@ -294,7 +295,7 @@ function PropertyDetails() {
 
 					{/* Right Column - Pricing & Contact */}
 					<div className="lg:col-span-1">
-						<div className="sticky top-24 space-y-6">
+						<div className="sticky top-28 space-y-6">
 							{/* Pricing Card */}
 							<Card>
 								<CardContent className="pt-6">
@@ -406,23 +407,22 @@ function PropertyDetails() {
 				initialIndex={currentImageIndex}
 			/>
 		</div>
+		</>
 	)
 }
 
 function PropertyDetailsSkeleton() {
 	return (
-		<div className="min-h-screen bg-background">
-			<div className="sticky top-0 z-40 border-b bg-background">
-				<div className="container mx-auto flex h-16 items-center justify-between px-4">
-					<Skeleton className="h-9 w-32" />
-					<div className="flex items-center gap-2">
-						<Skeleton className="h-9 w-9" />
-						<Skeleton className="h-9 w-9" />
-					</div>
+		<div className="container mx-auto px-4 py-6">
+			<div className="mb-6 flex items-center justify-between">
+				<Skeleton className="h-9 w-32" />
+				<div className="flex items-center gap-2">
+					<Skeleton className="h-9 w-9" />
+					<Skeleton className="h-9 w-9" />
 				</div>
 			</div>
 
-			<div className="container mx-auto px-4 py-8">
+			<div>
 				<div className="grid gap-8 lg:grid-cols-3">
 					<div className="lg:col-span-2">
 						<Skeleton className="mb-6 aspect-[4/3] rounded-xl" />

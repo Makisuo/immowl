@@ -12,7 +12,7 @@ export function PropertySearch() {
 	const [propertyType, setPropertyType] = useState<string>("apartment-rent")
 
 	// Filter states
-	const [priceRange, setPriceRange] = useState([1000, 3000])
+	const [priceRange, setPriceRange] = useState<[number, number]>([1000, 3000])
 	const [selectedAmenities, setSelectedAmenities] = useState<string[]>([])
 	const [selectedBedrooms, setSelectedBedrooms] = useState<string>("Any")
 	const [selectedBathrooms, setSelectedBathrooms] = useState<string>("Any")
