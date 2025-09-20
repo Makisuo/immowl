@@ -3,16 +3,23 @@ import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { type } from "arktype"
 import { api } from "convex/_generated/api"
-import { useState } from "react"
 import { ApartmentGrid } from "~/components/apartment-grid"
 import { FilterDropdown } from "~/components/filter-dropdown"
 import { useInfiniteQuery } from "~/hooks/use-infinite-query"
+import { useSearchFilters } from "~/hooks/use-search-params"
 
 const searchSchema = type({
 	city: "string = 'Berlin'",
 	country: "string = 'DE'",
-	propertyType: "string = 'apartment'",
-	"ammenities?": "string[]",
+	"propertyType?": "'apartment' | 'house' | 'condo' | 'townhouse' | 'studio'",
+	sortBy: "'price-low' | 'price-high' | 'newest' | 'available' = 'newest'",
+	"minPrice?": "number",
+	"maxPrice?": "number",
+	"bedrooms?": "number",
+	"bathrooms?": "number",
+	"amenities?": "string[]",
+	"petFriendly?": "boolean",
+	"furnished?": "boolean",
 })
 
 export const Route = createFileRoute("/search")({
@@ -21,26 +28,42 @@ export const Route = createFileRoute("/search")({
 })
 
 function RouteComponent() {
-	const { city, country, propertyType } = Route.useSearch()
-	const [sortBy, setSortBy] = useState<"price-low" | "price-high" | "newest" | "available">("newest")
+	const { searchParams, uiFilters, updateFilters } = useSearchFilters()
 
 	// Use infinite query for properties
+	// Note: The API currently only supports basic filters
 	const { query } = useInfiniteQuery(
 		api.properties.listProperties,
 		{
-			city,
-			country,
-			propertyType: propertyType as "apartment",
-			sortBy,
+			city: searchParams.city,
+			country: searchParams.country,
+			propertyType: searchParams.propertyType,
+			sortBy: searchParams.sortBy,
+			// TODO: Add these filters to the backend API
+			// minPrice: searchParams.minPrice,
+			// maxPrice: searchParams.maxPrice,
+			// bedrooms: searchParams.bedrooms,
+			// bathrooms: searchParams.bathrooms,
+			// amenities: searchParams.amenities,
+			// petFriendly: searchParams.petFriendly,
+			// furnished: searchParams.furnished,
 		},
 		{ initialNumItems: 24 },
 	)
 
 	const { data: totalCount } = useQuery(
 		convexQuery(api.properties.getTotalCount, {
-			city,
-			country,
-			propertyType: propertyType as "apartment",
+			city: searchParams.city,
+			country: searchParams.country,
+			propertyType: searchParams.propertyType,
+			// TODO: Add these filters to the backend API
+			// minPrice: searchParams.minPrice,
+			// maxPrice: searchParams.maxPrice,
+			// bedrooms: searchParams.bedrooms,
+			// bathrooms: searchParams.bathrooms,
+			// amenities: searchParams.amenities,
+			// petFriendly: searchParams.petFriendly,
+			// furnished: searchParams.furnished,
 		}),
 	)
 
@@ -53,21 +76,37 @@ function RouteComponent() {
 		<div className="container mx-auto px-4 py-6">
 			<div className="mb-6 flex items-center justify-between">
 				<div className="flex items-center gap-4">
-					<h1 className="font-semibold text-foreground text-xl">Available Properties in {city}</h1>
+					<h1 className="font-semibold text-foreground text-xl">
+						Available Properties in {searchParams.city}
+					</h1>
 					<span className="text-muted-foreground text-sm">
 						{isLoading ? "Loading..." : `${totalCount || 0} results`}
 					</span>
 				</div>
-				<FilterDropdown />
+				<FilterDropdown
+					priceRange={uiFilters.priceRange}
+					setPriceRange={(range) => updateFilters({ priceRange: range })}
+					selectedAmenities={uiFilters.amenities}
+					setSelectedAmenities={(amenities) => updateFilters({ amenities })}
+					selectedBedrooms={uiFilters.bedrooms}
+					setSelectedBedrooms={(bedrooms) => updateFilters({ bedrooms })}
+					selectedBathrooms={uiFilters.bathrooms}
+					setSelectedBathrooms={(bathrooms) => updateFilters({ bathrooms })}
+					selectedPropertyType={uiFilters.propertyType}
+					setSelectedPropertyType={(type) => updateFilters({ propertyType: type })}
+					selectedPetPolicy={uiFilters.petFriendly}
+					setSelectedPetPolicy={(policy) => updateFilters({ petFriendly: policy })}
+					selectedFurnished={uiFilters.furnished}
+					setSelectedFurnished={(furnished) => updateFilters({ furnished })}
+				/>
 			</div>
 			<main className="w-full">
 				<ApartmentGrid
 					properties={properties}
 					isLoading={isLoading}
 					isLoadingMore={isLoadingMore}
-					sortBy={sortBy}
-					onSortChange={setSortBy}
-					totalCount={totalCount || 0}
+					sortBy={searchParams.sortBy}
+					onSortChange={(sortBy) => updateFilters({ sortBy })}
 					canLoadMore={canLoadMore}
 					loadMore={() => query.loadMore(24)}
 				/>

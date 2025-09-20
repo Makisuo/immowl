@@ -9,6 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "~/compon
 import { Label } from "~/components/ui/label"
 import { Separator } from "~/components/ui/separator"
 import { Slider } from "~/components/ui/slider"
+import type { UISearchFilters } from "~/hooks/use-search-params"
 import { cn } from "~/lib/utils"
 
 interface FilterDropdownProps {
@@ -19,21 +20,23 @@ interface FilterDropdownProps {
 	showBadges?: boolean
 	align?: "start" | "center" | "end"
 	iconOnly?: boolean
-	// Optional controlled state props
-	priceRange?: number[]
-	setPriceRange?: (range: number[]) => void
+	// Controlled state props with proper types
+	priceRange?: [number, number]
+	setPriceRange?: (range: [number, number]) => void
 	selectedAmenities?: string[]
 	setSelectedAmenities?: (amenities: string[]) => void
-	selectedBedrooms?: string
-	setSelectedBedrooms?: (bedrooms: string) => void
-	selectedBathrooms?: string
-	setSelectedBathrooms?: (bathrooms: string) => void
-	selectedPropertyType?: string
-	setSelectedPropertyType?: (propertyType: string) => void
+	selectedBedrooms?: UISearchFilters["bedrooms"]
+	setSelectedBedrooms?: (bedrooms: UISearchFilters["bedrooms"]) => void
+	selectedBathrooms?: UISearchFilters["bathrooms"]
+	setSelectedBathrooms?: (bathrooms: UISearchFilters["bathrooms"]) => void
+	selectedPropertyType?: UISearchFilters["propertyType"]
+	setSelectedPropertyType?: (propertyType: UISearchFilters["propertyType"]) => void
+	selectedPetPolicy?: UISearchFilters["petFriendly"]
+	setSelectedPetPolicy?: (petPolicy: UISearchFilters["petFriendly"]) => void
+	selectedFurnished?: UISearchFilters["furnished"]
+	setSelectedFurnished?: (furnished: UISearchFilters["furnished"]) => void
 	selectedLeaseTerm?: string
 	setSelectedLeaseTerm?: (leaseTerm: string) => void
-	selectedPetPolicy?: string
-	setSelectedPetPolicy?: (petPolicy: string) => void
 }
 
 export function FilterDropdown({
@@ -58,15 +61,18 @@ export function FilterDropdown({
 	setSelectedLeaseTerm: setSelectedLeaseTermProp,
 	selectedPetPolicy: selectedPetPolicyProp,
 	setSelectedPetPolicy: setSelectedPetPolicyProp,
+	selectedFurnished: selectedFurnishedProp,
+	setSelectedFurnished: setSelectedFurnishedProp,
 }: FilterDropdownProps) {
 	// Use props if provided, otherwise use internal state
-	const [internalPriceRange, setInternalPriceRange] = useState([1000, 3000])
+	const [internalPriceRange, setInternalPriceRange] = useState<[number, number]>([0, 5000])
 	const [internalSelectedAmenities, setInternalSelectedAmenities] = useState<string[]>([])
-	const [internalSelectedBedrooms, setInternalSelectedBedrooms] = useState<string>("Any")
-	const [internalSelectedBathrooms, setInternalSelectedBathrooms] = useState<string>("Any")
-	const [internalSelectedPropertyType, setInternalSelectedPropertyType] = useState<string>("Any")
+	const [internalSelectedBedrooms, setInternalSelectedBedrooms] = useState<UISearchFilters["bedrooms"]>("Any")
+	const [internalSelectedBathrooms, setInternalSelectedBathrooms] = useState<UISearchFilters["bathrooms"]>("Any")
+	const [internalSelectedPropertyType, setInternalSelectedPropertyType] = useState<UISearchFilters["propertyType"]>("Any")
 	const [internalSelectedLeaseTerm, setInternalSelectedLeaseTerm] = useState<string>("Any")
-	const [internalSelectedPetPolicy, setInternalSelectedPetPolicy] = useState<string>("Any")
+	const [internalSelectedPetPolicy, setInternalSelectedPetPolicy] = useState<UISearchFilters["petFriendly"]>("Any")
+	const [internalSelectedFurnished, setInternalSelectedFurnished] = useState<UISearchFilters["furnished"]>("Any")
 
 	// Use props if provided, otherwise use internal state
 	const priceRange = priceRangeProp ?? internalPriceRange
@@ -83,6 +89,8 @@ export function FilterDropdown({
 	const setSelectedLeaseTerm = setSelectedLeaseTermProp ?? setInternalSelectedLeaseTerm
 	const selectedPetPolicy = selectedPetPolicyProp ?? internalSelectedPetPolicy
 	const setSelectedPetPolicy = setSelectedPetPolicyProp ?? setInternalSelectedPetPolicy
+	const selectedFurnished = selectedFurnishedProp ?? internalSelectedFurnished
+	const setSelectedFurnished = setSelectedFurnishedProp ?? setInternalSelectedFurnished
 
 	const amenities = [
 		"Pet Friendly",
@@ -107,24 +115,27 @@ export function FilterDropdown({
 	}
 
 	const clearFilters = () => {
-		setPriceRange([1000, 3000])
+		setPriceRange([0, 5000])
 		setSelectedAmenities([])
 		setSelectedBedrooms("Any")
 		setSelectedBathrooms("Any")
 		setSelectedPropertyType("Any")
 		setSelectedLeaseTerm("Any")
 		setSelectedPetPolicy("Any")
+		setSelectedFurnished("Any")
 	}
 
 	const getActiveFiltersCount = () => {
 		let count = 0
-		if (priceRange[0] !== 1000 || priceRange[1] !== 3000) count++
+		if (priceRange[0] > 0 || priceRange[1] < 5000) count++
 		if (selectedBedrooms !== "Any") count++
 		if (selectedBathrooms !== "Any") count++
 		if (selectedPropertyType !== "Any") count++
-		if (selectedLeaseTerm !== "Any") count++
 		if (selectedPetPolicy !== "Any") count++
+		if (selectedFurnished !== "Any") count++
 		if (selectedAmenities.length > 0) count++
+		// Note: city and country are not included as they're location filters, not property filters
+		// selectedLeaseTerm is not currently being used in the search
 		return count
 	}
 
@@ -232,7 +243,7 @@ export function FilterDropdown({
 									Bedrooms
 								</Label>
 								<div className="grid grid-cols-2 gap-1">
-									{["Any", "1", "2", "3+"].map((bed) => (
+									{(["Any", "Studio", "1", "2", "3+"] as const).map((bed) => (
 										<Button
 											key={bed}
 											variant={selectedBedrooms === bed ? "default" : "outline"}
@@ -251,7 +262,7 @@ export function FilterDropdown({
 									Bathrooms
 								</Label>
 								<div className="grid grid-cols-2 gap-1">
-									{["Any", "1+", "2+", "3+"].map((bath) => (
+									{(["Any", "1", "2", "3+"] as const).map((bath) => (
 										<Button
 											key={bath}
 											variant={selectedBathrooms === bath ? "default" : "outline"}
@@ -274,7 +285,7 @@ export function FilterDropdown({
 								Property type
 							</Label>
 							<div className="grid grid-cols-2 gap-2">
-								{["Any", "Apartment", "Condo", "Townhouse"].map((type) => (
+								{(["Any", "Apartment", "House", "Condo", "Townhouse", "Studio"] as const).map((type) => (
 									<Button
 										key={type}
 										variant={selectedPropertyType === type ? "default" : "outline"}
@@ -285,6 +296,48 @@ export function FilterDropdown({
 										{type}
 									</Button>
 								))}
+							</div>
+						</div>
+
+						<Separator />
+
+						{/* Pet Policy and Furnished */}
+						<div className="grid grid-cols-2 gap-4">
+							<div className="space-y-2">
+								<Label className="font-medium text-gray-900 text-sm dark:text-white">
+									Pet Policy
+								</Label>
+								<div className="space-y-1">
+									{(["Any", "Yes", "No"] as const).map((option) => (
+										<Button
+											key={option}
+											variant={selectedPetPolicy === option ? "default" : "outline"}
+											size="sm"
+											onClick={() => setSelectedPetPolicy(option)}
+											className="h-8 w-full text-xs"
+										>
+											{option === "Yes" ? "Pet Friendly" : option === "No" ? "No Pets" : option}
+										</Button>
+									))}
+								</div>
+							</div>
+							<div className="space-y-2">
+								<Label className="font-medium text-gray-900 text-sm dark:text-white">
+									Furnished
+								</Label>
+								<div className="space-y-1">
+									{(["Any", "Yes", "No"] as const).map((option) => (
+										<Button
+											key={option}
+											variant={selectedFurnished === option ? "default" : "outline"}
+											size="sm"
+											onClick={() => setSelectedFurnished(option)}
+											className="h-8 w-full text-xs"
+										>
+											{option === "Yes" ? "Furnished" : option === "No" ? "Unfurnished" : option}
+										</Button>
+									))}
+								</div>
 							</div>
 						</div>
 
