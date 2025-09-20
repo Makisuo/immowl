@@ -16,6 +16,7 @@ import type * as React from "react"
 import { AppHeader } from "~/components/header"
 import { authClient } from "~/lib/auth.client"
 import appCss from "~/styles/app.css?url"
+import { Toaster } from "sonner"
 
 const fetchAuth = createServerFn({ method: "GET" }).handler(async () => {
 	const { createAuth } = await import("../../convex/auth")
@@ -80,7 +81,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			<body className="min-h-screen bg-background">
 				<AppHeader />
 				<main className="relative pt-24 md:pt-36">{children}</main>
-
+				<Toaster position="bottom-right" />
 				<Scripts />
 			</body>
 		</html>

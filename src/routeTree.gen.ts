@@ -17,6 +17,7 @@ import { Route as AuthLayoutRouteImport } from './routes/_auth/layout'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PropertyPropertyIdRouteImport } from './routes/property.$propertyId'
 import { Route as AuthedUserRouteImport } from './routes/_authed/user'
+import { Route as AuthedSavedRouteImport } from './routes/_authed/saved'
 import { Route as AuthedProfileRouteImport } from './routes/_authed/profile'
 import { Route as AuthSignUpRouteImport } from './routes/_auth/sign-up'
 import { Route as AuthSignInRouteImport } from './routes/_auth/sign-in'
@@ -52,6 +53,11 @@ const PropertyPropertyIdRoute = PropertyPropertyIdRouteImport.update({
 const AuthedUserRoute = AuthedUserRouteImport.update({
   id: '/user',
   path: '/user',
+  getParentRoute: () => AuthedLayoutRoute,
+} as any)
+const AuthedSavedRoute = AuthedSavedRouteImport.update({
+  id: '/saved',
+  path: '/saved',
   getParentRoute: () => AuthedLayoutRoute,
 } as any)
 const AuthedProfileRoute = AuthedProfileRouteImport.update({
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof AuthSignInRoute
   '/sign-up': typeof AuthSignUpRoute
   '/profile': typeof AuthedProfileRoute
+  '/saved': typeof AuthedSavedRoute
   '/user': typeof AuthedUserRoute
   '/property/$propertyId': typeof PropertyPropertyIdRoute
 }
@@ -104,6 +111,7 @@ export interface FileRoutesByTo {
   '/sign-in': typeof AuthSignInRoute
   '/sign-up': typeof AuthSignUpRoute
   '/profile': typeof AuthedProfileRoute
+  '/saved': typeof AuthedSavedRoute
   '/user': typeof AuthedUserRoute
   '/property/$propertyId': typeof PropertyPropertyIdRoute
 }
@@ -118,6 +126,7 @@ export interface FileRoutesById {
   '/_auth/sign-in': typeof AuthSignInRoute
   '/_auth/sign-up': typeof AuthSignUpRoute
   '/_authed/profile': typeof AuthedProfileRoute
+  '/_authed/saved': typeof AuthedSavedRoute
   '/_authed/user': typeof AuthedUserRoute
   '/property/$propertyId': typeof PropertyPropertyIdRoute
 }
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/profile'
+    | '/saved'
     | '/user'
     | '/property/$propertyId'
   fileRoutesByTo: FileRoutesByTo
@@ -142,6 +152,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/profile'
+    | '/saved'
     | '/user'
     | '/property/$propertyId'
   id:
@@ -155,6 +166,7 @@ export interface FileRouteTypes {
     | '/_auth/sign-in'
     | '/_auth/sign-up'
     | '/_authed/profile'
+    | '/_authed/saved'
     | '/_authed/user'
     | '/property/$propertyId'
   fileRoutesById: FileRoutesById
@@ -232,6 +244,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedUserRouteImport
       parentRoute: typeof AuthedLayoutRoute
     }
+    '/_authed/saved': {
+      id: '/_authed/saved'
+      path: '/saved'
+      fullPath: '/saved'
+      preLoaderRoute: typeof AuthedSavedRouteImport
+      parentRoute: typeof AuthedLayoutRoute
+    }
     '/_authed/profile': {
       id: '/_authed/profile'
       path: '/profile'
@@ -301,11 +320,13 @@ const AuthLayoutRouteWithChildren = AuthLayoutRoute._addFileChildren(
 
 interface AuthedLayoutRouteChildren {
   AuthedProfileRoute: typeof AuthedProfileRoute
+  AuthedSavedRoute: typeof AuthedSavedRoute
   AuthedUserRoute: typeof AuthedUserRoute
 }
 
 const AuthedLayoutRouteChildren: AuthedLayoutRouteChildren = {
   AuthedProfileRoute: AuthedProfileRoute,
+  AuthedSavedRoute: AuthedSavedRoute,
   AuthedUserRoute: AuthedUserRoute,
 }
 

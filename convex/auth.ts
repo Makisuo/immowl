@@ -122,6 +122,7 @@ export const safeGetUser = async (ctx: QueryCtx) => {
 	if (!authUser) {
 		return
 	}
+	console.log(authUser)
 	const user = await ctx.db.get(authUser.userId as Id<"users">)
 	if (!user) {
 		return

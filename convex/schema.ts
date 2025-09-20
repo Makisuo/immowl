@@ -66,4 +66,11 @@ export default defineSchema({
 		.index("by_property_type", ["propertyType"])
 		.index("by_status_and_city", ["status", "city"])
 		.index("by_status_and_property_type", ["status", "propertyType"]),
+
+	savedProperties: defineTable({
+		userId: v.id("users"),
+		propertyId: v.id("properties"),
+	})
+		.index("by_user", ["userId"])
+		.index("by_user_and_property", ["userId", "propertyId"]),
 })

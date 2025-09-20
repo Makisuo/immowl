@@ -22,6 +22,7 @@ import type * as emails_verifyEmail from "../emails/verifyEmail.js";
 import type * as emails_verifyOtp from "../emails/verifyOtp.js";
 import type * as http from "../http.js";
 import type * as properties from "../properties.js";
+import type * as savedProperties from "../savedProperties.js";
 import type * as user from "../user.js";
 
 import type {
@@ -53,6 +54,7 @@ declare const fullApi: ApiFromModules<{
   "emails/verifyOtp": typeof emails_verifyOtp;
   http: typeof http;
   properties: typeof properties;
+  savedProperties: typeof savedProperties;
   user: typeof user;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
