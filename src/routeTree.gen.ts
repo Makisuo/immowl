@@ -15,6 +15,7 @@ import { Route as SearchRouteImport } from './routes/search'
 import { Route as AuthedLayoutRouteImport } from './routes/_authed/layout'
 import { Route as AuthLayoutRouteImport } from './routes/_auth/layout'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PropertyPropertyIdRouteImport } from './routes/property.$propertyId'
 import { Route as AuthedUserRouteImport } from './routes/_authed/user'
 import { Route as AuthedProfileRouteImport } from './routes/_authed/profile'
 import { Route as AuthSignUpRouteImport } from './routes/_auth/sign-up'
@@ -41,6 +42,11 @@ const AuthLayoutRoute = AuthLayoutRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PropertyPropertyIdRoute = PropertyPropertyIdRouteImport.update({
+  id: '/property/$propertyId',
+  path: '/property/$propertyId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthedUserRoute = AuthedUserRouteImport.update({
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/sign-up': typeof AuthSignUpRoute
   '/profile': typeof AuthedProfileRoute
   '/user': typeof AuthedUserRoute
+  '/property/$propertyId': typeof PropertyPropertyIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -98,6 +105,7 @@ export interface FileRoutesByTo {
   '/sign-up': typeof AuthSignUpRoute
   '/profile': typeof AuthedProfileRoute
   '/user': typeof AuthedUserRoute
+  '/property/$propertyId': typeof PropertyPropertyIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -111,6 +119,7 @@ export interface FileRoutesById {
   '/_auth/sign-up': typeof AuthSignUpRoute
   '/_authed/profile': typeof AuthedProfileRoute
   '/_authed/user': typeof AuthedUserRoute
+  '/property/$propertyId': typeof PropertyPropertyIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -123,6 +132,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/profile'
     | '/user'
+    | '/property/$propertyId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -133,6 +143,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/profile'
     | '/user'
+    | '/property/$propertyId'
   id:
     | '__root__'
     | '/'
@@ -145,6 +156,7 @@ export interface FileRouteTypes {
     | '/_auth/sign-up'
     | '/_authed/profile'
     | '/_authed/user'
+    | '/property/$propertyId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -152,6 +164,7 @@ export interface RootRouteChildren {
   AuthLayoutRoute: typeof AuthLayoutRouteWithChildren
   AuthedLayoutRoute: typeof AuthedLayoutRouteWithChildren
   SearchRoute: typeof SearchRoute
+  PropertyPropertyIdRoute: typeof PropertyPropertyIdRoute
 }
 export interface FileServerRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatServerRoute
@@ -203,6 +216,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/property/$propertyId': {
+      id: '/property/$propertyId'
+      path: '/property/$propertyId'
+      fullPath: '/property/$propertyId'
+      preLoaderRoute: typeof PropertyPropertyIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authed/user': {
@@ -298,6 +318,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthLayoutRoute: AuthLayoutRouteWithChildren,
   AuthedLayoutRoute: AuthedLayoutRouteWithChildren,
   SearchRoute: SearchRoute,
+  PropertyPropertyIdRoute: PropertyPropertyIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

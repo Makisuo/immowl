@@ -1,6 +1,7 @@
 "use client"
 
 import type { Id } from "convex/_generated/dataModel"
+import { Link } from "@tanstack/react-router"
 import { Bath, Bed, ChevronLeft, ChevronRight, Heart, Loader2, MapPin, Square } from "lucide-react"
 import { motion } from "motion/react"
 import { useState } from "react"
@@ -216,8 +217,9 @@ export function ApartmentGrid({
 								viewport={{ once: true, margin: "-50px" }}
 								transition={{ duration: 0.4, ease: "easeOut" }}
 							>
-								<Card className="group h-full cursor-pointer overflow-hidden border-0 bg-white p-0 shadow-sm transition-all duration-300 hover:shadow-xl dark:bg-gray-800">
-									<div className="relative">
+								<Link to="/property/$propertyId" params={{ propertyId: apartment.id }} className="block">
+									<Card className="group h-full cursor-pointer overflow-hidden border-0 bg-white p-0 shadow-sm transition-all duration-300 hover:shadow-xl dark:bg-gray-800">
+										<div className="relative">
 										<div className="flex">
 											<div
 												className={`${showThumbnails ? "flex-1" : "w-full"} relative`}
@@ -236,6 +238,7 @@ export function ApartmentGrid({
 															size="icon"
 															className="-translate-y-1/2 absolute top-1/2 left-2 h-8 w-8 rounded-full bg-black/50 text-white opacity-0 transition-opacity hover:bg-black/70 hover:text-white group-hover:opacity-100"
 															onClick={(e) => {
+																e.preventDefault()
 																e.stopPropagation()
 																navigateImage(
 																	apartment.id,
@@ -251,6 +254,7 @@ export function ApartmentGrid({
 															size="icon"
 															className="-translate-y-1/2 absolute top-1/2 right-2 h-8 w-8 rounded-full bg-black/50 text-white opacity-0 transition-opacity hover:bg-black/70 hover:text-white group-hover:opacity-100"
 															onClick={(e) => {
+																e.preventDefault()
 																e.stopPropagation()
 																navigateImage(
 																	apartment.id,
@@ -285,6 +289,7 @@ export function ApartmentGrid({
 															}`}
 															style={{ backgroundImage: `url(${image})` }}
 															onClick={(e) => {
+																e.preventDefault()
 																e.stopPropagation()
 																setImage(apartment.id, index + 1)
 															}}
@@ -312,6 +317,7 @@ export function ApartmentGrid({
 													size="icon"
 													className="ml-2 flex-shrink-0 rounded-full bg-gray-50 shadow-sm transition-all duration-200 hover:scale-110 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600"
 													onClick={(e) => {
+														e.preventDefault()
 														e.stopPropagation()
 														toggleFavorite(apartment.id)
 													}}
@@ -368,7 +374,8 @@ export function ApartmentGrid({
 											</div>
 										</div>
 									</CardContent>
-								</Card>
+									</Card>
+								</Link>
 							</motion.div>
 						)
 					})}

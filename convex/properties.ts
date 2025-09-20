@@ -338,6 +338,21 @@ export const getTotalCount = query({
 	},
 })
 
+export const getPropertyById = query({
+	args: {
+		propertyId: v.id("properties"),
+	},
+	handler: async (ctx, args) => {
+		const property = await ctx.db.get(args.propertyId)
+
+		if (!property || property.status !== "active") {
+			return null
+		}
+
+		return property
+	},
+})
+
 export const createMockListings = mutation({
 	args: {
 		count: v.optional(v.number()),
