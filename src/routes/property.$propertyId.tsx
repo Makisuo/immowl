@@ -22,14 +22,13 @@ import {
 	Phone,
 	Share2,
 	Square,
-	X,
 } from "lucide-react"
-import { AnimatePresence, motion } from "motion/react"
 import { useState } from "react"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent } from "~/components/ui/card"
 import { Separator } from "~/components/ui/separator"
+import { ImageGallery } from "~/components/ImageGallery"
 import { Skeleton } from "~/components/ui/skeleton"
 
 export const Route = createFileRoute("/property/$propertyId")({
@@ -399,62 +398,13 @@ function PropertyDetails() {
 			</div>
 
 			{/* Full Screen Gallery Modal */}
-			<AnimatePresence>
-				{isGalleryOpen && images.length > 0 && (
-					<motion.div
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						exit={{ opacity: 0 }}
-						className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95"
-						onClick={() => setIsGalleryOpen(false)}
-					>
-						<Button
-							variant="ghost"
-							size="icon"
-							className="absolute top-4 right-4 z-[110] text-white hover:bg-white/10"
-							onClick={(e) => {
-								e.stopPropagation()
-								setIsGalleryOpen(false)
-							}}
-						>
-							<X className="h-6 w-6" />
-						</Button>
-						<div className="relative flex h-full w-full items-center justify-center p-8">
-							<img
-								src={images[currentImageIndex]}
-								alt={`${property.title} - View ${currentImageIndex + 1}`}
-								className="max-h-full max-w-full object-contain"
-								onClick={(e) => e.stopPropagation()}
-							/>
-							{hasMultipleImages && (
-								<>
-									<Button
-										variant="ghost"
-										size="icon"
-										className="-translate-y-1/2 absolute top-1/2 left-4 h-12 w-12 rounded-full bg-white/10 text-white hover:bg-white/20"
-										onClick={() => navigateImage("prev")}
-									>
-										<ChevronLeft className="h-6 w-6" />
-									</Button>
-									<Button
-										variant="ghost"
-										size="icon"
-										className="-translate-y-1/2 absolute top-1/2 right-4 h-12 w-12 rounded-full bg-white/10 text-white hover:bg-white/20"
-										onClick={() => navigateImage("next")}
-									>
-										<ChevronRight className="h-6 w-6" />
-									</Button>
-								</>
-							)}
-							<div className="-translate-x-1/2 absolute bottom-4 left-1/2 rounded-full bg-black/50 px-3 py-1">
-								<span className="text-sm text-white">
-									{currentImageIndex + 1} / {images.length}
-								</span>
-							</div>
-						</div>
-					</motion.div>
-				)}
-			</AnimatePresence>
+			<ImageGallery
+				images={images}
+				title={property.title}
+				open={isGalleryOpen}
+				onOpenChange={setIsGalleryOpen}
+				initialIndex={currentImageIndex}
+			/>
 		</div>
 	)
 }
