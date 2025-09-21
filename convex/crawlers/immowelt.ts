@@ -130,7 +130,10 @@ export const scrapeListing = internalAction({
 							type: "object",
 							properties: {
 								title: { type: "string" },
-								description: { type: "string" },
+								description: {
+									type: "string",
+									prompt: "Very brief description of the property (max. 50 words)",
+								},
 								address: { type: "string" },
 								city: { type: "string" },
 								state: { type: "string" },
