@@ -5,7 +5,7 @@ import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { type } from "arktype"
 import { api } from "convex/_generated/api"
-import type { Id } from "convex/_generated/dataModel"
+import type { Doc } from "convex/_generated/dataModel"
 import {
 	AlertCircle,
 	Bath,
@@ -31,7 +31,6 @@ import { Label } from "~/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select"
 import { Skeleton } from "~/components/ui/skeleton"
 import { Slider } from "~/components/ui/slider"
-import { useInfiniteQuery } from "~/hooks/use-infinite-query"
 
 const savedSchema = type({
 	"propertyType?": "'apartment' | 'house' | 'condo' | 'townhouse' | 'studio'",
@@ -46,28 +45,6 @@ export const Route = createFileRoute("/_app/_authed/saved")({
 	validateSearch: savedSchema,
 })
 
-interface Property {
-	_id: Id<"properties">
-	title: string
-	address: string
-	city: string
-	state: string
-	zipCode: string
-	monthlyRent: number
-	rooms: {
-		bedrooms: number
-		bathrooms: number
-	}
-	squareMeters: number
-	imageUrls?: string[]
-	amenities?: string[]
-	availableFrom?: number
-	minimumLease?: number
-	deposit?: number
-	propertyType: "apartment" | "house" | "condo" | "townhouse" | "studio"
-	savedAt: number
-}
-
 function RouteComponent() {
 	const searchParams = Route.useSearch()
 	const navigate = Route.useNavigate()
@@ -78,7 +55,7 @@ function RouteComponent() {
 		searchParams.maxPrice ?? 5000,
 	])
 	const [cityFilter, setCityFilter] = useState(searchParams.city ?? "")
-	const [propertyTypeFilter, setPropertyTypeFilter] = useState<string>(searchParams.propertyType ?? "all")
+	const [propertyTypeFilter, setPropertyTypeFilter] = useState<string | undefined>(searchParams.propertyType)
 	const [sortBy, setSortBy] = useState(searchParams.sortBy)
 
 	// Update URL params when filters change
@@ -92,7 +69,7 @@ function RouteComponent() {
 				maxPrice: newFilters.maxPrice === 5000 ? undefined : newFilters.maxPrice,
 				// Clear other filters if they're empty/default
 				city: newFilters.city === "" ? undefined : newFilters.city,
-				propertyType: newFilters.propertyType === "all" ? undefined : newFilters.propertyType,
+				propertyType: newFilters.propertyType,
 			},
 		})
 	}
@@ -122,7 +99,12 @@ function RouteComponent() {
 
 	const { data: totalCount } = useQuery(convexQuery(api.savedProperties.getSavedCount, {}))
 
-	const properties = (query.data || []) as Property[]
+	type SavedPropertyWithDate = {
+		property: Doc<"properties">
+		savedDate: number
+	}
+
+	const propertiesWithDate = (query.data || []) as SavedPropertyWithDate[]
 	const isLoading = query.isLoading
 	const hasError = false
 
@@ -138,7 +120,7 @@ function RouteComponent() {
 	const clearFilters = () => {
 		setPriceRange([0, 5000])
 		setCityFilter("")
-		setPropertyTypeFilter("all")
+		setPropertyTypeFilter(undefined)
 		updateFilters({
 			minPrice: undefined,
 			maxPrice: undefined,
@@ -173,11 +155,12 @@ function RouteComponent() {
 					<div className="flex items-center gap-2">
 						<Label className="font-medium text-sm">Type:</Label>
 						<Select
-							value={propertyTypeFilter}
+							value={propertyTypeFilter ?? "all"}
 							onValueChange={(value) => {
-								setPropertyTypeFilter(value)
+								const newValue = value === "all" ? undefined : value
+								setPropertyTypeFilter(newValue as any)
 								updateFilters({
-									propertyType: value === "all" ? undefined : (value as any),
+									propertyType: newValue as any,
 								})
 							}}
 						>
@@ -300,7 +283,7 @@ function RouteComponent() {
 							<PropertyCardSkeleton key={`skeleton-${index}`} />
 						))}
 					</div>
-				) : properties.length === 0 ? (
+				) : propertiesWithDate.length === 0 ? (
 					<EmptyState />
 				) : (
 					<AnimatedGroup
@@ -333,8 +316,8 @@ function RouteComponent() {
 							},
 						}}
 					>
-						{properties.map((property) => (
-							<PropertyCard key={property._id} property={property} />
+						{propertiesWithDate.map((item) => (
+							<PropertyCard key={item.property._id} property={item.property} savedDate={item.savedDate} />
 						))}
 					</AnimatedGroup>
 				)}
@@ -343,7 +326,7 @@ function RouteComponent() {
 	)
 }
 
-function PropertyCard({ property }: { property: Property }) {
+function PropertyCard({ property, savedDate }: { property: Doc<"properties">; savedDate: number }) {
 	const [currentImageIndex, setCurrentImageIndex] = useState(0)
 	const [isUnsaving, setIsUnsaving] = useState(false)
 
@@ -380,7 +363,7 @@ function PropertyCard({ property }: { property: Property }) {
 	// Format property data for display
 	const propertyTypeLabel = property.propertyType.charAt(0).toUpperCase() + property.propertyType.slice(1)
 	const sqft = Math.round(property.squareMeters * 10.764)
-	const savedDate = new Date(property.savedAt).toLocaleDateString()
+	const savedDateStr = new Date(savedDate).toLocaleDateString()
 
 	return (
 		<motion.div
@@ -520,7 +503,7 @@ function PropertyCard({ property }: { property: Property }) {
 							</div>
 						</div>
 
-						<div className="text-muted-foreground text-xs">Saved on {savedDate}</div>
+						<div className="text-muted-foreground text-xs">Saved on {savedDateStr}</div>
 					</CardContent>
 				</Card>
 			</Link>

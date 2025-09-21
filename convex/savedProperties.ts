@@ -94,56 +94,56 @@ export const listSavedProperties = query({
 			.order("desc")
 			.collect()
 
-		// Get the actual properties
-		const properties = await Promise.all(
+		// Get the actual properties with their saved dates
+		const propertiesWithSavedDate = await Promise.all(
 			savedRecords.map(async (record) => {
 				const property = await ctx.db.get(record.propertyId)
 				if (!property || property.status !== "active") {
 					return null
 				}
 				return {
-					...property,
-					savedAt: record._creationTime,
+					property,
+					savedDate: record._creationTime,
 				}
 			}),
 		)
 
-		// Filter out nulls and apply filters
-		let filteredProperties = properties.filter((p) => p !== null)
+		// Filter out nulls and extract properties for filtering
+		let filteredResults = propertiesWithSavedDate.filter((p) => p !== null)
 
 		if (args.propertyType) {
-			filteredProperties = filteredProperties.filter((p) => p.propertyType === args.propertyType)
+			filteredResults = filteredResults.filter((p) => p.property.propertyType === args.propertyType)
 		}
 
 		if (args.city) {
-			filteredProperties = filteredProperties.filter((p) => p.city === args.city)
+			filteredResults = filteredResults.filter((p) => p.property.city === args.city)
 		}
 
 		if (args.minPrice !== undefined) {
-			filteredProperties = filteredProperties.filter((p) => p.monthlyRent >= args.minPrice!)
+			filteredResults = filteredResults.filter((p) => p.property.monthlyRent >= args.minPrice!)
 		}
 
 		if (args.maxPrice !== undefined) {
-			filteredProperties = filteredProperties.filter((p) => p.monthlyRent <= args.maxPrice!)
+			filteredResults = filteredResults.filter((p) => p.property.monthlyRent <= args.maxPrice!)
 		}
 
 		// Sort
 		switch (args.sortBy) {
 			case "price-low":
-				filteredProperties.sort((a, b) => a.monthlyRent - b.monthlyRent)
+				filteredResults.sort((a, b) => a.property.monthlyRent - b.property.monthlyRent)
 				break
 			case "price-high":
-				filteredProperties.sort((a, b) => b.monthlyRent - a.monthlyRent)
+				filteredResults.sort((a, b) => b.property.monthlyRent - a.property.monthlyRent)
 				break
 			case "newest":
-				filteredProperties.sort((a, b) => b._creationTime - a._creationTime)
+				filteredResults.sort((a, b) => b.property._creationTime - a.property._creationTime)
 				break
 			default:
 				// Already sorted by saved date (desc) from the query
 				break
 		}
 
-		return filteredProperties
+		return filteredResults
 	},
 })
 
