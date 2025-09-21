@@ -26,8 +26,6 @@ export const PropertyCard = memo(function PropertyCard({
 		[property.propertyType],
 	)
 
-	const sqft = useMemo(() => Math.round(property.squareMeters * 10.764), [property.squareMeters])
-
 	const savedDateStr = useMemo(
 		() => (savedDate ? new Date(savedDate).toLocaleDateString() : undefined),
 		[savedDate],
@@ -216,8 +214,7 @@ export const PropertyCard = memo(function PropertyCard({
 							</div>
 							<div className="flex items-center gap-1">
 								<Square className="h-4 w-4" aria-hidden="true" />
-								<span className="hidden sm:inline">{sqft} sqft</span>
-								<span className="sm:hidden">{sqft}</span>
+								<span className="hidden sm:inline">{property.squareMeters} m²</span>
 							</div>
 						</div>
 

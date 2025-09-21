@@ -349,7 +349,7 @@ export function ApartmentGrid({
 												</div>
 												<div className="flex items-center gap-1">
 													<Square className="h-4 w-4" />
-													{toSqft(property.squareMeters)} sqft
+													{property.squareMeters} m²
 												</div>
 											</div>
 
