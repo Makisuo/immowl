@@ -5,7 +5,7 @@
     - Scrape property details
     - Inital scrape for properties and cron job to sync new properties
 
-- Add Background job to add geo data to properties
+- Add Background job to add geo data to properties (openstreet map api bcs free hehe)
     - nearby stuff
         - nearest playground
         - nearest supermarket

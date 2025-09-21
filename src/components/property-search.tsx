@@ -57,10 +57,7 @@ export function PropertySearch() {
 							</SelectTrigger>
 							<SelectContent className="z-[100]">
 								<SelectItem value="Berlin">Berlin</SelectItem>
-								<SelectItem value="Hamburg">Hamburg</SelectItem>
-								<SelectItem value="Munich">Munich</SelectItem>
-								<SelectItem value="Frankfurt">Frankfurt</SelectItem>
-								<SelectItem value="Cologne">Cologne</SelectItem>
+								<SelectItem value="Potsdam">Potsdam</SelectItem>
 							</SelectContent>
 						</Select>
 					</div>

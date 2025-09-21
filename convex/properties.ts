@@ -20,7 +20,7 @@ import {
 } from "@ngneat/falso"
 import { paginationOptsValidator } from "convex/server"
 import { v } from "convex/values"
-import { mutation, query } from "./_generated/server"
+import { internalMutation, mutation, query } from "./_generated/server"
 import { applySorting, buildPropertyQuery, sortPaginatedResults } from "./propertyUtils"
 import { propertySortByValidator, propertyTypeValidator } from "./validators"
 
@@ -294,6 +294,92 @@ export const createMockListings = mutation({
 			city,
 			country,
 			message: `Created ${count} mock property listings${city ? ` in ${city}` : ""}${country ? ` in country ${country}` : ""}`,
+		}
+	},
+})
+
+export const upsertScrapedProperty = internalMutation({
+	args: {
+		externalId: v.string(),
+		title: v.string(),
+		description: v.string(),
+		address: v.string(),
+		city: v.string(),
+		state: v.string(),
+		zipCode: v.string(),
+		country: v.string(),
+		latitude: v.optional(v.number()),
+		longitude: v.optional(v.number()),
+		propertyType: propertyTypeValidator,
+		bedrooms: v.number(),
+		bathrooms: v.number(),
+		squareMeters: v.number(),
+		monthlyRent: v.number(),
+		deposit: v.optional(v.number()),
+		minimumLease: v.optional(v.number()),
+		availableFrom: v.optional(v.number()),
+		amenities: v.optional(v.array(v.string())),
+		furnished: v.optional(v.boolean()),
+		petFriendly: v.optional(v.boolean()),
+		imageUrls: v.optional(v.array(v.string())),
+		contactEmail: v.optional(v.string()),
+		contactPhone: v.optional(v.string()),
+		externalUrl: v.string(),
+	},
+	handler: async (ctx, args) => {
+		// Check if property already exists
+		const existing = await ctx.db
+			.query("properties")
+			.withIndex("by_external_id_and_source", (q) =>
+				q.eq("externalId", args.externalId).eq("externalSource", "immowelt")
+			)
+			.first()
+
+		const propertyData = {
+			title: args.title,
+			description: args.description,
+			address: args.address,
+			city: args.city,
+			state: args.state,
+			zipCode: args.zipCode,
+			country: args.country,
+			latitude: args.latitude,
+			longitude: args.longitude,
+			propertyType: args.propertyType,
+			rooms: {
+				bedrooms: args.bedrooms,
+				bathrooms: args.bathrooms,
+			},
+			squareMeters: args.squareMeters,
+			monthlyRent: args.monthlyRent,
+			deposit: args.deposit,
+			minimumLease: args.minimumLease,
+			availableFrom: args.availableFrom,
+			amenities: args.amenities,
+			furnished: args.furnished,
+			petFriendly: args.petFriendly,
+			imageUrls: args.imageUrls,
+			contactEmail: args.contactEmail,
+			contactPhone: args.contactPhone,
+			externalId: args.externalId,
+			externalSource: "immowelt" as const,
+			externalUrl: args.externalUrl,
+			lastSyncedAt: Date.now(),
+			status: "active" as const,
+			isExternal: true,
+		}
+
+		if (existing) {
+			// Update existing property
+			await ctx.db.patch(existing._id, {
+				...propertyData,
+				lastSyncedAt: Date.now(),
+			})
+			return { action: "updated", id: existing._id }
+		} else {
+			// Insert new property
+			const id = await ctx.db.insert("properties", propertyData)
+			return { action: "created", id }
 		}
 	},
 })
