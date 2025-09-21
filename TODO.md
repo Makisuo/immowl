@@ -1,0 +1,17 @@
+- Scrape Immowelt
+    - Scrape property details
+    - Inital scrape for properties and cron job to sync new properties
+- Scrape Immoscout
+    - Scrape property details
+    - Inital scrape for properties and cron job to sync new properties
+
+- Add Background job to add geo data to properties
+    - nearby stuff
+        - nearest playground
+        - nearest supermarket
+        - nearest hospital
+        - nearest school
+        - nearest park
+        - nearest restaurant
+        - nearest hotel
+        - nearbye bus stops/train stations

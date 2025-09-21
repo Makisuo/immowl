@@ -1,6 +1,7 @@
 import { v } from "convex/values"
 import { mutation, query } from "./_generated/server"
 import { getUser } from "./auth"
+import { propertyFiltersValidator, propertyTypeValidator, sortByValidator } from "./validators"
 
 export const toggleSaveProperty = mutation({
 	args: {
@@ -61,28 +62,7 @@ export const isSaved = query({
 })
 
 export const listSavedProperties = query({
-	args: {
-		propertyType: v.optional(
-			v.union(
-				v.literal("apartment"),
-				v.literal("house"),
-				v.literal("condo"),
-				v.literal("townhouse"),
-				v.literal("studio"),
-			),
-		),
-		city: v.optional(v.string()),
-		minPrice: v.optional(v.number()),
-		maxPrice: v.optional(v.number()),
-		sortBy: v.optional(
-			v.union(
-				v.literal("date-saved"),
-				v.literal("price-low"),
-				v.literal("price-high"),
-				v.literal("newest"),
-			),
-		),
-	},
+	args: propertyFiltersValidator,
 	handler: async (ctx, args) => {
 		const user = await getUser(ctx)
 

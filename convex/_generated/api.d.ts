@@ -24,6 +24,7 @@ import type * as http from "../http.js";
 import type * as properties from "../properties.js";
 import type * as savedProperties from "../savedProperties.js";
 import type * as user from "../user.js";
+import type * as validators from "../validators.js";
 
 import type {
   ApiFromModules,
@@ -56,6 +57,7 @@ declare const fullApi: ApiFromModules<{
   properties: typeof properties;
   savedProperties: typeof savedProperties;
   user: typeof user;
+  validators: typeof validators;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
 

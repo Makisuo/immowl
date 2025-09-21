@@ -22,6 +22,7 @@ import { type OrderedQuery, paginationOptsValidator, type Query, type QueryIniti
 import { v } from "convex/values"
 import type { DataModel } from "./_generated/dataModel"
 import { mutation, query } from "./_generated/server"
+import { propertyTypeValidator } from "./validators"
 
 const propertyTypes = ["apartment", "house", "condo", "townhouse", "studio"] as const
 
@@ -194,15 +195,7 @@ export const listProperties = query({
 	args: {
 		city: v.optional(v.string()),
 		country: v.optional(v.string()),
-		propertyType: v.optional(
-			v.union(
-				v.literal("apartment"),
-				v.literal("house"),
-				v.literal("condo"),
-				v.literal("townhouse"),
-				v.literal("studio"),
-			),
-		),
+		propertyType: v.optional(propertyTypeValidator),
 		sortBy: v.optional(
 			v.union(
 				v.literal("price-low"),
@@ -290,15 +283,7 @@ export const getTotalCount = query({
 	args: {
 		city: v.optional(v.string()),
 		country: v.optional(v.string()),
-		propertyType: v.optional(
-			v.union(
-				v.literal("apartment"),
-				v.literal("house"),
-				v.literal("condo"),
-				v.literal("townhouse"),
-				v.literal("studio"),
-			),
-		),
+		propertyType: v.optional(propertyTypeValidator),
 	},
 	handler: async (ctx, args) => {
 		// Stage 1: Create the initial table query

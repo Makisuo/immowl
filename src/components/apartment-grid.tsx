@@ -1,7 +1,7 @@
 "use client"
 
 import { Link } from "@tanstack/react-router"
-import type { Id } from "convex/_generated/dataModel"
+import type { Doc } from "convex/_generated/dataModel"
 import { Bath, Bed, ChevronLeft, ChevronRight, Heart, Loader2, MapPin, Square } from "lucide-react"
 import { motion } from "motion/react"
 import { useState } from "react"
@@ -11,30 +11,11 @@ import { Button } from "~/components/ui/button"
 import { Card, CardContent } from "~/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select"
 import { Skeleton } from "~/components/ui/skeleton"
-
-interface Property {
-	_id: Id<"properties">
-	title: string
-	address: string
-	city: string
-	state: string
-	zipCode: string
-	monthlyRent: number
-	rooms: {
-		bedrooms: number
-		bathrooms: number
-	}
-	squareMeters: number
-	imageUrls?: string[]
-	amenities?: string[]
-	availableFrom?: number
-	minimumLease?: number
-	deposit?: number
-	propertyType: "apartment" | "house" | "condo" | "townhouse" | "studio"
-}
+import { formatAvailability, formatBathCount, formatLeaseTerms, formatRoomCount, getDepositAmount, toSqft } from "~/utils/property-helpers"
+import { PROPERTY_TYPE_LABELS } from "~/types/property"
 
 interface ApartmentGridProps {
-	properties: Property[]
+	properties: Doc<"properties">[]
 	isLoading?: boolean
 	isLoadingMore?: boolean
 	sortBy: "price-low" | "price-high" | "newest" | "available"
@@ -59,55 +40,29 @@ export function ApartmentGrid({
 		setFavorites((prev) => (prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id]))
 	}
 
-	const navigateImage = (apartmentId: string, direction: "prev" | "next", totalImages: number) => {
+	const navigateImage = (propertyId: string, direction: "prev" | "next", totalImages: number) => {
 		setCurrentImageIndex((prev) => {
-			const current = prev[apartmentId] || 0
+			const current = prev[propertyId] || 0
 			let newIndex: number
 			if (direction === "next") {
 				newIndex = current === totalImages - 1 ? 0 : current + 1
 			} else {
 				newIndex = current === 0 ? totalImages - 1 : current - 1
 			}
-			return { ...prev, [apartmentId]: newIndex }
+			return { ...prev, [propertyId]: newIndex }
 		})
 	}
 
-	const setImage = (apartmentId: string, index: number) => {
-		setCurrentImageIndex((prev) => ({ ...prev, [apartmentId]: index }))
+	const setImage = (propertyId: string, index: number) => {
+		setCurrentImageIndex((prev) => ({ ...prev, [propertyId]: index }))
 	}
-
-	// Convert properties to display format
-	const apartments = properties.map((property) => ({
-		id: property._id,
-		title: property.title,
-		address: property.address,
-		city: property.city,
-		state: property.state,
-		zipCode: property.zipCode,
-		price: property.monthlyRent,
-		bedrooms: property.rooms.bedrooms,
-		bathrooms: property.rooms.bathrooms,
-		sqft: Math.round(property.squareMeters * 10.764), // Convert square meters to sqft
-		images: property.imageUrls || [],
-		amenities: property.amenities || [],
-		available: property.availableFrom
-			? property.availableFrom <= Date.now()
-				? "Available Now"
-				: new Date(property.availableFrom).toLocaleDateString("en-US", {
-						month: "short",
-						day: "numeric",
-					})
-			: "Available Now",
-		leaseTerms: property.minimumLease ? `${property.minimumLease}+ months` : "Flexible",
-		deposit: property.deposit || property.monthlyRent,
-	}))
 
 	return (
 		<div className="space-y-6">
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-3">
 					<span className="text-muted-foreground text-sm">Sort by:</span>
-					<Select value={sortBy} onValueChange={(value) => onSortChange(value as any)}>
+					<Select value={sortBy} onValueChange={(value) => onSortChange(value as "price-low" | "price-high" | "newest" | "available")}>
 						<SelectTrigger className="w-40 border-border">
 							<SelectValue />
 						</SelectTrigger>
@@ -184,7 +139,7 @@ export function ApartmentGrid({
 						</Card>
 					))}
 				</div>
-			) : apartments.length === 0 ? (
+			) : properties.length === 0 ? (
 				<div className="flex flex-col items-center justify-center py-12">
 					<p className="text-lg text-muted-foreground">No properties found</p>
 					<p className="mt-2 text-muted-foreground text-sm">Try adjusting your search filters</p>
@@ -220,15 +175,15 @@ export function ApartmentGrid({
 						},
 					}}
 				>
-					{apartments.map((apartment) => {
-						const currentIndex = currentImageIndex[apartment.id] || 0
-						const currentImage = apartment.images[currentIndex]
-						const hasMultipleImages = apartment.images.length > 1
-						const showThumbnails = apartment.images.length > 3
+					{properties.map((property) => {
+						const currentIndex = currentImageIndex[property._id] || 0
+						const currentImage = property.imageUrls?.[currentIndex]
+						const hasMultipleImages = (property.imageUrls?.length || 0) > 1
+						const showThumbnails = (property.imageUrls?.length || 0) > 3
 
 						return (
 							<motion.div
-								key={apartment.id}
+								key={property._id}
 								whileHover={{
 									scale: 1.02,
 									transition: { duration: 0.2 },
@@ -248,7 +203,7 @@ export function ApartmentGrid({
 							>
 								<Link
 									to="/property/$propertyId"
-									params={{ propertyId: apartment.id }}
+									params={{ propertyId: property._id }}
 									className="block"
 								>
 									<Card className="group h-full cursor-pointer overflow-hidden border-0 bg-white p-0 shadow-sm transition-all duration-300 hover:shadow-xl dark:bg-gray-800">
@@ -259,7 +214,7 @@ export function ApartmentGrid({
 												>
 													<img
 														src={currentImage || "/placeholder.svg"}
-														alt={apartment.title}
+														alt={property.title}
 														className="h-96 w-full object-cover transition-transform duration-300"
 													/>
 
@@ -274,9 +229,9 @@ export function ApartmentGrid({
 																	e.preventDefault()
 																	e.stopPropagation()
 																	navigateImage(
-																		apartment.id,
+																		property._id,
 																		"prev",
-																		apartment.images.length,
+																		property.imageUrls?.length || 0,
 																	)
 																}}
 															>
@@ -290,9 +245,9 @@ export function ApartmentGrid({
 																	e.preventDefault()
 																	e.stopPropagation()
 																	navigateImage(
-																		apartment.id,
+																		property._id,
 																		"next",
-																		apartment.images.length,
+																		property.imageUrls?.length || 0,
 																	)
 																}}
 															>
@@ -304,14 +259,14 @@ export function ApartmentGrid({
 													{/* Image counter */}
 													{hasMultipleImages && (
 														<div className="absolute bottom-2 left-2 rounded bg-black/70 px-2 py-1 text-white text-xs">
-															{currentIndex + 1} / {apartment.images.length}
+															{currentIndex + 1} / {property.imageUrls?.length || 0}
 														</div>
 													)}
 												</div>
 
 												{showThumbnails && (
 													<div className="flex h-96 w-24 flex-col">
-														{apartment.images.slice(1, 4).map((image, index) => (
+														{property.imageUrls?.slice(1, 4).map((image, index) => (
 															<button
 																type="button"
 																key={index}
@@ -324,7 +279,7 @@ export function ApartmentGrid({
 																onClick={(e) => {
 																	e.preventDefault()
 																	e.stopPropagation()
-																	setImage(apartment.id, index + 1)
+																	setImage(property._id, index + 1)
 																}}
 															/>
 														))}
@@ -338,11 +293,11 @@ export function ApartmentGrid({
 												<div className="flex items-start justify-between">
 													<div className="flex-1">
 														<h3 className="text-balance font-medium text-foreground leading-tight dark:text-white">
-															{apartment.title}
+															{property.title}
 														</h3>
 														<div className="mt-1 flex items-center gap-1 text-gray-800 text-sm dark:text-gray-200">
 															<MapPin className="h-3 w-3" />
-															{apartment.address}, {apartment.city}
+															{property.address}, {property.city}
 														</div>
 													</div>
 													<Button
@@ -352,12 +307,12 @@ export function ApartmentGrid({
 														onClick={(e) => {
 															e.preventDefault()
 															e.stopPropagation()
-															toggleFavorite(apartment.id)
+															toggleFavorite(property._id)
 														}}
 													>
 														<Heart
 															className={`h-4 w-4 ${
-																favorites.includes(apartment.id)
+																favorites.includes(property._id)
 																	? "fill-red-500 text-red-500"
 																	: "text-gray-600 dark:text-gray-300"
 															}`}
@@ -369,17 +324,15 @@ export function ApartmentGrid({
 											<div className="flex items-center gap-4 text-gray-700 text-sm dark:text-gray-300">
 												<div className="flex items-center gap-1">
 													<Bed className="h-4 w-4" />
-													{apartment.bedrooms === 0
-														? "Studio"
-														: `${apartment.bedrooms} bed`}
+													{formatRoomCount(property.rooms.bedrooms)}
 												</div>
 												<div className="flex items-center gap-1">
 													<Bath className="h-4 w-4" />
-													{apartment.bathrooms} bath
+													{formatBathCount(property.rooms.bathrooms)}
 												</div>
 												<div className="flex items-center gap-1">
 													<Square className="h-4 w-4" />
-													{apartment.sqft} sqft
+													{toSqft(property.squareMeters)} sqft
 												</div>
 											</div>
 
@@ -387,7 +340,7 @@ export function ApartmentGrid({
 												<div className="flex items-center justify-between">
 													<div>
 														<span className="font-semibold text-foreground text-lg dark:text-white">
-															${apartment.price.toLocaleString()}
+															${property.monthlyRent.toLocaleString()}
 														</span>
 														<span className="text-gray-700 text-sm dark:text-gray-300">
 															{" "}
@@ -398,13 +351,13 @@ export function ApartmentGrid({
 														variant="outline"
 														className="border-border text-xs dark:border-gray-600 dark:text-gray-200"
 													>
-														{apartment.available}
+														{formatAvailability(property.availableFrom)}
 													</Badge>
 												</div>
 												<div className="flex items-center justify-between text-gray-600 text-xs dark:text-gray-400">
-													<span>Lease: {apartment.leaseTerms}</span>
+													<span>Lease: {formatLeaseTerms(property.minimumLease)}</span>
 													<span>
-														Deposit: ${apartment.deposit.toLocaleString()}
+														Deposit: ${getDepositAmount(property).toLocaleString()}
 													</span>
 												</div>
 											</div>

@@ -1,12 +1,9 @@
 import type { Doc, Id } from "convex/_generated/dataModel"
 
-export type PropertyType = "apartment" | "house" | "condo" | "townhouse" | "studio"
-
+// Derive types directly from the Convex schema
+export type Property = Doc<"properties">
+export type PropertyType = Property["propertyType"]
 export type SortOption = "date-saved" | "price-low" | "price-high" | "newest"
-
-export interface Property extends Doc<"properties"> {
-	// Doc already includes all fields from the properties table
-}
 
 export interface SavedPropertyWithDate {
 	property: Property
@@ -29,25 +26,7 @@ export interface PropertyCardProps {
 	onImageClick?: (index: number) => void
 }
 
-export interface PropertyDisplay {
-	id: Id<"properties">
-	title: string
-	address: string
-	city: string
-	state: string
-	zipCode: string
-	price: number
-	bedrooms: number
-	bathrooms: number
-	sqft: number
-	images: string[]
-	amenities: string[]
-	available: string
-	leaseTerms: string
-	deposit: number
-	propertyTypeLabel: string
-}
-
+// Constants for UI display
 export const PROPERTY_TYPE_LABELS: Record<PropertyType, string> = {
 	apartment: "Apartment",
 	house: "House",
