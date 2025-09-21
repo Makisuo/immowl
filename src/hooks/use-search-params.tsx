@@ -1,5 +1,5 @@
 import { useNavigate } from "@tanstack/react-router"
-import { Route } from "~/routes/search"
+import { Route } from "~/routes/_app/search"
 
 // API-compatible types for the backend
 export interface SearchFilters {
@@ -139,7 +139,6 @@ function propertyTypeFromUI(
 			return "townhouse"
 		case "Studio":
 			return "studio"
-		case "Any":
 		default:
 			return undefined // Don't send propertyType when "Any" is selected
 	}

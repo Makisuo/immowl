@@ -32,7 +32,7 @@ import { Card, CardContent } from "~/components/ui/card"
 import { Separator } from "~/components/ui/separator"
 import { Skeleton } from "~/components/ui/skeleton"
 
-export const Route = createFileRoute("/property/$propertyId")({
+export const Route = createFileRoute("/_app/property/$propertyId")({
 	component: PropertyDetails,
 })
 
@@ -221,7 +221,7 @@ function PropertyDetails() {
 											>
 												<img
 													src={image}
-													alt={`Thumbnail ${index + 1}`}
+													alt={"Thumbnail ${index + 1}"}
 													className="h-20 w-28 object-cover"
 												/>
 											</button>
@@ -389,7 +389,7 @@ function PropertyDetails() {
 											)}
 											{property.contactPhone && (
 												<a
-													href={`tel:${property.contactPhone}`}
+													href={"tel:${property.contactPhone}"}
 													className="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-muted"
 												>
 													<Phone className="h-4 w-4 text-muted-foreground" />

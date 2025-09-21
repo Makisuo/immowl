@@ -13,10 +13,10 @@ import { createServerFn } from "@tanstack/react-start"
 import { getCookie, getWebRequest } from "@tanstack/react-start/server"
 import type { ConvexReactClient } from "convex/react"
 import type * as React from "react"
+import { Toaster } from "sonner"
 import { AppHeader } from "~/components/header"
 import { authClient } from "~/lib/auth.client"
 import appCss from "~/styles/app.css?url"
-import { Toaster } from "sonner"
 
 const fetchAuth = createServerFn({ method: "GET" }).handler(async () => {
 	const { createAuth } = await import("../../convex/auth")
@@ -79,8 +79,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<HeadContent />
 			</head>
 			<body className="min-h-screen bg-background">
-				<AppHeader />
-				<main className="relative pt-24 md:pt-36">{children}</main>
+				{children}
 				<Toaster position="bottom-right" />
 				<Scripts />
 			</body>

@@ -3,7 +3,7 @@ import { useQuery, useSuspenseQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { api } from "convex/_generated/api"
 
-export const Route = createFileRoute("/_authed/user")({
+export const Route = createFileRoute("/_app/_authed/user")({
 	component: RouteComponent,
 })
 

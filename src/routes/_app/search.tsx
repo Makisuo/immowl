@@ -22,7 +22,7 @@ const searchSchema = type({
 	"furnished?": "boolean",
 })
 
-export const Route = createFileRoute("/search")({
+export const Route = createFileRoute("/_app/search")({
 	component: RouteComponent,
 	validateSearch: searchSchema,
 })

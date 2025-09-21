@@ -11,59 +11,35 @@
 import { createServerRootRoute } from '@tanstack/react-start/server'
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SearchRouteImport } from './routes/search'
-import { Route as AuthedLayoutRouteImport } from './routes/_authed/layout'
 import { Route as AuthLayoutRouteImport } from './routes/_auth/layout'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as PropertyPropertyIdRouteImport } from './routes/property.$propertyId'
-import { Route as AuthedUserRouteImport } from './routes/_authed/user'
-import { Route as AuthedSavedRouteImport } from './routes/_authed/saved'
-import { Route as AuthedProfileRouteImport } from './routes/_authed/profile'
+import { Route as AppLayoutRouteImport } from './routes/_app/layout'
+import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AuthSignUpRouteImport } from './routes/_auth/sign-up'
 import { Route as AuthSignInRouteImport } from './routes/_auth/sign-in'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
+import { Route as AppSearchRouteImport } from './routes/_app/search'
+import { Route as AppAuthedLayoutRouteImport } from './routes/_app/_authed/layout'
+import { Route as AppPropertyPropertyIdRouteImport } from './routes/_app/property.$propertyId'
+import { Route as AppAuthedUserRouteImport } from './routes/_app/_authed/user'
+import { Route as AppAuthedSavedRouteImport } from './routes/_app/_authed/saved'
+import { Route as AppAuthedProfileRouteImport } from './routes/_app/_authed/profile'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
 
 const rootServerRouteImport = createServerRootRoute()
 
-const SearchRoute = SearchRouteImport.update({
-  id: '/search',
-  path: '/search',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthedLayoutRoute = AuthedLayoutRouteImport.update({
-  id: '/_authed',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthLayoutRoute = AuthLayoutRouteImport.update({
   id: '/_auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
+const AppLayoutRoute = AppLayoutRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PropertyPropertyIdRoute = PropertyPropertyIdRouteImport.update({
-  id: '/property/$propertyId',
-  path: '/property/$propertyId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthedUserRoute = AuthedUserRouteImport.update({
-  id: '/user',
-  path: '/user',
-  getParentRoute: () => AuthedLayoutRoute,
-} as any)
-const AuthedSavedRoute = AuthedSavedRouteImport.update({
-  id: '/saved',
-  path: '/saved',
-  getParentRoute: () => AuthedLayoutRoute,
-} as any)
-const AuthedProfileRoute = AuthedProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AuthedLayoutRoute,
+  getParentRoute: () => AppLayoutRoute,
 } as any)
 const AuthSignUpRoute = AuthSignUpRouteImport.update({
   id: '/sign-up',
@@ -85,6 +61,35 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => AuthLayoutRoute,
 } as any)
+const AppSearchRoute = AppSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => AppLayoutRoute,
+} as any)
+const AppAuthedLayoutRoute = AppAuthedLayoutRouteImport.update({
+  id: '/_authed',
+  getParentRoute: () => AppLayoutRoute,
+} as any)
+const AppPropertyPropertyIdRoute = AppPropertyPropertyIdRouteImport.update({
+  id: '/property/$propertyId',
+  path: '/property/$propertyId',
+  getParentRoute: () => AppLayoutRoute,
+} as any)
+const AppAuthedUserRoute = AppAuthedUserRouteImport.update({
+  id: '/user',
+  path: '/user',
+  getParentRoute: () => AppAuthedLayoutRoute,
+} as any)
+const AppAuthedSavedRoute = AppAuthedSavedRouteImport.update({
+  id: '/saved',
+  path: '/saved',
+  getParentRoute: () => AppAuthedLayoutRoute,
+} as any)
+const AppAuthedProfileRoute = AppAuthedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppAuthedLayoutRoute,
+} as any)
 const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -92,91 +97,90 @@ const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/search': typeof SearchRoute
+  '/search': typeof AppSearchRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/sign-in': typeof AuthSignInRoute
   '/sign-up': typeof AuthSignUpRoute
-  '/profile': typeof AuthedProfileRoute
-  '/saved': typeof AuthedSavedRoute
-  '/user': typeof AuthedUserRoute
-  '/property/$propertyId': typeof PropertyPropertyIdRoute
+  '/': typeof AppIndexRoute
+  '/profile': typeof AppAuthedProfileRoute
+  '/saved': typeof AppAuthedSavedRoute
+  '/user': typeof AppAuthedUserRoute
+  '/property/$propertyId': typeof AppPropertyPropertyIdRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/search': typeof SearchRoute
+  '/search': typeof AppSearchRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/sign-in': typeof AuthSignInRoute
   '/sign-up': typeof AuthSignUpRoute
-  '/profile': typeof AuthedProfileRoute
-  '/saved': typeof AuthedSavedRoute
-  '/user': typeof AuthedUserRoute
-  '/property/$propertyId': typeof PropertyPropertyIdRoute
+  '/': typeof AppIndexRoute
+  '/profile': typeof AppAuthedProfileRoute
+  '/saved': typeof AppAuthedSavedRoute
+  '/user': typeof AppAuthedUserRoute
+  '/property/$propertyId': typeof AppPropertyPropertyIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_app': typeof AppLayoutRouteWithChildren
   '/_auth': typeof AuthLayoutRouteWithChildren
-  '/_authed': typeof AuthedLayoutRouteWithChildren
-  '/search': typeof SearchRoute
+  '/_app/_authed': typeof AppAuthedLayoutRouteWithChildren
+  '/_app/search': typeof AppSearchRoute
   '/_auth/forgot-password': typeof AuthForgotPasswordRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/_auth/sign-in': typeof AuthSignInRoute
   '/_auth/sign-up': typeof AuthSignUpRoute
-  '/_authed/profile': typeof AuthedProfileRoute
-  '/_authed/saved': typeof AuthedSavedRoute
-  '/_authed/user': typeof AuthedUserRoute
-  '/property/$propertyId': typeof PropertyPropertyIdRoute
+  '/_app/': typeof AppIndexRoute
+  '/_app/_authed/profile': typeof AppAuthedProfileRoute
+  '/_app/_authed/saved': typeof AppAuthedSavedRoute
+  '/_app/_authed/user': typeof AppAuthedUserRoute
+  '/_app/property/$propertyId': typeof AppPropertyPropertyIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
     | '/search'
     | '/forgot-password'
     | '/reset-password'
     | '/sign-in'
     | '/sign-up'
+    | '/'
     | '/profile'
     | '/saved'
     | '/user'
     | '/property/$propertyId'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
     | '/search'
     | '/forgot-password'
     | '/reset-password'
     | '/sign-in'
     | '/sign-up'
+    | '/'
     | '/profile'
     | '/saved'
     | '/user'
     | '/property/$propertyId'
   id:
     | '__root__'
-    | '/'
+    | '/_app'
     | '/_auth'
-    | '/_authed'
-    | '/search'
+    | '/_app/_authed'
+    | '/_app/search'
     | '/_auth/forgot-password'
     | '/_auth/reset-password'
     | '/_auth/sign-in'
     | '/_auth/sign-up'
-    | '/_authed/profile'
-    | '/_authed/saved'
-    | '/_authed/user'
-    | '/property/$propertyId'
+    | '/_app/'
+    | '/_app/_authed/profile'
+    | '/_app/_authed/saved'
+    | '/_app/_authed/user'
+    | '/_app/property/$propertyId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  AppLayoutRoute: typeof AppLayoutRouteWithChildren
   AuthLayoutRoute: typeof AuthLayoutRouteWithChildren
-  AuthedLayoutRoute: typeof AuthedLayoutRouteWithChildren
-  SearchRoute: typeof SearchRoute
-  PropertyPropertyIdRoute: typeof PropertyPropertyIdRoute
 }
 export interface FileServerRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatServerRoute
@@ -202,20 +206,6 @@ export interface RootServerRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/search': {
-      id: '/search'
-      path: '/search'
-      fullPath: '/search'
-      preLoaderRoute: typeof SearchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authed': {
-      id: '/_authed'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof AuthedLayoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_auth': {
       id: '/_auth'
       path: ''
@@ -223,40 +213,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLayoutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AppLayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/': {
+      id: '/_app/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/property/$propertyId': {
-      id: '/property/$propertyId'
-      path: '/property/$propertyId'
-      fullPath: '/property/$propertyId'
-      preLoaderRoute: typeof PropertyPropertyIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authed/user': {
-      id: '/_authed/user'
-      path: '/user'
-      fullPath: '/user'
-      preLoaderRoute: typeof AuthedUserRouteImport
-      parentRoute: typeof AuthedLayoutRoute
-    }
-    '/_authed/saved': {
-      id: '/_authed/saved'
-      path: '/saved'
-      fullPath: '/saved'
-      preLoaderRoute: typeof AuthedSavedRouteImport
-      parentRoute: typeof AuthedLayoutRoute
-    }
-    '/_authed/profile': {
-      id: '/_authed/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof AuthedProfileRouteImport
-      parentRoute: typeof AuthedLayoutRoute
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppLayoutRoute
     }
     '/_auth/sign-up': {
       id: '/_auth/sign-up'
@@ -286,6 +255,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthForgotPasswordRouteImport
       parentRoute: typeof AuthLayoutRoute
     }
+    '/_app/search': {
+      id: '/_app/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof AppSearchRouteImport
+      parentRoute: typeof AppLayoutRoute
+    }
+    '/_app/_authed': {
+      id: '/_app/_authed'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AppAuthedLayoutRouteImport
+      parentRoute: typeof AppLayoutRoute
+    }
+    '/_app/property/$propertyId': {
+      id: '/_app/property/$propertyId'
+      path: '/property/$propertyId'
+      fullPath: '/property/$propertyId'
+      preLoaderRoute: typeof AppPropertyPropertyIdRouteImport
+      parentRoute: typeof AppLayoutRoute
+    }
+    '/_app/_authed/user': {
+      id: '/_app/_authed/user'
+      path: '/user'
+      fullPath: '/user'
+      preLoaderRoute: typeof AppAuthedUserRouteImport
+      parentRoute: typeof AppAuthedLayoutRoute
+    }
+    '/_app/_authed/saved': {
+      id: '/_app/_authed/saved'
+      path: '/saved'
+      fullPath: '/saved'
+      preLoaderRoute: typeof AppAuthedSavedRouteImport
+      parentRoute: typeof AppAuthedLayoutRoute
+    }
+    '/_app/_authed/profile': {
+      id: '/_app/_authed/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AppAuthedProfileRouteImport
+      parentRoute: typeof AppAuthedLayoutRoute
+    }
   }
 }
 declare module '@tanstack/react-start/server' {
@@ -299,6 +310,40 @@ declare module '@tanstack/react-start/server' {
     }
   }
 }
+
+interface AppAuthedLayoutRouteChildren {
+  AppAuthedProfileRoute: typeof AppAuthedProfileRoute
+  AppAuthedSavedRoute: typeof AppAuthedSavedRoute
+  AppAuthedUserRoute: typeof AppAuthedUserRoute
+}
+
+const AppAuthedLayoutRouteChildren: AppAuthedLayoutRouteChildren = {
+  AppAuthedProfileRoute: AppAuthedProfileRoute,
+  AppAuthedSavedRoute: AppAuthedSavedRoute,
+  AppAuthedUserRoute: AppAuthedUserRoute,
+}
+
+const AppAuthedLayoutRouteWithChildren = AppAuthedLayoutRoute._addFileChildren(
+  AppAuthedLayoutRouteChildren,
+)
+
+interface AppLayoutRouteChildren {
+  AppAuthedLayoutRoute: typeof AppAuthedLayoutRouteWithChildren
+  AppSearchRoute: typeof AppSearchRoute
+  AppIndexRoute: typeof AppIndexRoute
+  AppPropertyPropertyIdRoute: typeof AppPropertyPropertyIdRoute
+}
+
+const AppLayoutRouteChildren: AppLayoutRouteChildren = {
+  AppAuthedLayoutRoute: AppAuthedLayoutRouteWithChildren,
+  AppSearchRoute: AppSearchRoute,
+  AppIndexRoute: AppIndexRoute,
+  AppPropertyPropertyIdRoute: AppPropertyPropertyIdRoute,
+}
+
+const AppLayoutRouteWithChildren = AppLayoutRoute._addFileChildren(
+  AppLayoutRouteChildren,
+)
 
 interface AuthLayoutRouteChildren {
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
@@ -318,28 +363,9 @@ const AuthLayoutRouteWithChildren = AuthLayoutRoute._addFileChildren(
   AuthLayoutRouteChildren,
 )
 
-interface AuthedLayoutRouteChildren {
-  AuthedProfileRoute: typeof AuthedProfileRoute
-  AuthedSavedRoute: typeof AuthedSavedRoute
-  AuthedUserRoute: typeof AuthedUserRoute
-}
-
-const AuthedLayoutRouteChildren: AuthedLayoutRouteChildren = {
-  AuthedProfileRoute: AuthedProfileRoute,
-  AuthedSavedRoute: AuthedSavedRoute,
-  AuthedUserRoute: AuthedUserRoute,
-}
-
-const AuthedLayoutRouteWithChildren = AuthedLayoutRoute._addFileChildren(
-  AuthedLayoutRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  AppLayoutRoute: AppLayoutRouteWithChildren,
   AuthLayoutRoute: AuthLayoutRouteWithChildren,
-  AuthedLayoutRoute: AuthedLayoutRouteWithChildren,
-  SearchRoute: SearchRoute,
-  PropertyPropertyIdRoute: PropertyPropertyIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

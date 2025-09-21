@@ -41,7 +41,7 @@ const savedSchema = type({
 	"maxPrice?": "number",
 })
 
-export const Route = createFileRoute("/_authed/saved")({
+export const Route = createFileRoute("/_app/_authed/saved")({
 	component: RouteComponent,
 	validateSearch: savedSchema,
 })
