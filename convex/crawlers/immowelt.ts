@@ -25,8 +25,9 @@ export const crawlImmowelt = action({
 		for (let page = 1; page <= maxPages; page++) {
 			console.log(`Crawling page ${page}...`)
 
-			// Build the search URL (Munich by default, can be parameterized)
-			const searchUrl = `https://www.immowelt.de/classified-search?distributionTypes=Rent&estateTypes=Apartment&locations=AD08DE8638&order=DateDesc&page=${page}`
+			// Build the search URL (Potsdam by default, can be parameterized)
+			// Currently filters out apartmentswaps and WGs
+			const searchUrl = `https://www.immowelt.de/classified-search?distributionTypes=Rent&estateTypes=House,Apartment&locations=AD08DE8638&projectTypes=Stock,New_Build&order=DateDesc&page=${page}`
 
 			try {
 				const res = await firecrawl.scrape(searchUrl, {

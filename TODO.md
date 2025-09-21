@@ -1,9 +1,11 @@
+- Improve Property Schema
 - Scrape Immowelt
     - Scrape property details
     - Inital scrape for properties and cron job to sync new properties
 - Scrape Immoscout
     - Scrape property details
     - Inital scrape for properties and cron job to sync new properties
+    - Filter out apartmentswaps and WG's completely for now
 
 - Add Background job to add geo data to properties (openstreet map api bcs free hehe)
     - nearby stuff
