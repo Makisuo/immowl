@@ -17,4 +17,5 @@
         - nearest restaurant
         - nearest hotel
         - nearbye bus stops/train stations
-        
+
+- Add Payment System (Stripe)

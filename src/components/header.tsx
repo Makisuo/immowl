@@ -13,6 +13,7 @@ import {
 	DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu"
 import { useAuth } from "~/hooks/use-auth"
+import { useSavedSearch } from "~/hooks/use-saved-search"
 import { cn } from "~/lib/utils"
 
 const menuItems = [
@@ -27,6 +28,15 @@ export const AppHeader = () => {
 	const [menuState, setMenuState] = React.useState(false)
 	const [isScrolled, setIsScrolled] = React.useState(false)
 	const { user, isAuthenticated, signOut } = useAuth()
+	const { getSavedSearchParams } = useSavedSearch()
+
+	// Get saved search params for navigation
+	const savedSearchParams = getSavedSearchParams()
+	const searchLinkParams = savedSearchParams || {
+		city: "Berlin",
+		country: "DE",
+		sortBy: "newest" as const,
+	}
 
 	React.useEffect(() => {
 		const handleScroll = () => {
@@ -68,6 +78,7 @@ export const AppHeader = () => {
 									<li key={index}>
 										<Link
 											to={item.href}
+											search={item.href === "/search" ? searchLinkParams : undefined}
 											className="block text-muted-foreground duration-150 hover:text-accent-foreground"
 										>
 											<span>{item.name}</span>
@@ -84,6 +95,7 @@ export const AppHeader = () => {
 										<li key={index}>
 											<Link
 												to={item.href}
+												search={item.href === "/search" ? searchLinkParams : undefined}
 												className="block text-muted-foreground duration-150 hover:text-accent-foreground"
 											>
 												<span>{item.name}</span>

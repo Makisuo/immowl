@@ -6,6 +6,7 @@ import { api } from "convex/_generated/api"
 import { ApartmentGrid } from "~/components/apartment-grid"
 import { FilterDropdown } from "~/components/filter-dropdown"
 import { useInfiniteQuery } from "~/hooks/use-infinite-query"
+import { useSavedSearch } from "~/hooks/use-saved-search"
 import { useSearchFilters } from "~/hooks/use-search-params"
 
 const searchSchema = type({
@@ -29,6 +30,10 @@ export const Route = createFileRoute("/_app/search")({
 
 function RouteComponent() {
 	const { searchParams, uiFilters, updateFilters } = useSearchFilters()
+	const { useAutoSave } = useSavedSearch()
+
+	// Automatically save search params to localStorage when they change
+	useAutoSave(searchParams)
 
 	// Use infinite query for properties
 	// Note: The API currently only supports basic filters

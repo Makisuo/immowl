@@ -33,6 +33,7 @@ import { Button } from "~/components/ui/button"
 import { Card, CardContent } from "~/components/ui/card"
 import { Separator } from "~/components/ui/separator"
 import { Skeleton } from "~/components/ui/skeleton"
+import { useSavedSearch } from "~/hooks/use-saved-search"
 import { getSourceDisplayName } from "~/utils/externalSources"
 
 export const Route = createFileRoute("/_app/property/$propertyId")({
@@ -43,6 +44,15 @@ function PropertyDetails() {
 	const { propertyId } = Route.useParams()
 	const [currentImageIndex, setCurrentImageIndex] = useState(0)
 	const [isGalleryOpen, setIsGalleryOpen] = useState(false)
+	const { getSavedSearchParams } = useSavedSearch()
+
+	// Get saved search params for back navigation
+	const savedSearchParams = getSavedSearchParams()
+	const backToSearchParams = savedSearchParams || {
+		city: "Berlin",
+		country: "DE",
+		sortBy: "newest" as const,
+	}
 
 	const { data: property, isLoading } = useQuery(
 		convexQuery(api.properties.getPropertyById, {
@@ -86,7 +96,7 @@ function PropertyDetails() {
 				<p className="mb-8 text-muted-foreground">
 					The property you're looking for doesn't exist or has been removed.
 				</p>
-				<Link to="/search">
+				<Link to="/search" search={backToSearchParams}>
 					<Button>
 						<ArrowLeft className="mr-2 h-4 w-4" />
 						Back to Search
@@ -142,7 +152,7 @@ function PropertyDetails() {
 			<div className="container mx-auto px-4 py-6">
 				{/* Header Navigation */}
 				<div className="mb-6">
-					<Link to="/search">
+					<Link to="/search" search={backToSearchParams}>
 						<Button variant="ghost" size="sm">
 							<ArrowLeft className="mr-2 h-4 w-4" />
 							Back to Search
