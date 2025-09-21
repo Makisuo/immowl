@@ -18,11 +18,11 @@ import {
 	randUuid,
 	randZipCode,
 } from "@ngneat/falso"
-import { type OrderedQuery, paginationOptsValidator, type Query, type QueryInitializer } from "convex/server"
+import { paginationOptsValidator } from "convex/server"
 import { v } from "convex/values"
-import type { DataModel } from "./_generated/dataModel"
 import { mutation, query } from "./_generated/server"
-import { propertyTypeValidator } from "./validators"
+import { applySorting, buildPropertyQuery, sortPaginatedResults } from "./propertyUtils"
+import { propertySortByValidator, propertyTypeValidator } from "./validators"
 
 const propertyTypes = ["apartment", "house", "condo", "townhouse", "studio"] as const
 
@@ -61,17 +61,6 @@ const amenitiesList = [
 	"Wine Cellar",
 	"Home Office",
 	"Guest Room",
-]
-
-const externalSources = [
-	"immowelt",
-	// "zillow",
-	// "apartments.com",
-	// "trulia",
-	// "realtor.com",
-	// "craigslist",
-	// "padmapper",
-	// "rentberry",
 ]
 
 function generatePropertyData(specificCity?: string, specificCountry?: string) {
@@ -147,7 +136,7 @@ function generatePropertyData(specificCity?: string, specificCountry?: string) {
 
 	// Generate external source data
 	const isExternal = randBoolean()
-	const externalSource = isExternal ? rand(externalSources) : undefined
+	const externalSource = isExternal ? ("immowelt" as const) : undefined
 	const externalId = isExternal ? randUuid() : undefined
 	const externalUrl = isExternal ? `https://${externalSource}.com/listing/${externalId}` : undefined
 
@@ -196,84 +185,25 @@ export const listProperties = query({
 		city: v.optional(v.string()),
 		country: v.optional(v.string()),
 		propertyType: v.optional(propertyTypeValidator),
-		sortBy: v.optional(
-			v.union(
-				v.literal("price-low"),
-				v.literal("price-high"),
-				v.literal("newest"),
-				v.literal("available"),
-			),
-		),
+		sortBy: v.optional(propertySortByValidator),
 		paginationOpts: paginationOptsValidator,
 	},
 	handler: async (ctx, args) => {
-		// Stage 1: Create the initial table query
-		const tableQuery: QueryInitializer<DataModel["properties"]> = ctx.db.query("properties")
+		// Build the filtered query using shared logic
+		const filteredQuery = buildPropertyQuery(ctx, {
+			city: args.city,
+			propertyType: args.propertyType,
+			country: args.country,
+		})
 
-		// Stage 2: Apply index based on filters
-		let indexedQuery: Query<DataModel["properties"]>
+		// Apply sorting
+		const orderedQuery = applySorting(filteredQuery, args.sortBy)
 
-		if (args.city && args.propertyType) {
-			// Use composite index if both filters are present
-			indexedQuery = tableQuery
-				.withIndex("by_status_and_city", (q) => q.eq("status", "active").eq("city", args.city!))
-				.filter((q) => q.eq(q.field("propertyType"), args.propertyType))
-		} else if (args.city) {
-			// Use city index
-			indexedQuery = tableQuery.withIndex("by_status_and_city", (q) =>
-				q.eq("status", "active").eq("city", args.city!),
-			)
-		} else if (args.propertyType) {
-			// Use property type index
-			indexedQuery = tableQuery.withIndex("by_status_and_property_type", (q) =>
-				q.eq("status", "active").eq("propertyType", args.propertyType!),
-			)
-		} else {
-			// Use status index for general queries
-			indexedQuery = tableQuery.withIndex("by_status", (q) => q.eq("status", "active"))
-		}
-
-		// Stage 3: Apply country filter if provided (no index for country)
-		let filteredQuery = indexedQuery
-		if (args.country) {
-			filteredQuery = indexedQuery.filter((q) => q.eq(q.field("country"), args.country))
-		}
-
-		// Stage 4: Apply sorting and additional filters
-		let orderedQuery: OrderedQuery<DataModel["properties"]>
-
-		switch (args.sortBy) {
-			case "price-high":
-			case "price-low":
-			case "newest":
-				orderedQuery = filteredQuery.order("desc")
-				break
-			case "available": {
-				// Filter for properties available now or soon
-				const now = Date.now()
-				const oneMonthFromNow = now + 30 * 24 * 60 * 60 * 1000
-				const availableFiltered = filteredQuery.filter((q) =>
-					q.or(q.not(q.field("availableFrom")), q.lte(q.field("availableFrom"), oneMonthFromNow)),
-				)
-				orderedQuery = availableFiltered.order("asc")
-				break
-			}
-			default:
-				orderedQuery = filteredQuery.order("desc")
-		}
-
+		// Paginate results
 		const result = await orderedQuery.paginate(args.paginationOpts)
 
-		// If sorting by price, sort the page results client-side
-		if (args.sortBy === "price-low" || args.sortBy === "price-high") {
-			result.page.sort((a, b) => {
-				if (args.sortBy === "price-low") {
-					return a.monthlyRent - b.monthlyRent
-				} else {
-					return b.monthlyRent - a.monthlyRent
-				}
-			})
-		}
+		// Apply client-side sorting for price-based sorts
+		sortPaginatedResults(result.page, args.sortBy)
 
 		return result
 	},
@@ -286,37 +216,12 @@ export const getTotalCount = query({
 		propertyType: v.optional(propertyTypeValidator),
 	},
 	handler: async (ctx, args) => {
-		// Stage 1: Create the initial table query
-		const tableQuery: QueryInitializer<DataModel["properties"]> = ctx.db.query("properties")
-
-		// Stage 2: Apply index based on filters (same logic as listProperties)
-		let indexedQuery: Query<DataModel["properties"]>
-
-		if (args.city && args.propertyType) {
-			// Use composite index if both filters are present
-			indexedQuery = tableQuery
-				.withIndex("by_status_and_city", (q) => q.eq("status", "active").eq("city", args.city!))
-				.filter((q) => q.eq(q.field("propertyType"), args.propertyType))
-		} else if (args.city) {
-			// Use city index
-			indexedQuery = tableQuery.withIndex("by_status_and_city", (q) =>
-				q.eq("status", "active").eq("city", args.city!),
-			)
-		} else if (args.propertyType) {
-			// Use property type index
-			indexedQuery = tableQuery.withIndex("by_status_and_property_type", (q) =>
-				q.eq("status", "active").eq("propertyType", args.propertyType!),
-			)
-		} else {
-			// Use status index for general queries
-			indexedQuery = tableQuery.withIndex("by_status", (q) => q.eq("status", "active"))
-		}
-
-		// Stage 3: Apply country filter if provided (no index for country)
-		let filteredQuery = indexedQuery
-		if (args.country) {
-			filteredQuery = indexedQuery.filter((q) => q.eq(q.field("country"), args.country))
-		}
+		// Build the filtered query using shared logic
+		const filteredQuery = buildPropertyQuery(ctx, {
+			city: args.city,
+			propertyType: args.propertyType,
+			country: args.country,
+		})
 
 		const properties = await filteredQuery.collect()
 		return properties.length

@@ -11,8 +11,15 @@ import { Button } from "~/components/ui/button"
 import { Card, CardContent } from "~/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select"
 import { Skeleton } from "~/components/ui/skeleton"
-import { formatAvailability, formatBathCount, formatLeaseTerms, formatRoomCount, getDepositAmount, toSqft } from "~/utils/property-helpers"
 import { PROPERTY_TYPE_LABELS } from "~/types/property"
+import {
+	formatAvailability,
+	formatBathCount,
+	formatLeaseTerms,
+	formatRoomCount,
+	getDepositAmount,
+	toSqft,
+} from "~/utils/property-helpers"
 
 interface ApartmentGridProps {
 	properties: Doc<"properties">[]
@@ -62,7 +69,12 @@ export function ApartmentGrid({
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-3">
 					<span className="text-muted-foreground text-sm">Sort by:</span>
-					<Select value={sortBy} onValueChange={(value) => onSortChange(value as "price-low" | "price-high" | "newest" | "available")}>
+					<Select
+						value={sortBy}
+						onValueChange={(value) =>
+							onSortChange(value as "price-low" | "price-high" | "newest" | "available")
+						}
+					>
 						<SelectTrigger className="w-40 border-border">
 							<SelectValue />
 						</SelectTrigger>
@@ -259,30 +271,35 @@ export function ApartmentGrid({
 													{/* Image counter */}
 													{hasMultipleImages && (
 														<div className="absolute bottom-2 left-2 rounded bg-black/70 px-2 py-1 text-white text-xs">
-															{currentIndex + 1} / {property.imageUrls?.length || 0}
+															{currentIndex + 1} /{" "}
+															{property.imageUrls?.length || 0}
 														</div>
 													)}
 												</div>
 
 												{showThumbnails && (
 													<div className="flex h-96 w-24 flex-col">
-														{property.imageUrls?.slice(1, 4).map((image, index) => (
-															<button
-																type="button"
-																key={index}
-																className={`w-24 flex-1 border-white/20 border-l bg-center bg-cover transition-opacity hover:opacity-80 ${
-																	currentIndex === index + 1
-																		? "ring-2 ring-accent"
-																		: ""
-																}`}
-																style={{ backgroundImage: `url(${image})` }}
-																onClick={(e) => {
-																	e.preventDefault()
-																	e.stopPropagation()
-																	setImage(property._id, index + 1)
-																}}
-															/>
-														))}
+														{property.imageUrls
+															?.slice(1, 4)
+															.map((image, index) => (
+																<button
+																	type="button"
+																	key={index}
+																	className={`w-24 flex-1 border-white/20 border-l bg-center bg-cover transition-opacity hover:opacity-80 ${
+																		currentIndex === index + 1
+																			? "ring-2 ring-accent"
+																			: ""
+																	}`}
+																	style={{
+																		backgroundImage: `url(${image})`,
+																	}}
+																	onClick={(e) => {
+																		e.preventDefault()
+																		e.stopPropagation()
+																		setImage(property._id, index + 1)
+																	}}
+																/>
+															))}
 													</div>
 												)}
 											</div>
@@ -355,9 +372,12 @@ export function ApartmentGrid({
 													</Badge>
 												</div>
 												<div className="flex items-center justify-between text-gray-600 text-xs dark:text-gray-400">
-													<span>Lease: {formatLeaseTerms(property.minimumLease)}</span>
 													<span>
-														Deposit: ${getDepositAmount(property).toLocaleString()}
+														Lease: {formatLeaseTerms(property.minimumLease)}
+													</span>
+													<span>
+														Deposit: $
+														{getDepositAmount(property).toLocaleString()}
 													</span>
 												</div>
 											</div>

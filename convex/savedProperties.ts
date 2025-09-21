@@ -1,7 +1,8 @@
 import { v } from "convex/values"
 import { mutation, query } from "./_generated/server"
 import { getUser } from "./auth"
-import { propertyFiltersValidator, propertyTypeValidator, sortByValidator } from "./validators"
+import { sortPaginatedResults } from "./propertyUtils"
+import { propertyFiltersValidator } from "./validators"
 
 export const toggleSaveProperty = mutation({
 	args: {
@@ -106,20 +107,18 @@ export const listSavedProperties = query({
 			filteredResults = filteredResults.filter((p) => p.property.monthlyRent <= args.maxPrice!)
 		}
 
-		// Sort
-		switch (args.sortBy) {
-			case "price-low":
-				filteredResults.sort((a, b) => a.property.monthlyRent - b.property.monthlyRent)
-				break
-			case "price-high":
-				filteredResults.sort((a, b) => b.property.monthlyRent - a.property.monthlyRent)
-				break
-			case "newest":
-				filteredResults.sort((a, b) => b.property._creationTime - a.property._creationTime)
-				break
-			default:
-				// Already sorted by saved date (desc) from the query
-				break
+		// Apply sorting using shared utility
+		// Extract just the properties for sorting
+		const properties = filteredResults.map((r) => r.property)
+		sortPaginatedResults(properties, args.sortBy)
+
+		// Rebuild the results with sorted properties
+		if (args.sortBy && args.sortBy !== "date-saved") {
+			const propertyToSavedDate = new Map(filteredResults.map((r) => [r.property._id, r.savedDate]))
+			filteredResults = properties.map((property) => ({
+				property,
+				savedDate: propertyToSavedDate.get(property._id)!,
+			}))
 		}
 
 		return filteredResults

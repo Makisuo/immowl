@@ -7,6 +7,8 @@ import { api } from "convex/_generated/api"
 import type { Id } from "convex/_generated/dataModel"
 import { Bookmark, Search, X } from "lucide-react"
 import { useCallback, useMemo, useState } from "react"
+import { PropertyCard } from "~/components/properties/PropertyCard"
+import { EmptyState, ErrorState, LoadingGrid } from "~/components/properties/PropertyStates"
 import { AnimatedGroup } from "~/components/ui/animated-group"
 import { Button } from "~/components/ui/button"
 import { Card } from "~/components/ui/card"
@@ -14,8 +16,6 @@ import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select"
 import { Slider } from "~/components/ui/slider"
-import { PropertyCard } from "~/components/properties/PropertyCard"
-import { EmptyState, ErrorState, LoadingGrid } from "~/components/properties/PropertyStates"
 import type { PropertyType, SavedPropertyWithDate, SortOption } from "~/types/property"
 import { DEFAULT_PRICE_RANGE } from "~/types/property"
 
@@ -48,24 +48,31 @@ function RouteComponent() {
 		searchParams.maxPrice ?? 5000,
 	])
 	const [cityFilter, setCityFilter] = useState(searchParams.city ?? "")
-	const [propertyTypeFilter, setPropertyTypeFilter] = useState<PropertyType | undefined>(searchParams.propertyType)
+	const [propertyTypeFilter, setPropertyTypeFilter] = useState<PropertyType | undefined>(
+		searchParams.propertyType,
+	)
 	const [sortBy, setSortBy] = useState<SortOption>(searchParams.sortBy)
 
 	// Update URL params when filters change
-	const updateFilters = useCallback((newFilters: Partial<SavedSearchParams>) => {
-		navigate({
-			search: {
-				...searchParams,
-				...newFilters,
-				// Clear price filters if they're at default values
-				minPrice: newFilters.minPrice === DEFAULT_PRICE_RANGE.min ? undefined : newFilters.minPrice,
-				maxPrice: newFilters.maxPrice === DEFAULT_PRICE_RANGE.max ? undefined : newFilters.maxPrice,
-				// Clear other filters if they're empty/default
-				city: newFilters.city === "" ? undefined : newFilters.city,
-				propertyType: newFilters.propertyType,
-			},
-		})
-	}, [navigate, searchParams])
+	const updateFilters = useCallback(
+		(newFilters: Partial<SavedSearchParams>) => {
+			navigate({
+				search: {
+					...searchParams,
+					...newFilters,
+					// Clear price filters if they're at default values
+					minPrice:
+						newFilters.minPrice === DEFAULT_PRICE_RANGE.min ? undefined : newFilters.minPrice,
+					maxPrice:
+						newFilters.maxPrice === DEFAULT_PRICE_RANGE.max ? undefined : newFilters.maxPrice,
+					// Clear other filters if they're empty/default
+					city: newFilters.city === "" ? undefined : newFilters.city,
+					propertyType: newFilters.propertyType,
+				},
+			})
+		},
+		[navigate, searchParams],
+	)
 
 	// Apply filters when user stops interacting
 	const applyPriceFilter = useCallback(() => {
@@ -91,7 +98,6 @@ function RouteComponent() {
 	)
 
 	const { data: totalCount } = useQuery(convexQuery(api.savedProperties.getSavedCount, {}))
-
 
 	const propertiesWithDate = (query.data || []) as SavedPropertyWithDate[]
 	const isLoading = query.isLoading
@@ -146,7 +152,7 @@ function RouteComponent() {
 						<Select
 							value={propertyTypeFilter ?? "all"}
 							onValueChange={(value) => {
-								const newValue = value === "all" ? undefined : value as PropertyType
+								const newValue = value === "all" ? undefined : (value as PropertyType)
 								setPropertyTypeFilter(newValue)
 								updateFilters({
 									propertyType: newValue,
@@ -285,9 +291,12 @@ function PropertiesGrid({ propertiesWithDate, isLoading, hasError }: PropertiesG
 		mutationFn: toggleSaveMutationFn,
 	})
 
-	const handleToggleSave = useCallback(async (propertyId: Id<"properties">) => {
-		await toggleSave.mutateAsync({ propertyId })
-	}, [toggleSave])
+	const handleToggleSave = useCallback(
+		async (propertyId: Id<"properties">) => {
+			await toggleSave.mutateAsync({ propertyId })
+		},
+		[toggleSave],
+	)
 
 	if (hasError) {
 		return <ErrorState error={new Error("Failed to load saved properties")} />
@@ -352,4 +361,3 @@ function PropertiesGrid({ propertiesWithDate, isLoading, hasError }: PropertiesG
 		</main>
 	)
 }
-

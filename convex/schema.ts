@@ -1,5 +1,6 @@
 import { defineSchema, defineTable } from "convex/server"
 import { v } from "convex/values"
+import { externalSourceValidator, propertyTypeValidator } from "./validators"
 
 export default defineSchema({
 	users: defineTable({
@@ -18,13 +19,7 @@ export default defineSchema({
 		longitude: v.optional(v.number()),
 
 		// Property details
-		propertyType: v.union(
-			v.literal("apartment"),
-			v.literal("house"),
-			v.literal("condo"),
-			v.literal("townhouse"),
-			v.literal("studio"),
-		),
+		propertyType: propertyTypeValidator,
 		rooms: v.object({
 			bedrooms: v.number(),
 			bathrooms: v.number(),
@@ -51,7 +46,7 @@ export default defineSchema({
 
 		// External source tracking
 		externalId: v.optional(v.string()), // ID from external provider
-		externalSource: v.optional(v.string()), // Name of the external provider (e.g., "zillow", "apartments.com")
+		externalSource: v.optional(externalSourceValidator),
 		externalUrl: v.optional(v.string()), // Original listing URL
 		lastSyncedAt: v.optional(v.number()), // Timestamp of last sync
 

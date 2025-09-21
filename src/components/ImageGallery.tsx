@@ -12,13 +12,7 @@ interface ImageGalleryProps {
 	initialIndex?: number
 }
 
-export function ImageGallery({
-	images,
-	title,
-	open,
-	onOpenChange,
-	initialIndex = 0,
-}: ImageGalleryProps) {
+export function ImageGallery({ images, title, open, onOpenChange, initialIndex = 0 }: ImageGalleryProps) {
 	const [currentIndex, setCurrentIndex] = useState(initialIndex)
 
 	useEffect(() => {
