@@ -14,7 +14,6 @@ import { getCookie, getWebRequest } from "@tanstack/react-start/server"
 import type { ConvexReactClient } from "convex/react"
 import type * as React from "react"
 import { Toaster } from "sonner"
-import { AppHeader } from "~/components/header"
 import { authClient } from "~/lib/auth.client"
 import appCss from "~/styles/app.css?url"
 

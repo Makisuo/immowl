@@ -14,6 +14,7 @@ import {
 	ChevronRight,
 	DollarSign,
 	Expand,
+	ExternalLink,
 	FileText,
 	Heart,
 	Home,
@@ -26,11 +27,13 @@ import {
 import { useState } from "react"
 import { toast } from "sonner"
 import { ImageGallery } from "~/components/ImageGallery"
+import { ExternalSourceIndicator } from "~/components/properties/ExternalSourceIndicator"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent } from "~/components/ui/card"
 import { Separator } from "~/components/ui/separator"
 import { Skeleton } from "~/components/ui/skeleton"
+import { getSourceDisplayName } from "~/utils/externalSources"
 
 export const Route = createFileRoute("/_app/property/$propertyId")({
 	component: PropertyDetails,
@@ -221,7 +224,7 @@ function PropertyDetails() {
 											>
 												<img
 													src={image}
-													alt={"Thumbnail ${index + 1}"}
+													alt={`Thumbnail ${index + 1}`}
 													className="h-20 w-28 object-cover"
 												/>
 											</button>
@@ -243,12 +246,23 @@ function PropertyDetails() {
 
 							{/* Property Info */}
 							<div className="mb-6">
-								<h1 className="mb-2 font-bold text-3xl">{property.title}</h1>
+								<div className="mb-2 flex items-start justify-between gap-4">
+									<h1 className="flex-1 font-bold text-3xl">{property.title}</h1>
+									{property.isExternal && property.externalSource && (
+										<ExternalSourceIndicator
+											source={property.externalSource}
+											url={property.externalUrl}
+											size="lg"
+											showText={true}
+											className="mt-1"
+										/>
+									)}
+								</div>
 								<div className="mb-4 flex items-center gap-2 text-muted-foreground">
 									<MapPin className="h-4 w-4" />
 									<span>
-										{property.address}, {property.city}, {property.state}{" "}
-										{property.zipCode}
+										{property.address.street}, {property.address.city},{" "}
+										{property.address.state} {property.address.zipCode}
 									</span>
 								</div>
 								<div className="flex flex-wrap items-center gap-4">
@@ -333,9 +347,11 @@ function PropertyDetails() {
 										<div className="mb-6">
 											<div className="mb-2 flex items-baseline gap-1">
 												<span className="font-bold text-3xl">
-													${property.monthlyRent.toLocaleString()}
+													${(property.monthlyRent.warm || property.monthlyRent.cold || 0).toLocaleString()}
 												</span>
-												<span className="text-muted-foreground">/month</span>
+												<span className="text-muted-foreground">
+													{property.monthlyRent.warm ? " (warm)" : property.monthlyRent.cold ? " (cold)" : ""}/month
+												</span>
 											</div>
 											<Badge variant="outline" className="mb-4">
 												<Calendar className="mr-1 h-3 w-3" />
@@ -354,7 +370,7 @@ function PropertyDetails() {
 												<span className="font-medium">
 													$
 													{(
-														property.deposit || property.monthlyRent
+														property.deposit || property.monthlyRent.warm || property.monthlyRent.cold || 0
 													).toLocaleString()}
 												</span>
 											</div>
@@ -389,7 +405,7 @@ function PropertyDetails() {
 											)}
 											{property.contactPhone && (
 												<a
-													href={"tel:${property.contactPhone}"}
+													href={`tel:${property.contactPhone}`}
 													className="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-muted"
 												>
 													<Phone className="h-4 w-4 text-muted-foreground" />
@@ -409,19 +425,31 @@ function PropertyDetails() {
 								</Card>
 
 								{/* External Link */}
-								{property.externalUrl && (
-									<Card>
+								{property.isExternal && property.externalUrl && (
+									<Card className="border-primary/20 bg-primary/5">
 										<CardContent className="pt-6">
-											<p className="mb-3 text-muted-foreground text-sm">
-												This property is listed on {property.externalSource}
-											</p>
+											<div className="mb-3 flex items-center gap-2">
+												<ExternalSourceIndicator
+													source={property.externalSource}
+													url={property.externalUrl}
+													size="md"
+													showText={false}
+												/>
+												<div className="flex-1">
+													<p className="font-medium text-sm">External Listing</p>
+													<p className="text-muted-foreground text-xs">
+														From {getSourceDisplayName(property.externalSource)}
+													</p>
+												</div>
+											</div>
 											<a
 												href={property.externalUrl}
 												target="_blank"
 												rel="noopener noreferrer"
 											>
-												<Button variant="outline" className="w-full">
-													View Original Listing
+												<Button variant="outline" className="w-full" size="lg">
+													<ExternalLink className="mr-2 h-4 w-4" />
+													View on {getSourceDisplayName(property.externalSource)}
 												</Button>
 											</a>
 										</CardContent>

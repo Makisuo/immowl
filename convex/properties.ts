@@ -22,7 +22,7 @@ import { paginationOptsValidator } from "convex/server"
 import { v } from "convex/values"
 import { internalMutation, mutation, query } from "./_generated/server"
 import { applySorting, buildPropertyQuery, sortPaginatedResults } from "./propertyUtils"
-import { propertySortByValidator, propertyTypeValidator } from "./validators"
+import { externalSourceValidator, propertySortByValidator, propertyTypeValidator } from "./validators"
 
 const propertyTypes = ["apartment", "house", "condo", "townhouse", "studio"] as const
 
@@ -111,11 +111,13 @@ function generatePropertyData(specificCity?: string, specificCountry?: string) {
 	}
 
 	// Generate address
-	const address = randAddress()
+	const addressData = randAddress()
 	const city = specificCity || randCity()
 	const state = randState()
 	const zipCode = randZipCode()
 	const country = specificCountry || randCountryCode()
+	const latitude = randLatitude()
+	const longitude = randLongitude()
 
 	// Generate title and description
 	const bedroomText = bedrooms === 0 ? "Studio" : `${bedrooms} Bedroom`
@@ -148,20 +150,26 @@ function generatePropertyData(specificCity?: string, specificCountry?: string) {
 	return {
 		title,
 		description,
-		address: address.street,
-		city,
-		state,
-		zipCode,
-		country,
-		latitude: randLatitude(),
-		longitude: randLongitude(),
+		address: {
+			fullAddress: addressData.street,
+			street: addressData.street,
+			city,
+			state,
+			zipCode,
+			country,
+			latitude,
+			longitude,
+		},
 		propertyType,
 		rooms: {
 			bedrooms,
 			bathrooms,
 		},
 		squareMeters,
-		monthlyRent,
+		monthlyRent: {
+			cold: monthlyRent,
+			warm: undefined,
+		},
 		deposit: Math.round(monthlyRent * randFloat({ min: 1, max: 2, fraction: 1 })),
 		minimumLease: rand([1, 3, 6, 12, 24]),
 		availableFrom,
@@ -300,58 +308,86 @@ export const createMockListings = mutation({
 
 export const upsertScrapedProperty = internalMutation({
 	args: {
+		// External tracking
 		externalId: v.string(),
+		externalSource: externalSourceValidator,
+		externalUrl: v.string(),
+
+		// Basic info
 		title: v.string(),
 		description: v.string(),
-		address: v.string(),
+
+		// Address - more flexible
+		street: v.optional(v.string()), // Optional street address
+		address: v.string(), // Fallback/general address
 		city: v.string(),
 		state: v.string(),
 		zipCode: v.string(),
 		country: v.string(),
 		latitude: v.optional(v.number()),
 		longitude: v.optional(v.number()),
+
+		// Property details
 		propertyType: propertyTypeValidator,
 		bedrooms: v.number(),
 		bathrooms: v.number(),
 		squareMeters: v.number(),
-		monthlyRent: v.number(),
+
+		// Rent - separate cold and warm
+		coldRent: v.optional(v.number()),
+		warmRent: v.optional(v.number()),
+
+		// Other rental details
 		deposit: v.optional(v.number()),
 		minimumLease: v.optional(v.number()),
 		availableFrom: v.optional(v.number()),
+
+		// Features
 		amenities: v.optional(v.array(v.string())),
 		furnished: v.optional(v.boolean()),
 		petFriendly: v.optional(v.boolean()),
 		imageUrls: v.optional(v.array(v.string())),
+
+		// Contact
 		contactEmail: v.optional(v.string()),
 		contactPhone: v.optional(v.string()),
-		externalUrl: v.string(),
 	},
 	handler: async (ctx, args) => {
 		// Check if property already exists
 		const existing = await ctx.db
 			.query("properties")
 			.withIndex("by_external_id_and_source", (q) =>
-				q.eq("externalId", args.externalId).eq("externalSource", "immowelt")
+				q.eq("externalId", args.externalId).eq("externalSource", args.externalSource)
 			)
 			.first()
+
+		// Build full address from components
+		const streetAddress = args.street || args.address
+		const fullAddress = `${streetAddress}, ${args.zipCode} ${args.city}, ${args.state}, ${args.country}`
 
 		const propertyData = {
 			title: args.title,
 			description: args.description,
-			address: args.address,
-			city: args.city,
-			state: args.state,
-			zipCode: args.zipCode,
-			country: args.country,
-			latitude: args.latitude,
-			longitude: args.longitude,
+			address: {
+				fullAddress,
+				street: streetAddress,
+				city: args.city,
+				state: args.state,
+				zipCode: args.zipCode,
+				country: args.country,
+				latitude: args.latitude,
+				longitude: args.longitude,
+			},
 			propertyType: args.propertyType,
 			rooms: {
 				bedrooms: args.bedrooms,
 				bathrooms: args.bathrooms,
 			},
 			squareMeters: args.squareMeters,
-			monthlyRent: args.monthlyRent,
+			monthlyRent: {
+				cold: args.coldRent,
+				warm: args.warmRent,
+			},
 			deposit: args.deposit,
 			minimumLease: args.minimumLease,
 			availableFrom: args.availableFrom,
@@ -362,7 +398,7 @@ export const upsertScrapedProperty = internalMutation({
 			contactEmail: args.contactEmail,
 			contactPhone: args.contactPhone,
 			externalId: args.externalId,
-			externalSource: "immowelt" as const,
+			externalSource: args.externalSource,
 			externalUrl: args.externalUrl,
 			lastSyncedAt: Date.now(),
 			status: "active" as const,

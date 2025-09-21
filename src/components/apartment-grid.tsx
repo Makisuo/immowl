@@ -5,20 +5,19 @@ import type { Doc } from "convex/_generated/dataModel"
 import { Bath, Bed, ChevronLeft, ChevronRight, Heart, Loader2, MapPin, Square } from "lucide-react"
 import { motion } from "motion/react"
 import { useState } from "react"
+import { ExternalSourceIndicator } from "~/components/properties/ExternalSourceIndicator"
 import { AnimatedGroup } from "~/components/ui/animated-group"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent } from "~/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select"
 import { Skeleton } from "~/components/ui/skeleton"
-import { PROPERTY_TYPE_LABELS } from "~/types/property"
 import {
 	formatAvailability,
 	formatBathCount,
 	formatLeaseTerms,
 	formatRoomCount,
 	getDepositAmount,
-	toSqft,
 } from "~/utils/property-helpers"
 
 interface ApartmentGridProps {
@@ -275,6 +274,18 @@ export function ApartmentGrid({
 															{property.imageUrls?.length || 0}
 														</div>
 													)}
+
+													{/* External source indicator */}
+													{property.isExternal && property.externalSource && (
+														<div className="absolute top-2 right-2 rounded-md bg-white/90 px-2 py-1 shadow-sm">
+															<ExternalSourceIndicator
+																source={property.externalSource}
+																url={property.externalUrl}
+																size="sm"
+																showText={false}
+															/>
+														</div>
+													)}
 												</div>
 
 												{showThumbnails && (
@@ -309,12 +320,14 @@ export function ApartmentGrid({
 											<div className="space-y-1">
 												<div className="flex items-start justify-between">
 													<div className="flex-1">
-														<h3 className="text-balance font-medium text-foreground leading-tight dark:text-white">
-															{property.title}
-														</h3>
+														<div className="flex items-start gap-2">
+															<h3 className="flex-1 text-balance font-medium text-foreground leading-tight dark:text-white">
+																{property.title}
+															</h3>
+														</div>
 														<div className="mt-1 flex items-center gap-1 text-gray-800 text-sm dark:text-gray-200">
 															<MapPin className="h-3 w-3" />
-															{property.address}, {property.city}
+															{property.address.street}, {property.address.city}
 														</div>
 													</div>
 													<Button
@@ -357,10 +370,19 @@ export function ApartmentGrid({
 												<div className="flex items-center justify-between">
 													<div>
 														<span className="font-semibold text-foreground text-lg dark:text-white">
-															${property.monthlyRent.toLocaleString()}
+															$
+															{(
+																property.monthlyRent.warm ||
+																property.monthlyRent.cold ||
+																0
+															).toLocaleString()}
 														</span>
 														<span className="text-gray-700 text-sm dark:text-gray-300">
-															{" "}
+															{property.monthlyRent.warm
+																? " (warm)"
+																: property.monthlyRent.cold
+																	? " (cold)"
+																	: ""}{" "}
 															/ month
 														</span>
 													</div>

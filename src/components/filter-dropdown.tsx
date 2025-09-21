@@ -57,7 +57,6 @@ export function FilterDropdown({
 	setSelectedBathrooms: setSelectedBathroomsProp,
 	selectedPropertyType: selectedPropertyTypeProp,
 	setSelectedPropertyType: setSelectedPropertyTypeProp,
-	selectedLeaseTerm: selectedLeaseTermProp,
 	setSelectedLeaseTerm: setSelectedLeaseTermProp,
 	selectedPetPolicy: selectedPetPolicyProp,
 	setSelectedPetPolicy: setSelectedPetPolicyProp,
@@ -73,7 +72,7 @@ export function FilterDropdown({
 		useState<UISearchFilters["bathrooms"]>("Any")
 	const [internalSelectedPropertyType, setInternalSelectedPropertyType] =
 		useState<UISearchFilters["propertyType"]>("Any")
-	const [internalSelectedLeaseTerm, setInternalSelectedLeaseTerm] = useState<string>("Any")
+	const [_internalSelectedLeaseTerm, setInternalSelectedLeaseTerm] = useState<string>("Any")
 	const [internalSelectedPetPolicy, setInternalSelectedPetPolicy] =
 		useState<UISearchFilters["petFriendly"]>("Any")
 	const [internalSelectedFurnished, setInternalSelectedFurnished] =
@@ -90,7 +89,6 @@ export function FilterDropdown({
 	const setSelectedBathrooms = setSelectedBathroomsProp ?? setInternalSelectedBathrooms
 	const selectedPropertyType = selectedPropertyTypeProp ?? internalSelectedPropertyType
 	const setSelectedPropertyType = setSelectedPropertyTypeProp ?? setInternalSelectedPropertyType
-	const selectedLeaseTerm = selectedLeaseTermProp ?? internalSelectedLeaseTerm
 	const setSelectedLeaseTerm = setSelectedLeaseTermProp ?? setInternalSelectedLeaseTerm
 	const selectedPetPolicy = selectedPetPolicyProp ?? internalSelectedPetPolicy
 	const setSelectedPetPolicy = setSelectedPetPolicyProp ?? setInternalSelectedPetPolicy

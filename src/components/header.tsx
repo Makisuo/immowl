@@ -129,7 +129,11 @@ export const AppHeader = () => {
 											</DropdownMenuLabel>
 											<DropdownMenuSeparator />
 											<DropdownMenuItem asChild>
-												<Link to="/saved" className="cursor-pointer">
+												<Link
+													to="/saved"
+													className="cursor-pointer"
+													search={{ propertyType: undefined, sortBy: "newest" }}
+												>
 													<Heart className="mr-2 h-4 w-4" />
 													<span>Saved Properties</span>
 												</Link>

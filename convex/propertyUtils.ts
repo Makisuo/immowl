@@ -22,12 +22,14 @@ export function buildPropertyQuery(
 	if (filters.city && filters.propertyType) {
 		// Use composite index if both filters are present
 		indexedQuery = tableQuery
-			.withIndex("by_status_and_city", (q) => q.eq("status", "active").eq("city", filters.city!))
+			.withIndex("by_status_and_city", (q) =>
+				q.eq("status", "active").eq("address.city", filters.city!),
+			)
 			.filter((q) => q.eq(q.field("propertyType"), filters.propertyType))
 	} else if (filters.city) {
 		// Use city index
 		indexedQuery = tableQuery.withIndex("by_status_and_city", (q) =>
-			q.eq("status", "active").eq("city", filters.city!),
+			q.eq("status", "active").eq("address.city", filters.city!),
 		)
 	} else if (filters.propertyType) {
 		// Use property type index
@@ -41,7 +43,7 @@ export function buildPropertyQuery(
 
 	// Stage 3: Apply country filter if provided (no index for country)
 	if (filters.country) {
-		return indexedQuery.filter((q) => q.eq(q.field("country"), filters.country))
+		return indexedQuery.filter((q) => q.eq(q.field("address.country"), filters.country))
 	}
 
 	return indexedQuery
@@ -50,9 +52,14 @@ export function buildPropertyQuery(
 /**
  * Sort properties by price
  */
-export function sortByPrice(properties: Array<{ monthlyRent: number }>, direction: "asc" | "desc"): void {
+export function sortByPrice(
+	properties: Array<{ monthlyRent: { cold?: number; warm?: number } }>,
+	direction: "asc" | "desc",
+): void {
 	properties.sort((a, b) => {
-		const diff = a.monthlyRent - b.monthlyRent
+		const aPrice = a.monthlyRent.warm ?? a.monthlyRent.cold ?? 0
+		const bPrice = b.monthlyRent.warm ?? b.monthlyRent.cold ?? 0
+		const diff = aPrice - bPrice
 		return direction === "asc" ? diff : -diff
 	})
 }
@@ -112,10 +119,9 @@ export function applySorting(
 /**
  * Apply client-side sorting to paginated results
  */
-export function sortPaginatedResults<T extends { monthlyRent: number; _creationTime: number }>(
-	results: T[],
-	sortBy?: "price-low" | "price-high" | "newest" | "date-saved" | "available",
-): void {
+export function sortPaginatedResults<
+	T extends { monthlyRent: { cold?: number; warm?: number }; _creationTime: number },
+>(results: T[], sortBy?: "price-low" | "price-high" | "newest" | "date-saved" | "available"): void {
 	switch (sortBy) {
 		case "price-low":
 			sortByPrice(results, "asc")

@@ -9,6 +9,7 @@ import { PROPERTY_TYPE_LABELS } from "~/types/property"
 import { Badge } from "../ui/badge"
 import { Button } from "../ui/button"
 import { Card, CardContent } from "../ui/card"
+import { ExternalSourceIndicator } from "./ExternalSourceIndicator"
 
 export const PropertyCard = memo(function PropertyCard({
 	property,
@@ -155,6 +156,18 @@ export const PropertyCard = memo(function PropertyCard({
 							{propertyTypeLabel}
 						</Badge>
 
+						{/* External source indicator */}
+						{property.isExternal && property.externalSource && (
+							<div className="absolute top-2 right-12 rounded-md bg-white/90 px-2 py-1 shadow-sm">
+								<ExternalSourceIndicator
+									source={property.externalSource}
+									url={property.externalUrl}
+									size="sm"
+									showText={false}
+								/>
+							</div>
+						)}
+
 						{/* Save/Unsave button */}
 						{onToggleSave && (
 							<motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
@@ -186,13 +199,24 @@ export const PropertyCard = memo(function PropertyCard({
 
 					<CardContent className="space-y-3 p-4">
 						<div className="space-y-1">
-							<h3 className="line-clamp-2 font-medium text-foreground leading-tight dark:text-white">
-								{property.title}
-							</h3>
+							<div className="flex items-start justify-between gap-2">
+								<h3 className="line-clamp-2 flex-1 font-medium text-foreground leading-tight dark:text-white">
+									{property.title}
+								</h3>
+								{property.isExternal && property.externalSource && (
+									<ExternalSourceIndicator
+										source={property.externalSource}
+										url={property.externalUrl}
+										size="sm"
+										showText={false}
+										className="mt-0.5 flex-shrink-0"
+									/>
+								)}
+							</div>
 							<div className="flex items-center gap-1 text-muted-foreground text-sm">
 								<MapPin className="h-3 w-3" />
 								<span>
-									{property.address}, {property.city}
+									{property.address.street}, {property.address.city}
 								</span>
 							</div>
 						</div>
@@ -221,9 +245,11 @@ export const PropertyCard = memo(function PropertyCard({
 						<div className="flex items-center justify-between pt-1">
 							<div>
 								<span className="font-semibold text-foreground text-lg dark:text-white">
-									${property.monthlyRent.toLocaleString()}
+									${(property.monthlyRent.warm || property.monthlyRent.cold || 0).toLocaleString()}
 								</span>
-								<span className="text-muted-foreground text-sm"> / month</span>
+								<span className="text-muted-foreground text-sm">
+									{property.monthlyRent.warm ? " (warm)" : property.monthlyRent.cold ? " (cold)" : ""} / month
+								</span>
 							</div>
 						</div>
 

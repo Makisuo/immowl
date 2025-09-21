@@ -252,8 +252,9 @@ export const scrapeListing = internalAction({
 					.slice(0, 20) // Limit to 20 images
 			}
 
-			// Determine rent (prefer warm rent if available)
-			const monthlyRent = data.warmRent || data.monthlyRent || data.coldRent || 0
+			// Determine rent - set warm and cold appropriately
+			const coldRent = data.coldRent || data.monthlyRent || 0
+			const warmRent = data.warmRent || undefined
 
 			// Get square meters
 			const squareMeters = data.squareMeters || data.livingArea || 50
@@ -261,6 +262,8 @@ export const scrapeListing = internalAction({
 			// Save to database
 			await ctx.runMutation(internal.properties.upsertScrapedProperty, {
 				externalId: args.listingId,
+				externalSource: "immowelt",
+				externalUrl: args.url,
 				title:
 					data.title ||
 					`${bedrooms > 0 ? `${bedrooms} Bedroom` : "Studio"} ${propertyType} in ${data.city || "Munich"}`,
@@ -274,7 +277,8 @@ export const scrapeListing = internalAction({
 				bedrooms,
 				bathrooms: data.bathrooms || 1,
 				squareMeters,
-				monthlyRent,
+				coldRent,
+				warmRent,
 				deposit: data.securityDeposit,
 				availableFrom,
 				amenities: amenities.length > 0 ? amenities : undefined,
@@ -282,7 +286,6 @@ export const scrapeListing = internalAction({
 				petFriendly: data.petFriendly,
 				imageUrls: imageUrls.length > 0 ? imageUrls : undefined,
 				contactPhone: data.contactPhone,
-				externalUrl: args.url,
 			})
 
 			console.log(`Successfully scraped and saved listing ${args.listingId}`)

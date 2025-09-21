@@ -17,3 +17,4 @@
         - nearest restaurant
         - nearest hotel
         - nearbye bus stops/train stations
+        

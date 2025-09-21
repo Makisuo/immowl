@@ -31,10 +31,26 @@ export const formatLeaseTerms = (minimumLease?: number): string => {
 }
 
 /**
+ * Get monthly rent amount (prefers warm rent over cold rent)
+ */
+export const getRent = (property: Property): number => {
+	return property.monthlyRent.warm || property.monthlyRent.cold || 0
+}
+
+/**
+ * Get rent type label (warm or cold)
+ */
+export const getRentType = (property: Property): "warm" | "cold" | null => {
+	if (property.monthlyRent.warm) return "warm"
+	if (property.monthlyRent.cold) return "cold"
+	return null
+}
+
+/**
  * Get deposit amount (defaults to monthly rent if not specified)
  */
 export const getDepositAmount = (property: Property): number => {
-	return property.deposit || property.monthlyRent
+	return property.deposit || getRent(property)
 }
 
 /**

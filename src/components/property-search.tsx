@@ -32,8 +32,9 @@ export function PropertySearch() {
 		const searchParams = {
 			city,
 			country: "DE",
-			propertyType: propertyTypeMap[propertyType] || "apartment",
-		}
+			sortBy: "newest",
+			propertyType: (propertyTypeMap[propertyType] || "apartment") as "apartment",
+		} as const
 
 		// Navigate to search route with parameters
 		navigate({ to: "/search", search: searchParams })

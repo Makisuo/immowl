@@ -10,7 +10,8 @@
 		"build": "vite build && tsc --noEmit",
 		"start": "node .output/server/index.mjs",
 		"format": "biome check --write",
-		"seed": "npx convex import --table tasks sampleData.jsonl"
+		"seed": "npx convex import --table tasks sampleData.jsonl",
+		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
 		"@convex-dev/better-auth": "^0.8.6",

@@ -10,13 +10,16 @@ export default defineSchema({
 	properties: defineTable({
 		title: v.string(),
 		description: v.string(),
-		address: v.string(),
-		city: v.string(),
-		state: v.string(),
-		zipCode: v.string(),
-		country: v.string(),
-		latitude: v.optional(v.number()),
-		longitude: v.optional(v.number()),
+		address: v.object({
+			fullAddress: v.string(),
+			street: v.string(),
+			city: v.string(),
+			state: v.string(),
+			zipCode: v.string(),
+			country: v.string(),
+			latitude: v.optional(v.number()),
+			longitude: v.optional(v.number()),
+		}),
 
 		// Property details
 		propertyType: propertyTypeValidator,
@@ -27,7 +30,10 @@ export default defineSchema({
 		squareMeters: v.number(),
 
 		// Rental details
-		monthlyRent: v.number(),
+		monthlyRent: v.object({
+			cold: v.optional(v.number()),
+			warm: v.optional(v.number()),
+		}),
 		deposit: v.optional(v.number()), // Made optional for external imports
 		minimumLease: v.optional(v.number()), // in months, made optional
 		availableFrom: v.optional(v.number()),
@@ -37,7 +43,7 @@ export default defineSchema({
 		furnished: v.optional(v.boolean()), // Made optional for external imports
 		petFriendly: v.optional(v.boolean()),
 
-		imageUrls: v.optional(v.array(v.string())), // External image URLs for scraped properties
+		imageUrls: v.optional(v.array(v.string())),
 
 		// Owner info - made flexible for external sources
 		ownerId: v.optional(v.id("users")), // Made optional for external properties
@@ -50,16 +56,14 @@ export default defineSchema({
 		externalUrl: v.optional(v.string()), // Original listing URL
 		lastSyncedAt: v.optional(v.number()), // Timestamp of last sync
 
-		// Additional fields that might come from external sources
-
 		// Status
 		status: v.union(v.literal("active"), v.literal("disabled")),
-		isExternal: v.boolean(), // Flag to identify external properties
+		isExternal: v.boolean(),
 	})
 		.index("by_status", ["status"])
-		.index("by_city", ["city"])
+		.index("by_city", ["address.city"])
 		.index("by_property_type", ["propertyType"])
-		.index("by_status_and_city", ["status", "city"])
+		.index("by_status_and_city", ["status", "address.city"])
 		.index("by_status_and_property_type", ["status", "propertyType"])
 		.index("by_external_id_and_source", ["externalId", "externalSource"]),
 

@@ -96,15 +96,19 @@ export const listSavedProperties = query({
 		}
 
 		if (args.city) {
-			filteredResults = filteredResults.filter((p) => p.property.city === args.city)
+			filteredResults = filteredResults.filter((p) => p.property.address.city === args.city)
 		}
 
 		if (args.minPrice !== undefined) {
-			filteredResults = filteredResults.filter((p) => p.property.monthlyRent >= args.minPrice!)
+			filteredResults = filteredResults.filter(
+				(p) => (p.property.monthlyRent.warm || p.property.monthlyRent.cold || 0) >= args.minPrice!,
+			)
 		}
 
 		if (args.maxPrice !== undefined) {
-			filteredResults = filteredResults.filter((p) => p.property.monthlyRent <= args.maxPrice!)
+			filteredResults = filteredResults.filter(
+				(p) => (p.property.monthlyRent.warm || p.property.monthlyRent.cold || 0) <= args.maxPrice!,
+			)
 		}
 
 		// Apply sorting using shared utility
