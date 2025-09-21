@@ -2,47 +2,40 @@
 
 import { convexQuery, useConvexMutation } from "@convex-dev/react-query"
 import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query"
-import { createFileRoute, Link } from "@tanstack/react-router"
-import { type } from "arktype"
+import { createFileRoute } from "@tanstack/react-router"
 import { api } from "convex/_generated/api"
-import type { Doc } from "convex/_generated/dataModel"
-import {
-	AlertCircle,
-	Bath,
-	Bed,
-	Bookmark,
-	ChevronLeft,
-	ChevronRight,
-	Heart,
-	Loader2,
-	MapPin,
-	Search,
-	Square,
-	X,
-} from "lucide-react"
-import { motion } from "motion/react"
-import { useState } from "react"
+import type { Id } from "convex/_generated/dataModel"
+import { Bookmark, Search, X } from "lucide-react"
+import { useCallback, useMemo, useState } from "react"
 import { AnimatedGroup } from "~/components/ui/animated-group"
-import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
-import { Card, CardContent } from "~/components/ui/card"
+import { Card } from "~/components/ui/card"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select"
-import { Skeleton } from "~/components/ui/skeleton"
 import { Slider } from "~/components/ui/slider"
+import { PropertyCard } from "~/components/properties/PropertyCard"
+import { EmptyState, ErrorState, LoadingGrid } from "~/components/properties/PropertyStates"
+import type { PropertyType, SavedPropertyWithDate, SortOption } from "~/types/property"
+import { DEFAULT_PRICE_RANGE } from "~/types/property"
 
-const savedSchema = type({
-	"propertyType?": "'apartment' | 'house' | 'condo' | 'townhouse' | 'studio'",
-	sortBy: "'date-saved' | 'price-low' | 'price-high' | 'newest' = 'date-saved'",
-	"city?": "string",
-	"minPrice?": "number",
-	"maxPrice?": "number",
-})
+interface SavedSearchParams {
+	propertyType?: PropertyType
+	sortBy: SortOption
+	city?: string
+	minPrice?: number
+	maxPrice?: number
+}
 
 export const Route = createFileRoute("/_app/_authed/saved")({
 	component: RouteComponent,
-	validateSearch: savedSchema,
+	validateSearch: (search: Record<string, unknown>): SavedSearchParams => ({
+		propertyType: search.propertyType as PropertyType | undefined,
+		sortBy: (search.sortBy as SortOption) || "date-saved",
+		city: search.city as string | undefined,
+		minPrice: search.minPrice as number | undefined,
+		maxPrice: search.maxPrice as number | undefined,
+	}),
 })
 
 function RouteComponent() {
@@ -55,36 +48,36 @@ function RouteComponent() {
 		searchParams.maxPrice ?? 5000,
 	])
 	const [cityFilter, setCityFilter] = useState(searchParams.city ?? "")
-	const [propertyTypeFilter, setPropertyTypeFilter] = useState<string | undefined>(searchParams.propertyType)
-	const [sortBy, setSortBy] = useState(searchParams.sortBy)
+	const [propertyTypeFilter, setPropertyTypeFilter] = useState<PropertyType | undefined>(searchParams.propertyType)
+	const [sortBy, setSortBy] = useState<SortOption>(searchParams.sortBy)
 
 	// Update URL params when filters change
-	const updateFilters = (newFilters: Partial<typeof searchParams>) => {
+	const updateFilters = useCallback((newFilters: Partial<SavedSearchParams>) => {
 		navigate({
 			search: {
 				...searchParams,
 				...newFilters,
 				// Clear price filters if they're at default values
-				minPrice: newFilters.minPrice === 0 ? undefined : newFilters.minPrice,
-				maxPrice: newFilters.maxPrice === 5000 ? undefined : newFilters.maxPrice,
+				minPrice: newFilters.minPrice === DEFAULT_PRICE_RANGE.min ? undefined : newFilters.minPrice,
+				maxPrice: newFilters.maxPrice === DEFAULT_PRICE_RANGE.max ? undefined : newFilters.maxPrice,
 				// Clear other filters if they're empty/default
 				city: newFilters.city === "" ? undefined : newFilters.city,
 				propertyType: newFilters.propertyType,
 			},
 		})
-	}
+	}, [navigate, searchParams])
 
 	// Apply filters when user stops interacting
-	const applyPriceFilter = () => {
+	const applyPriceFilter = useCallback(() => {
 		updateFilters({
 			minPrice: priceRange[0],
 			maxPrice: priceRange[1],
 		})
-	}
+	}, [priceRange, updateFilters])
 
-	const applyCityFilter = () => {
+	const applyCityFilter = useCallback(() => {
 		updateFilters({ city: cityFilter })
-	}
+	}, [cityFilter, updateFilters])
 
 	// Use infinite query for saved properties
 	const query = useSuspenseQuery(
@@ -99,26 +92,22 @@ function RouteComponent() {
 
 	const { data: totalCount } = useQuery(convexQuery(api.savedProperties.getSavedCount, {}))
 
-	type SavedPropertyWithDate = {
-		property: Doc<"properties">
-		savedDate: number
-	}
 
 	const propertiesWithDate = (query.data || []) as SavedPropertyWithDate[]
 	const isLoading = query.isLoading
 	const hasError = false
 
-	const getActiveFiltersCount = () => {
+	const getActiveFiltersCount = useMemo(() => {
 		let count = 0
-		if (searchParams.minPrice !== undefined && searchParams.minPrice > 0) count++
-		if (searchParams.maxPrice !== undefined && searchParams.maxPrice < 5000) count++
+		if (searchParams.minPrice !== undefined && searchParams.minPrice > DEFAULT_PRICE_RANGE.min) count++
+		if (searchParams.maxPrice !== undefined && searchParams.maxPrice < DEFAULT_PRICE_RANGE.max) count++
 		if (searchParams.city) count++
 		if (searchParams.propertyType) count++
 		return count
-	}
+	}, [searchParams])
 
-	const clearFilters = () => {
-		setPriceRange([0, 5000])
+	const clearFilters = useCallback(() => {
+		setPriceRange([DEFAULT_PRICE_RANGE.min, DEFAULT_PRICE_RANGE.max])
 		setCityFilter("")
 		setPropertyTypeFilter(undefined)
 		updateFilters({
@@ -127,7 +116,7 @@ function RouteComponent() {
 			city: undefined,
 			propertyType: undefined,
 		})
-	}
+	}, [updateFilters])
 
 	return (
 		<div className="container mx-auto px-4 py-6">
@@ -157,10 +146,10 @@ function RouteComponent() {
 						<Select
 							value={propertyTypeFilter ?? "all"}
 							onValueChange={(value) => {
-								const newValue = value === "all" ? undefined : value
-								setPropertyTypeFilter(newValue as any)
+								const newValue = value === "all" ? undefined : value as PropertyType
+								setPropertyTypeFilter(newValue)
 								updateFilters({
-									propertyType: newValue as any,
+									propertyType: newValue,
 								})
 							}}
 						>
@@ -213,8 +202,9 @@ function RouteComponent() {
 						<Select
 							value={sortBy}
 							onValueChange={(value) => {
-								setSortBy(value as any)
-								updateFilters({ sortBy: value as any })
+								const newSortBy = value as SortOption
+								setSortBy(newSortBy)
+								updateFilters({ sortBy: newSortBy })
 							}}
 						>
 							<SelectTrigger className="w-40 sm:w-48">
@@ -229,14 +219,14 @@ function RouteComponent() {
 						</Select>
 					</div>
 
-					{getActiveFiltersCount() > 0 && (
+					{getActiveFiltersCount > 0 && (
 						<Button
 							variant="outline"
 							size="sm"
 							onClick={clearFilters}
 							className="w-full sm:w-auto"
 						>
-							Clear Filters ({getActiveFiltersCount()})
+							Clear Filters ({getActiveFiltersCount})
 						</Button>
 					)}
 				</div>
@@ -274,343 +264,92 @@ function RouteComponent() {
 			</div>
 
 			{/* Properties Grid */}
-			<main className="w-full">
-				{hasError ? (
-					<ErrorState error={new Error("Failed to load saved properties")} />
-				) : isLoading ? (
-					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
-						{[...Array(8)].map((_, index) => (
-							<PropertyCardSkeleton key={`skeleton-${index}`} />
-						))}
-					</div>
-				) : propertiesWithDate.length === 0 ? (
-					<EmptyState />
-				) : (
-					<AnimatedGroup
-						preset="blur-slide"
-						className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4"
-						variants={{
-							container: {
-								visible: {
-									transition: {
-										staggerChildren: 0.08,
-										delayChildren: 0.1,
-									},
-								},
-							},
-							item: {
-								hidden: {
-									opacity: 0,
-									y: 30,
-									filter: "blur(8px)",
-								},
-								visible: {
-									opacity: 1,
-									y: 0,
-									filter: "blur(0px)",
-									transition: {
-										duration: 0.5,
-										ease: "easeOut",
-									},
-								},
-							},
-						}}
-					>
-						{propertiesWithDate.map((item) => (
-							<PropertyCard key={item.property._id} property={item.property} savedDate={item.savedDate} />
-						))}
-					</AnimatedGroup>
-				)}
-			</main>
+			<PropertiesGrid
+				propertiesWithDate={propertiesWithDate}
+				isLoading={isLoading}
+				hasError={hasError}
+			/>
 		</div>
 	)
 }
 
-function PropertyCard({ property, savedDate }: { property: Doc<"properties">; savedDate: number }) {
-	const [currentImageIndex, setCurrentImageIndex] = useState(0)
-	const [isUnsaving, setIsUnsaving] = useState(false)
+interface PropertiesGridProps {
+	propertiesWithDate: SavedPropertyWithDate[]
+	isLoading: boolean
+	hasError: boolean
+}
 
+function PropertiesGrid({ propertiesWithDate, isLoading, hasError }: PropertiesGridProps) {
 	const toggleSaveMutationFn = useConvexMutation(api.savedProperties.toggleSaveProperty)
 	const toggleSave = useMutation({
 		mutationFn: toggleSaveMutationFn,
-		onSuccess: () => {
-			// The query will automatically update due to Convex reactivity
-		},
-		onError: (error) => {
-			console.error("Failed to unsave property:", error)
-			// You could add a toast notification here
-		},
 	})
 
-	const handleUnsave = async (e: React.MouseEvent) => {
-		e.preventDefault()
-		e.stopPropagation()
+	const handleToggleSave = useCallback(async (propertyId: Id<"properties">) => {
+		await toggleSave.mutateAsync({ propertyId })
+	}, [toggleSave])
 
-		setIsUnsaving(true)
-		try {
-			await toggleSave.mutateAsync({ propertyId: property._id })
-		} catch (error) {
-			console.error("Failed to unsave property:", error)
-			// Error is already handled by onError callback
-		} finally {
-			setIsUnsaving(false)
-		}
+	if (hasError) {
+		return <ErrorState error={new Error("Failed to load saved properties")} />
 	}
 
-	const currentImage = property.imageUrls?.[currentImageIndex]
-	const hasMultipleImages = (property.imageUrls?.length || 0) > 1
+	if (isLoading) {
+		return <LoadingGrid />
+	}
 
-	// Format property data for display
-	const propertyTypeLabel = property.propertyType.charAt(0).toUpperCase() + property.propertyType.slice(1)
-	const sqft = Math.round(property.squareMeters * 10.764)
-	const savedDateStr = new Date(savedDate).toLocaleDateString()
+	if (propertiesWithDate.length === 0) {
+		return (
+			<EmptyState
+				title="No saved properties yet"
+				description="Start exploring properties and save your favorites to see them here. Use the heart icon on any property to add it to your saved list."
+				icon={Bookmark}
+			/>
+		)
+	}
 
 	return (
-		<motion.div
-			whileHover={{
-				scale: 1.02,
-				transition: { duration: 0.2 },
-			}}
-			layout
-		>
-			<Link to="/property/$propertyId" params={{ propertyId: property._id }} className="block">
-				<Card className="group h-full cursor-pointer overflow-hidden border-0 bg-white p-0 shadow-sm transition-all duration-300 hover:shadow-xl dark:bg-gray-800">
-					<div className="relative">
-						<img
-							src={currentImage || "/placeholder.svg"}
-							alt={property.title}
-							className="h-40 w-full object-cover transition-transform duration-300 sm:h-48"
-						/>
-
-						{/* Navigation arrows for multiple images */}
-						{hasMultipleImages && (
-							<>
-								<Button
-									variant="ghost"
-									size="icon"
-									className="-translate-y-1/2 absolute top-1/2 left-2 h-8 w-8 rounded-full bg-black/50 text-white opacity-0 transition-opacity hover:bg-black/70 hover:text-white group-hover:opacity-100"
-									onClick={(e) => {
-										e.preventDefault()
-										e.stopPropagation()
-										const newIndex =
-											currentImageIndex === 0
-												? (property.imageUrls?.length || 1) - 1
-												: currentImageIndex - 1
-										setCurrentImageIndex(newIndex)
-									}}
-								>
-									<ChevronLeft className="h-4 w-4" />
-								</Button>
-								<Button
-									variant="ghost"
-									size="icon"
-									className="-translate-y-1/2 absolute top-1/2 right-2 h-8 w-8 rounded-full bg-black/50 text-white opacity-0 transition-opacity hover:bg-black/70 hover:text-white group-hover:opacity-100"
-									onClick={(e) => {
-										e.preventDefault()
-										e.stopPropagation()
-										const newIndex =
-											currentImageIndex === (property.imageUrls?.length || 1) - 1
-												? 0
-												: currentImageIndex + 1
-										setCurrentImageIndex(newIndex)
-									}}
-								>
-									<ChevronRight className="h-4 w-4" />
-								</Button>
-							</>
-						)}
-
-						{/* Image counter */}
-						{hasMultipleImages && (
-							<div className="absolute bottom-2 left-2 rounded bg-black/70 px-2 py-1 text-white text-xs">
-								{currentImageIndex + 1} / {property.imageUrls?.length || 0}
-							</div>
-						)}
-
-						{/* Property type badge */}
-						<Badge
-							variant="secondary"
-							className="absolute top-2 left-2 bg-white/90 text-gray-800"
-						>
-							{propertyTypeLabel}
-						</Badge>
-
-						{/* Unsave button */}
-						<motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-							<Button
-								variant="ghost"
-								size="icon"
-								className="absolute top-2 right-2 h-9 w-9 rounded-full bg-white/90 shadow-sm transition-all duration-200 hover:bg-white"
-								onClick={handleUnsave}
-								disabled={isUnsaving}
-							>
-								{isUnsaving ? (
-									<Loader2 className="h-4 w-4 animate-spin text-gray-600" />
-								) : (
-									<motion.div
-										initial={{ scale: 1 }}
-										animate={{ scale: isUnsaving ? 0.8 : 1 }}
-										transition={{ duration: 0.2 }}
-									>
-										<Heart className="h-4 w-4 fill-red-500 text-red-500" />
-									</motion.div>
-								)}
-							</Button>
-						</motion.div>
-					</div>
-
-					<CardContent className="space-y-3 p-4">
-						<div className="space-y-1">
-							<h3 className="line-clamp-2 font-medium text-foreground leading-tight dark:text-white">
-								{property.title}
-							</h3>
-							<div className="flex items-center gap-1 text-muted-foreground text-sm">
-								<MapPin className="h-3 w-3" />
-								{property.address}, {property.city}
-							</div>
-						</div>
-
-						<div className="flex flex-wrap items-center gap-3 text-muted-foreground text-sm sm:gap-4">
-							<div className="flex items-center gap-1">
-								<Bed className="h-4 w-4" />
-								<span className="hidden sm:inline">
-									{property.rooms.bedrooms === 0
-										? "Studio"
-										: `${property.rooms.bedrooms} bed`}
-								</span>
-								<span className="sm:hidden">
-									{property.rooms.bedrooms === 0 ? "Studio" : property.rooms.bedrooms}
-								</span>
-							</div>
-							<div className="flex items-center gap-1">
-								<Bath className="h-4 w-4" />
-								<span className="hidden sm:inline">{property.rooms.bathrooms} bath</span>
-								<span className="sm:hidden">{property.rooms.bathrooms}</span>
-							</div>
-							<div className="flex items-center gap-1">
-								<Square className="h-4 w-4" />
-								<span className="hidden sm:inline">{sqft} sqft</span>
-								<span className="sm:hidden">{sqft}</span>
-							</div>
-						</div>
-
-						<div className="flex items-center justify-between pt-1">
-							<div>
-								<span className="font-semibold text-foreground text-lg dark:text-white">
-									${property.monthlyRent.toLocaleString()}
-								</span>
-								<span className="text-muted-foreground text-sm"> / month</span>
-							</div>
-						</div>
-
-						<div className="text-muted-foreground text-xs">Saved on {savedDateStr}</div>
-					</CardContent>
-				</Card>
-			</Link>
-		</motion.div>
+		<main className="w-full">
+			<AnimatedGroup
+				preset="blur-slide"
+				className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4"
+				variants={{
+					container: {
+						visible: {
+							transition: {
+								staggerChildren: 0.08,
+								delayChildren: 0.1,
+							},
+						},
+					},
+					item: {
+						hidden: {
+							opacity: 0,
+							y: 30,
+							filter: "blur(8px)",
+						},
+						visible: {
+							opacity: 1,
+							y: 0,
+							filter: "blur(0px)",
+							transition: {
+								duration: 0.5,
+								ease: "easeOut",
+							},
+						},
+					},
+				}}
+			>
+				{propertiesWithDate.map((item) => (
+					<PropertyCard
+						key={item.property._id}
+						property={item.property}
+						savedDate={item.savedDate}
+						isSaved={true}
+						onToggleSave={handleToggleSave}
+					/>
+				))}
+			</AnimatedGroup>
+		</main>
 	)
 }
 
-function PropertyCardSkeleton() {
-	return (
-		<Card className="h-full overflow-hidden border-0 bg-white p-0 shadow-sm dark:bg-gray-800">
-			<div className="relative">
-				<Skeleton className="h-40 w-full rounded-none sm:h-48" />
-				<div className="absolute bottom-2 left-2">
-					<Skeleton className="h-4 w-8 rounded" />
-				</div>
-				<div className="absolute top-2 left-2">
-					<Skeleton className="h-6 w-16 rounded-full" />
-				</div>
-				<div className="absolute top-2 right-2">
-					<Skeleton className="h-9 w-9 rounded-full" />
-				</div>
-			</div>
-			<CardContent className="space-y-3 p-4">
-				<div className="space-y-1">
-					<Skeleton className="h-5 w-3/4" />
-					<div className="flex items-center gap-1">
-						<Skeleton className="h-3 w-3 rounded-full" />
-						<Skeleton className="h-4 w-1/2" />
-					</div>
-				</div>
-				<div className="flex items-center gap-4">
-					<div className="flex items-center gap-1">
-						<Skeleton className="h-4 w-4" />
-						<Skeleton className="h-4 w-12" />
-					</div>
-					<div className="flex items-center gap-1">
-						<Skeleton className="h-4 w-4" />
-						<Skeleton className="h-4 w-12" />
-					</div>
-					<div className="flex items-center gap-1">
-						<Skeleton className="h-4 w-4" />
-						<Skeleton className="h-4 w-16" />
-					</div>
-				</div>
-				<div className="flex items-center justify-between pt-1">
-					<div>
-						<Skeleton className="inline h-6 w-16" />
-						<Skeleton className="ml-1 inline h-4 w-12" />
-					</div>
-				</div>
-				<Skeleton className="h-3 w-24" />
-			</CardContent>
-		</Card>
-	)
-}
-
-function EmptyState() {
-	return (
-		<motion.div
-			className="flex flex-col items-center justify-center py-16 text-center"
-			initial={{ opacity: 0, y: 20 }}
-			animate={{ opacity: 1, y: 0 }}
-			transition={{ duration: 0.5 }}
-		>
-			<div className="mb-4 rounded-full bg-blue-50 p-4 dark:bg-blue-900/20">
-				<Bookmark className="h-12 w-12 text-blue-500" />
-			</div>
-			<h3 className="mb-2 font-semibold text-foreground text-xl">No saved properties yet</h3>
-			<p className="mb-6 max-w-md text-muted-foreground">
-				Start exploring properties and save your favorites to see them here. Use the heart icon on any
-				property to add it to your saved list.
-			</p>
-			<Link to="/search">
-				<Button>
-					<Search className="mr-2 h-4 w-4" />
-					Browse Properties
-				</Button>
-			</Link>
-		</motion.div>
-	)
-}
-
-function ErrorState({ error }: { error: any }) {
-	return (
-		<motion.div
-			className="flex flex-col items-center justify-center py-16 text-center"
-			initial={{ opacity: 0, y: 20 }}
-			animate={{ opacity: 1, y: 0 }}
-			transition={{ duration: 0.5 }}
-		>
-			<div className="mb-4 rounded-full bg-red-50 p-4 dark:bg-red-900/20">
-				<AlertCircle className="h-12 w-12 text-red-500" />
-			</div>
-			<h3 className="mb-2 font-semibold text-foreground text-xl">Something went wrong</h3>
-			<p className="mb-6 max-w-md text-muted-foreground">
-				We're having trouble loading your saved properties. Please try refreshing the page or check
-				your connection.
-			</p>
-			{error && (
-				<details className="mb-4 text-muted-foreground text-sm">
-					<summary className="cursor-pointer">Technical details</summary>
-					<pre className="mt-2 max-w-lg overflow-auto rounded bg-gray-100 p-2 text-left text-xs dark:bg-gray-800">
-						{error.toString()}
-					</pre>
-				</details>
-			)}
-			<Button onClick={() => window.location.reload()}>Try Again</Button>
-		</motion.div>
-	)
-}
