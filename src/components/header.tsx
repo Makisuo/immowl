@@ -95,7 +95,9 @@ export const AppHeader = () => {
 										<li key={index}>
 											<Link
 												to={item.href}
-												search={item.href === "/search" ? searchLinkParams : undefined}
+												search={
+													item.href === "/search" ? searchLinkParams : undefined
+												}
 												className="block text-muted-foreground duration-150 hover:text-accent-foreground"
 											>
 												<span>{item.name}</span>

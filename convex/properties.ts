@@ -357,7 +357,7 @@ export const upsertScrapedProperty = internalMutation({
 		const existing = await ctx.db
 			.query("properties")
 			.withIndex("by_external_id_and_source", (q) =>
-				q.eq("externalId", args.externalId).eq("externalSource", args.externalSource)
+				q.eq("externalId", args.externalId).eq("externalSource", args.externalSource),
 			)
 			.first()
 

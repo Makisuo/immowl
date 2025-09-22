@@ -4,8 +4,8 @@ import { useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
 import { FilterDropdown } from "~/components/filter-dropdown"
 import { Button } from "~/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 import { useSavedSearch } from "~/hooks/use-saved-search"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 
 export function PropertySearch() {
 	const navigate = useNavigate()
@@ -14,7 +14,9 @@ export function PropertySearch() {
 	// Use saved search params as initial values if available
 	const savedParams = getSavedSearchParams()
 	const [city, setCity] = useState<string>(savedParams?.city || "Berlin")
-	const [propertyType, setPropertyType] = useState<string>(savedParams?.propertyType ? `${savedParams.propertyType}-rent` : "apartment-rent")
+	const [propertyType, setPropertyType] = useState<string>(
+		savedParams?.propertyType ? `${savedParams.propertyType}-rent` : "apartment-rent",
+	)
 
 	// Filter states
 	const [priceRange, setPriceRange] = useState<[number, number]>([1000, 3000])
@@ -39,13 +41,17 @@ export function PropertySearch() {
 			city,
 			country: "DE",
 			sortBy: "newest" as const,
-			propertyType: (propertyTypeMap[propertyType] || "apartment") as "apartment" | "house" | "condo" | "townhouse" | "studio",
+			propertyType: (propertyTypeMap[propertyType] || "apartment") as
+				| "apartment"
+				| "house"
+				| "condo"
+				| "townhouse"
+				| "studio",
 		}
 
 		// Merge with any additional saved filters (price, bedrooms, etc.)
-		const searchParams = savedParams && savedParams.city === city
-			? { ...savedParams, ...baseParams }
-			: baseParams
+		const searchParams =
+			savedParams && savedParams.city === city ? { ...savedParams, ...baseParams } : baseParams
 
 		// Navigate to search route with parameters
 		navigate({ to: "/search", search: searchParams })

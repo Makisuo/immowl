@@ -245,10 +245,20 @@ export const PropertyCard = memo(function PropertyCard({
 						<div className="flex items-center justify-between pt-1">
 							<div>
 								<span className="font-semibold text-foreground text-lg dark:text-white">
-									${(property.monthlyRent.warm || property.monthlyRent.cold || 0).toLocaleString()}
+									$
+									{(
+										property.monthlyRent.warm ||
+										property.monthlyRent.cold ||
+										0
+									).toLocaleString()}
 								</span>
 								<span className="text-muted-foreground text-sm">
-									{property.monthlyRent.warm ? " (warm)" : property.monthlyRent.cold ? " (cold)" : ""} / month
+									{property.monthlyRent.warm
+										? " (warm)"
+										: property.monthlyRent.cold
+											? " (cold)"
+											: ""}{" "}
+									/ month
 								</span>
 							</div>
 						</div>

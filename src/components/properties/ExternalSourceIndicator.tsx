@@ -1,6 +1,6 @@
 import { ExternalLink } from "lucide-react"
-import { getFaviconUrl, getSourceDisplayName } from "~/utils/externalSources"
 import { cn } from "~/lib/utils"
+import { getFaviconUrl, getSourceDisplayName } from "~/utils/externalSources"
 
 interface ExternalSourceIndicatorProps {
 	source?: string
@@ -21,7 +21,9 @@ export function ExternalSourceIndicator({
 }: ExternalSourceIndicatorProps) {
 	if (!source && !url) return null
 
-	const faviconUrl = getFaviconUrl(source) || (url ? `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=32` : null)
+	const faviconUrl =
+		getFaviconUrl(source) ||
+		(url ? `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=32` : null)
 	const displayName = getSourceDisplayName(source)
 
 	const sizeClasses = {
@@ -38,20 +40,20 @@ export function ExternalSourceIndicator({
 
 	return (
 		<div
-			className={cn(
-				"inline-flex items-center",
-				containerClasses[size],
-				className,
-			)}
+			className={cn("inline-flex items-center", containerClasses[size], className)}
 			onClick={onClick}
 			role={onClick ? "button" : undefined}
 			tabIndex={onClick ? 0 : undefined}
-			onKeyDown={onClick ? (e) => {
-				if (e.key === "Enter" || e.key === " ") {
-					e.preventDefault()
-					onClick(e as any)
-				}
-			} : undefined}
+			onKeyDown={
+				onClick
+					? (e) => {
+							if (e.key === "Enter" || e.key === " ") {
+								e.preventDefault()
+								onClick(e as any)
+							}
+						}
+					: undefined
+			}
 		>
 			{faviconUrl ? (
 				<img
@@ -63,11 +65,7 @@ export function ExternalSourceIndicator({
 			) : (
 				<ExternalLink className={cn(sizeClasses[size], "text-muted-foreground")} />
 			)}
-			{showText && (
-				<span className="text-muted-foreground">
-					{displayName}
-				</span>
-			)}
+			{showText && <span className="text-muted-foreground">{displayName}</span>}
 		</div>
 	)
 }

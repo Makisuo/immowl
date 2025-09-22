@@ -28,6 +28,8 @@ import { useState } from "react"
 import { toast } from "sonner"
 import { ImageGallery } from "~/components/ImageGallery"
 import { ExternalSourceIndicator } from "~/components/properties/ExternalSourceIndicator"
+import { PropertyInsights } from "~/components/properties/PropertyInsights"
+import { PropertyMatchScore } from "~/components/properties/PropertyMatchScore"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent } from "~/components/ui/card"
@@ -348,19 +350,35 @@ function PropertyDetails() {
 							)}
 						</div>
 
-						{/* Right Column - Pricing & Contact */}
+						{/* Right Column - Match Score, Insights, Pricing & Contact */}
 						<div className="lg:col-span-1">
 							<div className="sticky top-28 space-y-6">
+								{/* Match Score */}
+								<PropertyMatchScore property={property} />
+
+								{/* Property Insights */}
+								<PropertyInsights property={property} />
+
 								{/* Pricing Card */}
 								<Card>
 									<CardContent className="pt-6">
 										<div className="mb-6">
 											<div className="mb-2 flex items-baseline gap-1">
 												<span className="font-bold text-3xl">
-													${(property.monthlyRent.warm || property.monthlyRent.cold || 0).toLocaleString()}
+													$
+													{(
+														property.monthlyRent.warm ||
+														property.monthlyRent.cold ||
+														0
+													).toLocaleString()}
 												</span>
 												<span className="text-muted-foreground">
-													{property.monthlyRent.warm ? " (warm)" : property.monthlyRent.cold ? " (cold)" : ""}/month
+													{property.monthlyRent.warm
+														? " (warm)"
+														: property.monthlyRent.cold
+															? " (cold)"
+															: ""}
+													/month
 												</span>
 											</div>
 											<Badge variant="outline" className="mb-4">
@@ -380,7 +398,10 @@ function PropertyDetails() {
 												<span className="font-medium">
 													$
 													{(
-														property.deposit || property.monthlyRent.warm || property.monthlyRent.cold || 0
+														property.deposit ||
+														property.monthlyRent.warm ||
+														property.monthlyRent.cold ||
+														0
 													).toLocaleString()}
 												</span>
 											</div>
@@ -399,46 +420,54 @@ function PropertyDetails() {
 									</CardContent>
 								</Card>
 
-								{/* Contact Card */}
-								<Card>
-									<CardContent className="pt-6">
-										<h3 className="mb-4 font-semibold text-lg">Contact Information</h3>
-										<div className="space-y-3">
-											{property.contactEmail && (
-												<a
-													href={`mailto:${property.contactEmail}?subject=Inquiry about ${property.title}`}
-													className="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-muted"
-												>
-													<Mail className="h-4 w-4 text-muted-foreground" />
-													<span className="text-sm">{property.contactEmail}</span>
-												</a>
-											)}
-											{property.contactPhone && (
-												<a
-													href={`tel:${property.contactPhone}`}
-													className="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-muted"
-												>
-													<Phone className="h-4 w-4 text-muted-foreground" />
-													<span className="text-sm">{property.contactPhone}</span>
-												</a>
-											)}
-										</div>
-										<div className="mt-6 space-y-3">
-											<Button className="w-full" size="lg">
-												Schedule a Viewing
-											</Button>
-											<Button variant="outline" className="w-full" size="lg">
-												Ask a Question
-											</Button>
-										</div>
-									</CardContent>
-								</Card>
+								{/* Contact Card - Only show for non-external properties */}
+								{!property.isExternal && (
+									<Card>
+										<CardContent className="pt-6">
+											<h3 className="mb-4 font-semibold text-lg">
+												Contact Information
+											</h3>
+											<div className="space-y-3">
+												{property.contactEmail && (
+													<a
+														href={`mailto:${property.contactEmail}?subject=Inquiry about ${property.title}`}
+														className="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-muted"
+													>
+														<Mail className="h-4 w-4 text-muted-foreground" />
+														<span className="text-sm">
+															{property.contactEmail}
+														</span>
+													</a>
+												)}
+												{property.contactPhone && (
+													<a
+														href={`tel:${property.contactPhone}`}
+														className="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-muted"
+													>
+														<Phone className="h-4 w-4 text-muted-foreground" />
+														<span className="text-sm">
+															{property.contactPhone}
+														</span>
+													</a>
+												)}
+											</div>
+											<div className="mt-6 space-y-3">
+												<Button className="w-full" size="lg">
+													Schedule a Viewing
+												</Button>
+												<Button variant="outline" className="w-full" size="lg">
+													Ask a Question
+												</Button>
+											</div>
+										</CardContent>
+									</Card>
+								)}
 
-								{/* External Link */}
+								{/* External Link - Show prominently for external properties */}
 								{property.isExternal && property.externalUrl && (
 									<Card className="border-primary/20 bg-primary/5">
 										<CardContent className="pt-6">
-											<div className="mb-3 flex items-center gap-2">
+											<div className="mb-4 flex items-center gap-2">
 												<ExternalSourceIndicator
 													source={property.externalSource}
 													url={property.externalUrl}
@@ -446,9 +475,10 @@ function PropertyDetails() {
 													showText={false}
 												/>
 												<div className="flex-1">
-													<p className="font-medium text-sm">External Listing</p>
+													<p className="font-medium text-sm">View Full Listing</p>
 													<p className="text-muted-foreground text-xs">
-														From {getSourceDisplayName(property.externalSource)}
+														Contact & apply on{" "}
+														{getSourceDisplayName(property.externalSource)}
 													</p>
 												</div>
 											</div>
@@ -457,7 +487,7 @@ function PropertyDetails() {
 												target="_blank"
 												rel="noopener noreferrer"
 											>
-												<Button variant="outline" className="w-full" size="lg">
+												<Button className="w-full" size="lg">
 													<ExternalLink className="mr-2 h-4 w-4" />
 													View on {getSourceDisplayName(property.externalSource)}
 												</Button>
