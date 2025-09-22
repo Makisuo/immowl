@@ -5,7 +5,7 @@ import { externalSourceValidator, propertyTypeValidator } from "./validators"
 export default defineSchema({
 	users: defineTable({
 		email: v.string(),
-	}).index("email", ["email"]),
+	}).index("by_email", ["email"]),
 
 	properties: defineTable({
 		title: v.string(),
@@ -65,7 +65,8 @@ export default defineSchema({
 		.index("by_property_type", ["propertyType"])
 		.index("by_status_and_city", ["status", "address.city"])
 		.index("by_status_and_property_type", ["status", "propertyType"])
-		.index("by_external_id_and_source", ["externalId", "externalSource"]),
+		.index("by_external_id_and_source", ["externalId", "externalSource"])
+		.index("by_owner", ["ownerId"]),
 
 	savedProperties: defineTable({
 		userId: v.id("users"),

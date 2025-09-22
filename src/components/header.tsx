@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router"
-import { Heart, LogOut, Menu, User, X } from "lucide-react"
+import { Heart, Home, LogOut, Menu, User, X } from "lucide-react"
 import React from "react"
 import { Logo } from "~/components/logo"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
@@ -150,6 +150,12 @@ export const AppHeader = () => {
 												>
 													<Heart className="mr-2 h-4 w-4" />
 													<span>Saved Properties</span>
+												</Link>
+											</DropdownMenuItem>
+											<DropdownMenuItem asChild>
+												<Link to="/owners" className="cursor-pointer">
+													<Home className="mr-2 h-4 w-4" />
+													<span>My Properties</span>
 												</Link>
 											</DropdownMenuItem>
 											<DropdownMenuItem asChild>
