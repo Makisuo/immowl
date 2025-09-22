@@ -164,7 +164,7 @@ export const scrapeListing = internalAction({
 								garage: { type: "boolean" },
 								builtInKitchen: { type: "boolean" },
 								petFriendly: { type: "boolean" },
-								images: { type: "array", prompt: "All images of the property" },
+								images: { type: "array" },
 								contactName: { type: "string" },
 								contactPhone: { type: "string" },
 								yearBuilt: { type: "number" },
@@ -175,7 +175,7 @@ export const scrapeListing = internalAction({
 				],
 			})
 
-			console.log(`Scraped listing ${res}`)
+			console.log(`Scraped listing`, res)
 
 			if (!res || !(res as any).json) {
 				console.error(`No data returned for listing ${args.listingId}`)
