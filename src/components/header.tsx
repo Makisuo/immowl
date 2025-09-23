@@ -19,9 +19,7 @@ import { cn } from "~/lib/utils"
 const menuItems = [
 	{ name: "Search", href: "/search" },
 	{ name: "Saved", href: "/saved" },
-	{ name: "Solution", href: "#link" },
 	{ name: "Pricing", href: "#link" },
-	{ name: "About", href: "#link" },
 ]
 
 export const AppHeader = () => {
