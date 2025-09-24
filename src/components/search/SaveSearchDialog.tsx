@@ -1,8 +1,9 @@
 import { useConvexMutation } from "@convex-dev/react-query"
 import { useMutation } from "@tanstack/react-query"
+import { useForm } from "@tanstack/react-form"
 import { api } from "convex/_generated/api"
 import { Bell, BellOff, Save } from "lucide-react"
-import { useState } from "react"
+import { useEffect } from "react"
 import { toast } from "sonner"
 import { Button } from "~/components/ui/button"
 import {
@@ -26,63 +27,74 @@ interface SaveSearchDialogProps {
 }
 
 export function SaveSearchDialog({ open, onOpenChange, searchParams }: SaveSearchDialogProps) {
-	const [name, setName] = useState("")
-	const [description, setDescription] = useState("")
-	const [notificationsEnabled, setNotificationsEnabled] = useState(true)
-	const [emailNotifications, setEmailNotifications] = useState(true)
+	type SaveSearchForm = {
+		name: string
+		description: string
+		notificationsEnabled: boolean
+		emailNotifications: boolean
+	}
 
 	const createSavedSearch = useMutation({
 		mutationFn: useConvexMutation(api.savedSearches.createSavedSearch),
 	})
 
-	const handleSave = async () => {
-		if (!name.trim()) {
-			toast.error("Please enter a name for your search")
-			return
+	const form = useForm({
+		defaultValues: {
+			name: "",
+			description: "",
+			notificationsEnabled: true,
+			emailNotifications: true,
+		} as SaveSearchForm,
+		onSubmit: async ({ value }) => {
+			const v = value as SaveSearchForm
+			if (!v.name.trim()) {
+				toast.error("Please enter a name for your search")
+				return
+			}
+
+			if (!searchParams.city || !searchParams.country) {
+				toast.error("City and country are required to save a search")
+				return
+			}
+
+			try {
+				await createSavedSearch.mutateAsync({
+					name: v.name.trim(),
+					description: v.description.trim() || undefined,
+
+					// Search criteria - ensure required fields are present
+					city: searchParams.city,
+					country: searchParams.country,
+					propertyType: searchParams.propertyType,
+					sortBy: searchParams.sortBy,
+					minPrice: searchParams.minPrice,
+					maxPrice: searchParams.maxPrice,
+					bedrooms: searchParams.bedrooms,
+					bathrooms: searchParams.bathrooms,
+					amenities: searchParams.amenities,
+					petFriendly: searchParams.petFriendly,
+					furnished: searchParams.furnished,
+
+					// Notification settings
+					notificationsEnabled: v.notificationsEnabled,
+					emailNotifications: v.emailNotifications,
+				})
+
+				toast.success("Search saved successfully!")
+				onOpenChange(false)
+			} catch (error) {
+				toast.error("Failed to save search. Please try again.")
+				console.error(error)
+			}
+		},
+	})
+
+	// Reset form values when dialog closes
+	useEffect(() => {
+		if (!open) {
+			form.reset()
 		}
-
-		// Validate required fields
-		if (!searchParams.city || !searchParams.country) {
-			toast.error("City and country are required to save a search")
-			return
-		}
-
-		try {
-			await createSavedSearch.mutateAsync({
-				name: name.trim(),
-				description: description.trim() || undefined,
-
-				// Search criteria - ensure required fields are present
-				city: searchParams.city,
-				country: searchParams.country,
-				propertyType: searchParams.propertyType,
-				sortBy: searchParams.sortBy,
-				minPrice: searchParams.minPrice,
-				maxPrice: searchParams.maxPrice,
-				bedrooms: searchParams.bedrooms,
-				bathrooms: searchParams.bathrooms,
-				amenities: searchParams.amenities,
-				petFriendly: searchParams.petFriendly,
-				furnished: searchParams.furnished,
-
-				// Notification settings
-				notificationsEnabled,
-				emailNotifications,
-			})
-
-			toast.success("Search saved successfully!")
-			onOpenChange(false)
-
-			// Reset form
-			setName("")
-			setDescription("")
-			setNotificationsEnabled(true)
-			setEmailNotifications(true)
-		} catch (error) {
-			toast.error("Failed to save search. Please try again.")
-			console.error(error)
-		}
-	}
+	}, [open, form])
 
 	const getSearchSummary = () => {
 		const parts = []
@@ -135,96 +147,161 @@ export function SaveSearchDialog({ open, onOpenChange, searchParams }: SaveSearc
 						Save this search to get notified when new matching properties are available.
 					</DialogDescription>
 				</DialogHeader>
-
-				<div className="space-y-4 py-4">
-					{/* Search Summary */}
-					<div className="rounded-lg bg-muted p-3">
-						<Label className="font-medium text-sm">Search Criteria</Label>
-						<p className="mt-1 text-muted-foreground text-sm">{getSearchSummary()}</p>
-					</div>
-
-					{/* Name Input */}
-					<div className="space-y-2">
-						<Label htmlFor="name">Search Name *</Label>
-						<Input
-							id="name"
-							placeholder="e.g., 2BR Apartments in Berlin"
-							value={name}
-							onChange={(e) => setName(e.target.value)}
-							maxLength={100}
-						/>
-						<p className="text-muted-foreground text-xs">{name.length}/100 characters</p>
-					</div>
-
-					{/* Description Input */}
-					<div className="space-y-2">
-						<Label htmlFor="description">Description (optional)</Label>
-						<Textarea
-							id="description"
-							placeholder="Add notes about what you're looking for..."
-							value={description}
-							onChange={(e) => setDescription(e.target.value)}
-							rows={3}
-							maxLength={500}
-						/>
-						<p className="text-muted-foreground text-xs">{description.length}/500 characters</p>
-					</div>
-
-					{/* Notification Settings */}
-					<div className="space-y-4 border-t pt-4">
-						<Label className="font-medium text-sm">Notification Settings</Label>
-
-						<div className="flex items-center justify-between">
-							<div className="flex items-center space-x-2">
-								{notificationsEnabled ? (
-									<Bell className="h-4 w-4 text-blue-600" />
-								) : (
-									<BellOff className="h-4 w-4 text-muted-foreground" />
-								)}
-								<div>
-									<Label htmlFor="notifications" className="font-normal">
-										Enable Notifications
-									</Label>
-									<p className="text-muted-foreground text-xs">
-										Get notified when new properties match your search
-									</p>
-								</div>
-							</div>
-							<Switch
-								id="notifications"
-								checked={notificationsEnabled}
-								onCheckedChange={setNotificationsEnabled}
-							/>
+				<form
+					onSubmit={(e) => {
+						e.preventDefault()
+						e.stopPropagation()
+						form.handleSubmit()
+					}}
+				>
+					<div className="space-y-4 py-4">
+						{/* Search Summary */}
+						<div className="rounded-lg bg-muted p-3">
+							<p className="font-medium text-sm">Search Criteria</p>
+							<p className="mt-1 text-muted-foreground text-sm">{getSearchSummary()}</p>
 						</div>
 
-						{notificationsEnabled && (
-							<div className="flex items-center justify-between pl-6">
-								<div>
-									<Label htmlFor="email-notifications" className="font-normal">
-										Email Notifications
-									</Label>
-									<p className="text-muted-foreground text-xs">
-										Receive notifications via email
-									</p>
+						{/* Name Input */}
+						<form.Field
+							name="name"
+							validators={{
+								onChange: ({ value }) =>
+									!value.trim()
+										? "A name is required"
+										: value.length > 100
+											? "Name must be at most 100 characters"
+											: undefined,
+							}}
+						>
+							{(field) => (
+								<div className="space-y-2">
+									<Label htmlFor={field.name}>Search Name *</Label>
+									<Input
+										id={field.name}
+										placeholder="e.g., 2BR Apartment in Berlin"
+										value={field.state.value}
+										onChange={(e) => field.handleChange(e.target.value)}
+										maxLength={100}
+									/>
+									<div className="flex items-center justify-between">
+										<p className="text-muted-foreground text-xs">
+											{field.state.value.length}/100 characters
+										</p>
+										{field.state.meta.errors.length > 0 && (
+											<p className="text-red-600 text-xs">
+												{field.state.meta.errors[0]}
+											</p>
+										)}
+									</div>
 								</div>
-								<Switch
-									id="email-notifications"
-									checked={emailNotifications}
-									onCheckedChange={setEmailNotifications}
-								/>
-							</div>
-						)}
-					</div>
-				</div>
+							)}
+						</form.Field>
 
-				<DialogFooter>
-					<Button variant="outline" onClick={() => onOpenChange(false)}>
-						Cancel
-					</Button>
-					<Button onClick={handleSave} disabled={!name.trim() || createSavedSearch.isPending}>
-						{createSavedSearch.isPending ? "Saving..." : "Save Search"}
-					</Button>
-				</DialogFooter>
+						{/* Description Input */}
+						<form.Field
+							name="description"
+							validators={{
+								onChange: ({ value }) =>
+									value.length > 500
+										? "Description must be at most 500 characters"
+										: undefined,
+							}}
+						>
+							{(field) => (
+								<div className="space-y-2">
+									<Label htmlFor={field.name}>Description (optional)</Label>
+									<Textarea
+										id={field.name}
+										placeholder="Add notes about what you're looking for..."
+										value={field.state.value}
+										onChange={(e) => field.handleChange(e.target.value)}
+										rows={3}
+										maxLength={500}
+									/>
+									<div className="flex items-center justify-between">
+										<p className="text-muted-foreground text-xs">
+											{field.state.value.length}/500 characters
+										</p>
+										{field.state.meta.errors.length > 0 && (
+											<p className="text-red-600 text-xs">
+												{field.state.meta.errors[0]}
+											</p>
+										)}
+									</div>
+								</div>
+							)}
+						</form.Field>
+
+						{/* Notification Settings */}
+						<div className="space-y-4 border-t pt-4">
+							<Label className="font-medium text-sm">Notification Settings</Label>
+
+							<form.Field name="notificationsEnabled">
+								{(field) => (
+									<div className="flex items-center justify-between">
+										<div className="flex items-center space-x-2">
+											{field.state.value ? (
+												<Bell className="h-4 w-4 text-blue-600" />
+											) : (
+												<BellOff className="h-4 w-4 text-muted-foreground" />
+											)}
+											<div>
+												<Label htmlFor="notifications" className="font-normal">
+													Enable Notifications
+												</Label>
+												<p className="text-muted-foreground text-xs">
+													Get notified when new properties match your search
+												</p>
+											</div>
+										</div>
+										<Switch
+											id="notifications"
+											checked={field.state.value}
+											onCheckedChange={(v) => field.handleChange(Boolean(v))}
+										/>
+									</div>
+								)}
+							</form.Field>
+
+							<form.Field name="emailNotifications">
+								{(field) =>
+									field.form.getFieldValue("notificationsEnabled") ? (
+										<div className="flex items-center justify-between pl-6">
+											<div>
+												<Label htmlFor="email-notifications" className="font-normal">
+													Email Notifications
+												</Label>
+												<p className="text-muted-foreground text-xs">
+													Receive notifications via email
+												</p>
+											</div>
+											<Switch
+												id="email-notifications"
+												checked={field.state.value}
+												onCheckedChange={(v) => field.handleChange(Boolean(v))}
+											/>
+										</div>
+									) : null
+								}
+							</form.Field>
+						</div>
+					</div>
+
+					<DialogFooter>
+						<Button variant="outline" type="button" onClick={() => onOpenChange(false)}>
+							Cancel
+						</Button>
+						<form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+							{([canSubmit, isSubmitting]) => (
+								<Button type="submit" disabled={!canSubmit || createSavedSearch.isPending}>
+									{createSavedSearch.isPending || isSubmitting
+										? "Saving..."
+										: "Save Search"}
+								</Button>
+							)}
+						</form.Subscribe>
+					</DialogFooter>
+				</form>
 			</DialogContent>
 		</Dialog>
 	)

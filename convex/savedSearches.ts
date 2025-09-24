@@ -38,18 +38,22 @@ export const createSavedSearch = mutation({
 			name: args.name,
 			description: args.description,
 
-			// Search criteria
-			city: args.city,
-			country: args.country,
-			propertyType: args.propertyType,
+			// Search criteria (nested)
+			criteria: {
+				city: args.city,
+				country: args.country,
+				propertyType: args.propertyType,
+				minPrice: args.minPrice,
+				maxPrice: args.maxPrice,
+				bedrooms: args.bedrooms,
+				bathrooms: args.bathrooms,
+				amenities: args.amenities,
+				petFriendly: args.petFriendly,
+				furnished: args.furnished,
+			},
+
+			// Sorting
 			sortBy: args.sortBy,
-			minPrice: args.minPrice,
-			maxPrice: args.maxPrice,
-			bedrooms: args.bedrooms,
-			bathrooms: args.bathrooms,
-			amenities: args.amenities,
-			petFriendly: args.petFriendly,
-			furnished: args.furnished,
 
 			// Notification settings
 			notificationsEnabled: args.notificationsEnabled,
@@ -107,22 +111,39 @@ export const updateSavedSearch = mutation({
 			lastModified: Date.now(),
 		}
 
-		// Only update provided fields
+		// Only update provided fields (top-level)
 		if (args.name !== undefined) updates.name = args.name
 		if (args.description !== undefined) updates.description = args.description
-		if (args.city !== undefined) updates.city = args.city
-		if (args.country !== undefined) updates.country = args.country
-		if (args.propertyType !== undefined) updates.propertyType = args.propertyType
 		if (args.sortBy !== undefined) updates.sortBy = args.sortBy
-		if (args.minPrice !== undefined) updates.minPrice = args.minPrice
-		if (args.maxPrice !== undefined) updates.maxPrice = args.maxPrice
-		if (args.bedrooms !== undefined) updates.bedrooms = args.bedrooms
-		if (args.bathrooms !== undefined) updates.bathrooms = args.bathrooms
-		if (args.amenities !== undefined) updates.amenities = args.amenities
-		if (args.petFriendly !== undefined) updates.petFriendly = args.petFriendly
-		if (args.furnished !== undefined) updates.furnished = args.furnished
 		if (args.notificationsEnabled !== undefined) updates.notificationsEnabled = args.notificationsEnabled
 		if (args.emailNotifications !== undefined) updates.emailNotifications = args.emailNotifications
+
+		// Build updated nested criteria (support legacy docs without `criteria`)
+		const baseCriteria: any = (savedSearch as any).criteria ?? {
+			city: (savedSearch as any).city,
+			country: (savedSearch as any).country,
+			propertyType: (savedSearch as any).propertyType,
+			minPrice: (savedSearch as any).minPrice,
+			maxPrice: (savedSearch as any).maxPrice,
+			bedrooms: (savedSearch as any).bedrooms,
+			bathrooms: (savedSearch as any).bathrooms,
+			amenities: (savedSearch as any).amenities,
+			petFriendly: (savedSearch as any).petFriendly,
+			furnished: (savedSearch as any).furnished,
+		}
+		const updatedCriteria: any = { ...baseCriteria }
+		if (args.city !== undefined) updatedCriteria.city = args.city
+		if (args.country !== undefined) updatedCriteria.country = args.country
+		if (args.propertyType !== undefined) updatedCriteria.propertyType = args.propertyType
+		if (args.minPrice !== undefined) updatedCriteria.minPrice = args.minPrice
+		if (args.maxPrice !== undefined) updatedCriteria.maxPrice = args.maxPrice
+		if (args.bedrooms !== undefined) updatedCriteria.bedrooms = args.bedrooms
+		if (args.bathrooms !== undefined) updatedCriteria.bathrooms = args.bathrooms
+		if (args.amenities !== undefined) updatedCriteria.amenities = args.amenities
+		if (args.petFriendly !== undefined) updatedCriteria.petFriendly = args.petFriendly
+		if (args.furnished !== undefined) updatedCriteria.furnished = args.furnished
+
+		updates.criteria = updatedCriteria
 
 		await ctx.db.patch(args.searchId, updates)
 		return null
@@ -269,17 +290,30 @@ export const getSavedSearchResults = query({
 		// Use the same logic as the main property search
 		const { buildPropertyQuery, applySorting, sortPaginatedResults } = await import("./propertyUtils")
 
+		// Handle legacy docs that might not have `criteria`
+		const criteria1: any = (savedSearch as any).criteria ?? {
+			city: (savedSearch as any).city,
+			country: (savedSearch as any).country,
+			propertyType: (savedSearch as any).propertyType,
+			minPrice: (savedSearch as any).minPrice,
+			maxPrice: (savedSearch as any).maxPrice,
+			bedrooms: (savedSearch as any).bedrooms,
+			bathrooms: (savedSearch as any).bathrooms,
+			amenities: (savedSearch as any).amenities,
+			petFriendly: (savedSearch as any).petFriendly,
+			furnished: (savedSearch as any).furnished,
+		}
 		const filteredQuery = buildPropertyQuery(ctx, {
-			city: savedSearch.city,
-			country: savedSearch.country,
-			propertyType: savedSearch.propertyType,
-			minPrice: savedSearch.minPrice,
-			maxPrice: savedSearch.maxPrice,
-			bedrooms: savedSearch.bedrooms,
-			bathrooms: savedSearch.bathrooms,
-			amenities: savedSearch.amenities,
-			petFriendly: savedSearch.petFriendly,
-			furnished: savedSearch.furnished,
+			city: criteria1.city,
+			country: criteria1.country,
+			propertyType: criteria1.propertyType,
+			minPrice: criteria1.minPrice,
+			maxPrice: criteria1.maxPrice,
+			bedrooms: criteria1.bedrooms,
+			bathrooms: criteria1.bathrooms,
+			amenities: criteria1.amenities,
+			petFriendly: criteria1.petFriendly,
+			furnished: criteria1.furnished,
 		})
 
 		const orderedQuery = applySorting(filteredQuery, savedSearch.sortBy)
@@ -313,17 +347,30 @@ export const getSavedSearchCount = query({
 		// Use the same logic as the main property search
 		const { buildPropertyQuery } = await import("./propertyUtils")
 
+		// Handle legacy docs that might not have `criteria`
+		const criteria2: any = (savedSearch as any).criteria ?? {
+			city: (savedSearch as any).city,
+			country: (savedSearch as any).country,
+			propertyType: (savedSearch as any).propertyType,
+			minPrice: (savedSearch as any).minPrice,
+			maxPrice: (savedSearch as any).maxPrice,
+			bedrooms: (savedSearch as any).bedrooms,
+			bathrooms: (savedSearch as any).bathrooms,
+			amenities: (savedSearch as any).amenities,
+			petFriendly: (savedSearch as any).petFriendly,
+			furnished: (savedSearch as any).furnished,
+		}
 		const filteredQuery = buildPropertyQuery(ctx, {
-			city: savedSearch.city,
-			country: savedSearch.country,
-			propertyType: savedSearch.propertyType,
-			minPrice: savedSearch.minPrice,
-			maxPrice: savedSearch.maxPrice,
-			bedrooms: savedSearch.bedrooms,
-			bathrooms: savedSearch.bathrooms,
-			amenities: savedSearch.amenities,
-			petFriendly: savedSearch.petFriendly,
-			furnished: savedSearch.furnished,
+			city: criteria2.city,
+			country: criteria2.country,
+			propertyType: criteria2.propertyType,
+			minPrice: criteria2.minPrice,
+			maxPrice: criteria2.maxPrice,
+			bedrooms: criteria2.bedrooms,
+			bathrooms: criteria2.bathrooms,
+			amenities: criteria2.amenities,
+			petFriendly: criteria2.petFriendly,
+			furnished: criteria2.furnished,
 		})
 
 		const properties = await filteredQuery.collect()

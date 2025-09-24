@@ -1,9 +1,19 @@
 import { v } from "convex/values"
 import { internalAction, internalMutation } from "./_generated/server"
 
-import type { Doc } from "./_generated/dataModel"
+import type { Doc, Id } from "./_generated/dataModel"
 import { internal } from "./_generated/api"
 import { propertyTypeValidator } from "./validators"
+
+// Narrowed property shape used for matching and notifications
+type MatchableProperty = Pick<
+	Doc<"properties">,
+	"title" | "propertyType" | "amenities" | "furnished" | "petFriendly"
+> & {
+	address: Pick<Doc<"properties">["address"], "city" | "country">
+	monthlyRent: Doc<"properties">["monthlyRent"]
+	rooms: Doc<"properties">["rooms"]
+}
 
 // Check if a new property matches any saved searches
 export const checkPropertyMatches = internalAction({
@@ -56,45 +66,59 @@ export const checkPropertyMatches = internalAction({
 })
 
 // Helper function to check if property matches search criteria
-function doesPropertyMatchSearch(property: any, search: any): boolean {
+function doesPropertyMatchSearch(property: MatchableProperty, search: Doc<"savedSearches">): boolean {
+	// Support new nested criteria as well as legacy flat fields
+	const criteria = (search as any).criteria ?? {
+		city: (search as any).city,
+		country: (search as any).country,
+		propertyType: (search as any).propertyType,
+		minPrice: (search as any).minPrice,
+		maxPrice: (search as any).maxPrice,
+		bedrooms: (search as any).bedrooms,
+		bathrooms: (search as any).bathrooms,
+		amenities: (search as any).amenities,
+		petFriendly: (search as any).petFriendly,
+		furnished: (search as any).furnished,
+	}
+
 	// City match (required)
-	if (property.address.city.toLowerCase() !== search.city.toLowerCase()) {
+	if (property.address.city.toLowerCase() !== String(criteria.city).toLowerCase()) {
 		return false
 	}
 
 	// Country match (required)
-	if (property.address.country !== search.country) {
+	if (property.address.country !== criteria.country) {
 		return false
 	}
 
 	// Property type match (if specified)
-	if (search.propertyType && property.propertyType !== search.propertyType) {
+	if (criteria.propertyType && property.propertyType !== criteria.propertyType) {
 		return false
 	}
 
 	// Price range match
 	const rent = property.monthlyRent.warm || property.monthlyRent.cold || 0
-	if (search.minPrice && rent < search.minPrice) return false
-	if (search.maxPrice && rent > search.maxPrice) return false
+	if (criteria.minPrice && rent < criteria.minPrice) return false
+	if (criteria.maxPrice && rent > criteria.maxPrice) return false
 
 	// Bedroom match
-	if (search.bedrooms !== undefined && property.rooms.bedrooms !== search.bedrooms) {
+	if (criteria.bedrooms !== undefined && property.rooms.bedrooms !== criteria.bedrooms) {
 		return false
 	}
 
 	// Bathroom match
-	if (search.bathrooms !== undefined && property.rooms.bathrooms < search.bathrooms) {
+	if (criteria.bathrooms !== undefined && property.rooms.bathrooms < criteria.bathrooms) {
 		return false
 	}
 
 	// Boolean filters
-	if (search.furnished === true && !property.furnished) return false
-	if (search.petFriendly === true && !property.petFriendly) return false
+	if (criteria.furnished === true && !property.furnished) return false
+	if (criteria.petFriendly === true && !property.petFriendly) return false
 
 	// Amenities match (property must have all required amenities)
-	if (search.amenities && search.amenities.length > 0) {
+	if (criteria.amenities && criteria.amenities.length > 0) {
 		const propertyAmenities = property.amenities || []
-		const hasAllAmenities = search.amenities.every((amenity: string) =>
+		const hasAllAmenities = (criteria.amenities as string[]).every((amenity: string) =>
 			propertyAmenities.includes(amenity),
 		)
 		if (!hasAllAmenities) return false
@@ -111,13 +135,19 @@ export const sendPropertyMatchNotifications = internalMutation({
 		matchingSearches: v.array(v.any()), // Array of matching saved searches
 	},
 	returns: v.null(),
-	handler: async (ctx, { property, matchingSearches }) => {
+	handler: async (ctx, { propertyId, property, matchingSearches }) => {
 		// Group by user to send one email per user (even if multiple searches match)
-		const userNotifications = new Map()
+		const userNotifications = new Map<
+			string,
+			{ user: Doc<"users"> | null; searches: Doc<"savedSearches">[]; properties: MatchableProperty[] }
+		>()
 
-		for (const search of matchingSearches) {
+		const p = property as MatchableProperty
+		const searches = matchingSearches as Doc<"savedSearches">[]
+
+		for (const search of searches) {
 			if (!userNotifications.has(search.userId)) {
-				const user = await ctx.db.get(search.userId)
+				const user = await ctx.db.get(search.userId as Id<"users">)
 				userNotifications.set(search.userId, {
 					user,
 					searches: [],
@@ -125,19 +155,26 @@ export const sendPropertyMatchNotifications = internalMutation({
 				})
 			}
 
-			userNotifications.get(search.userId).searches.push(search)
-			userNotifications.get(search.userId).properties.push(property)
+			userNotifications.get(search.userId)!.searches.push(search)
+			userNotifications.get(search.userId)!.properties.push(p)
 		}
 
 		// Send notifications
 		for (const [, notification] of userNotifications) {
 			if (notification.user?.email && notification.searches.length > 0) {
+				// Fetch the full property document for the email
+				const fullProperty = await ctx.db.get(propertyId)
+				if (!fullProperty) {
+					console.error("Property not found for notification:", propertyId)
+					continue
+				}
+
 				// Send email notification
 				await sendPropertyMatchEmail({
 					to: notification.user.email,
 					userName: notification.user.email.split("@")[0], // Simple name extraction
 					searches: notification.searches,
-					property: property,
+					property: fullProperty,
 				})
 
 				// Update last notification timestamp for all matching searches

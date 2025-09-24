@@ -79,25 +79,29 @@ export default defineSchema({
 		userId: v.id("users"),
 		name: v.string(), // User-defined name for the search
 		description: v.optional(v.string()), // Optional description
-		
-		// Search criteria (mirrors SearchFilters interface)
-		city: v.string(),
-		country: v.string(),
-		propertyType: v.optional(propertyTypeValidator),
+
+		// Search criteria grouped under a single object for extensibility
+		criteria: v.object({
+			city: v.string(),
+			country: v.string(),
+			propertyType: v.optional(propertyTypeValidator),
+			minPrice: v.optional(v.number()),
+			maxPrice: v.optional(v.number()),
+			bedrooms: v.optional(v.number()),
+			bathrooms: v.optional(v.number()),
+			amenities: v.optional(v.array(v.string())),
+			petFriendly: v.optional(v.boolean()),
+			furnished: v.optional(v.boolean()),
+		}),
+
+		// Sorting
 		sortBy: propertySortByValidator,
-		minPrice: v.optional(v.number()),
-		maxPrice: v.optional(v.number()),
-		bedrooms: v.optional(v.number()),
-		bathrooms: v.optional(v.number()),
-		amenities: v.optional(v.array(v.string())),
-		petFriendly: v.optional(v.boolean()),
-		furnished: v.optional(v.boolean()),
-		
+
 		// Notification settings
 		notificationsEnabled: v.boolean(),
 		emailNotifications: v.boolean(),
 		lastNotificationSent: v.optional(v.number()), // timestamp
-		
+
 		// Metadata
 		isActive: v.boolean(), // user can disable without deleting
 		createdAt: v.number(),
@@ -106,5 +110,5 @@ export default defineSchema({
 		.index("by_user", ["userId"])
 		.index("by_user_active", ["userId", "isActive"])
 		.index("by_notifications", ["notificationsEnabled", "isActive"])
-		.index("by_city_notifications", ["city", "notificationsEnabled", "isActive"]),
+		.index("by_city_notifications", ["criteria.city", "notificationsEnabled", "isActive"]),
 })

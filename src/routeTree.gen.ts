@@ -26,6 +26,7 @@ import { Route as AppAuthedSearchRequestsRouteImport } from './routes/_app/_auth
 import { Route as AppAuthedSavedRouteImport } from './routes/_app/_authed/saved'
 import { Route as AppAuthedProfileRouteImport } from './routes/_app/_authed/profile'
 import { Route as AppAuthedOwnersRouteImport } from './routes/_app/_authed/owners'
+import { Route as AppAuthedSavedSearchSearchIdRouteImport } from './routes/_app/_authed/saved-search.$searchId'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
 
 const rootServerRouteImport = createServerRootRoute()
@@ -102,6 +103,12 @@ const AppAuthedOwnersRoute = AppAuthedOwnersRouteImport.update({
   path: '/owners',
   getParentRoute: () => AppAuthedLayoutRoute,
 } as any)
+const AppAuthedSavedSearchSearchIdRoute =
+  AppAuthedSavedSearchSearchIdRouteImport.update({
+    id: '/saved-search/$searchId',
+    path: '/saved-search/$searchId',
+    getParentRoute: () => AppAuthedLayoutRoute,
+  } as any)
 const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -121,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/search-requests': typeof AppAuthedSearchRequestsRoute
   '/user': typeof AppAuthedUserRoute
   '/property/$propertyId': typeof AppPropertyPropertyIdRoute
+  '/saved-search/$searchId': typeof AppAuthedSavedSearchSearchIdRoute
 }
 export interface FileRoutesByTo {
   '/search': typeof AppSearchRoute
@@ -135,6 +143,7 @@ export interface FileRoutesByTo {
   '/search-requests': typeof AppAuthedSearchRequestsRoute
   '/user': typeof AppAuthedUserRoute
   '/property/$propertyId': typeof AppPropertyPropertyIdRoute
+  '/saved-search/$searchId': typeof AppAuthedSavedSearchSearchIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -153,6 +162,7 @@ export interface FileRoutesById {
   '/_app/_authed/search-requests': typeof AppAuthedSearchRequestsRoute
   '/_app/_authed/user': typeof AppAuthedUserRoute
   '/_app/property/$propertyId': typeof AppPropertyPropertyIdRoute
+  '/_app/_authed/saved-search/$searchId': typeof AppAuthedSavedSearchSearchIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/search-requests'
     | '/user'
     | '/property/$propertyId'
+    | '/saved-search/$searchId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/search'
@@ -183,6 +194,7 @@ export interface FileRouteTypes {
     | '/search-requests'
     | '/user'
     | '/property/$propertyId'
+    | '/saved-search/$searchId'
   id:
     | '__root__'
     | '/_app'
@@ -200,6 +212,7 @@ export interface FileRouteTypes {
     | '/_app/_authed/search-requests'
     | '/_app/_authed/user'
     | '/_app/property/$propertyId'
+    | '/_app/_authed/saved-search/$searchId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -335,6 +348,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAuthedOwnersRouteImport
       parentRoute: typeof AppAuthedLayoutRoute
     }
+    '/_app/_authed/saved-search/$searchId': {
+      id: '/_app/_authed/saved-search/$searchId'
+      path: '/saved-search/$searchId'
+      fullPath: '/saved-search/$searchId'
+      preLoaderRoute: typeof AppAuthedSavedSearchSearchIdRouteImport
+      parentRoute: typeof AppAuthedLayoutRoute
+    }
   }
 }
 declare module '@tanstack/react-start/server' {
@@ -355,6 +375,7 @@ interface AppAuthedLayoutRouteChildren {
   AppAuthedSavedRoute: typeof AppAuthedSavedRoute
   AppAuthedSearchRequestsRoute: typeof AppAuthedSearchRequestsRoute
   AppAuthedUserRoute: typeof AppAuthedUserRoute
+  AppAuthedSavedSearchSearchIdRoute: typeof AppAuthedSavedSearchSearchIdRoute
 }
 
 const AppAuthedLayoutRouteChildren: AppAuthedLayoutRouteChildren = {
@@ -363,6 +384,7 @@ const AppAuthedLayoutRouteChildren: AppAuthedLayoutRouteChildren = {
   AppAuthedSavedRoute: AppAuthedSavedRoute,
   AppAuthedSearchRequestsRoute: AppAuthedSearchRequestsRoute,
   AppAuthedUserRoute: AppAuthedUserRoute,
+  AppAuthedSavedSearchSearchIdRoute: AppAuthedSavedSearchSearchIdRoute,
 }
 
 const AppAuthedLayoutRouteWithChildren = AppAuthedLayoutRoute._addFileChildren(

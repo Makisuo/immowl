@@ -189,40 +189,58 @@ function SavedSearchCard({
 		}),
 	)
 
+	// Helper to get criteria from either new nested structure or legacy flat fields
+	const getCriteria = () => {
+		return (search as any).criteria ?? {
+			city: (search as any).city,
+			country: (search as any).country,
+			propertyType: (search as any).propertyType,
+			minPrice: (search as any).minPrice,
+			maxPrice: (search as any).maxPrice,
+			bedrooms: (search as any).bedrooms,
+			bathrooms: (search as any).bathrooms,
+			amenities: (search as any).amenities,
+			petFriendly: (search as any).petFriendly,
+			furnished: (search as any).furnished,
+		}
+	}
+
 	const getSearchSummary = () => {
+		const criteria = getCriteria()
+
 		const parts = []
 
-		parts.push(`${search.city}, ${search.country}`)
+		parts.push(`${criteria.city}, ${criteria.country}`)
 
-		if (search.propertyType) {
-			parts.push(search.propertyType)
+		if (criteria.propertyType) {
+			parts.push(criteria.propertyType)
 		}
 
-		if (search.minPrice || search.maxPrice) {
+		if (criteria.minPrice || criteria.maxPrice) {
 			const priceRange = []
-			if (search.minPrice) priceRange.push(`€${search.minPrice}+`)
-			if (search.maxPrice) priceRange.push(`€${search.maxPrice}-`)
+			if (criteria.minPrice) priceRange.push(`€${criteria.minPrice}+`)
+			if (criteria.maxPrice) priceRange.push(`€${criteria.maxPrice}-`)
 			parts.push(priceRange.join(" to "))
 		}
 
-		if (search.bedrooms) {
-			parts.push(`${search.bedrooms} bed`)
+		if (criteria.bedrooms) {
+			parts.push(`${criteria.bedrooms} bed`)
 		}
 
-		if (search.bathrooms) {
-			parts.push(`${search.bathrooms}+ bath`)
+		if (criteria.bathrooms) {
+			parts.push(`${criteria.bathrooms}+ bath`)
 		}
 
-		if (search.furnished) {
+		if (criteria.furnished) {
 			parts.push("furnished")
 		}
 
-		if (search.petFriendly) {
+		if (criteria.petFriendly) {
 			parts.push("pet-friendly")
 		}
 
-		if (search.amenities && search.amenities.length > 0) {
-			parts.push(`${search.amenities.length} amenities`)
+		if (criteria.amenities && criteria.amenities.length > 0) {
+			parts.push(`${criteria.amenities.length} amenities`)
 		}
 
 		return parts.join(" • ")
@@ -318,18 +336,21 @@ function SavedSearchCard({
 
 					<Link
 						to="/search"
-						search={{
-							city: search.city,
-							country: search.country,
-							propertyType: search.propertyType,
-							sortBy: search.sortBy,
-							minPrice: search.minPrice,
-							maxPrice: search.maxPrice,
-							bedrooms: search.bedrooms,
-							bathrooms: search.bathrooms,
-							amenities: search.amenities,
-							petFriendly: search.petFriendly,
-							furnished: search.furnished,
+						search={() => {
+							const criteria = getCriteria()
+							return {
+								city: criteria.city,
+								country: criteria.country,
+								propertyType: criteria.propertyType,
+								sortBy: search.sortBy,
+								minPrice: criteria.minPrice,
+								maxPrice: criteria.maxPrice,
+								bedrooms: criteria.bedrooms,
+								bathrooms: criteria.bathrooms,
+								amenities: criteria.amenities,
+								petFriendly: criteria.petFriendly,
+								furnished: criteria.furnished,
+							}
 						}}
 						className="text-blue-600 text-xs hover:underline"
 					>
