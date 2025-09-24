@@ -21,10 +21,12 @@ import type * as emails_resetPassword from "../emails/resetPassword.js";
 import type * as emails_verifyEmail from "../emails/verifyEmail.js";
 import type * as emails_verifyOtp from "../emails/verifyOtp.js";
 import type * as http from "../http.js";
+import type * as notifications from "../notifications.js";
 import type * as ownerProperties from "../ownerProperties.js";
 import type * as properties from "../properties.js";
 import type * as propertyUtils from "../propertyUtils.js";
 import type * as savedProperties from "../savedProperties.js";
+import type * as savedSearches from "../savedSearches.js";
 import type * as user from "../user.js";
 import type * as validators from "../validators.js";
 
@@ -56,10 +58,12 @@ declare const fullApi: ApiFromModules<{
   "emails/verifyEmail": typeof emails_verifyEmail;
   "emails/verifyOtp": typeof emails_verifyOtp;
   http: typeof http;
+  notifications: typeof notifications;
   ownerProperties: typeof ownerProperties;
   properties: typeof properties;
   propertyUtils: typeof propertyUtils;
   savedProperties: typeof savedProperties;
+  savedSearches: typeof savedSearches;
   user: typeof user;
   validators: typeof validators;
 }>;

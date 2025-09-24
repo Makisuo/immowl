@@ -21,6 +21,7 @@ import {
 import { paginationOptsValidator } from "convex/server"
 import { v } from "convex/values"
 import { internalMutation, mutation, query } from "./_generated/server"
+import { internal } from "./_generated/api"
 import { applySorting, buildPropertyQuery, sortPaginatedResults } from "./propertyUtils"
 import { externalSourceValidator, propertySortByValidator, propertyTypeValidator } from "./validators"
 
@@ -415,6 +416,22 @@ export const upsertScrapedProperty = internalMutation({
 		} else {
 			// Insert new property
 			const id = await ctx.db.insert("properties", propertyData)
+
+			// 🆕 NEW: Check for saved search matches immediately for new properties
+			await ctx.scheduler.runAfter(0, internal.notifications.checkPropertyMatches, {
+				propertyId: id,
+				property: {
+					title: propertyData.title,
+					address: propertyData.address,
+					propertyType: propertyData.propertyType,
+					monthlyRent: propertyData.monthlyRent,
+					rooms: propertyData.rooms,
+					amenities: propertyData.amenities,
+					furnished: propertyData.furnished,
+					petFriendly: propertyData.petFriendly,
+				},
+			})
+
 			return { action: "created", id }
 		}
 	},

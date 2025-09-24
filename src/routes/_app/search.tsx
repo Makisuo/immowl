@@ -3,8 +3,12 @@ import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { type } from "arktype"
 import { api } from "convex/_generated/api"
+import { Save } from "lucide-react"
+import { useState } from "react"
 import { ApartmentGrid } from "~/components/apartment-grid"
 import { FilterDropdown } from "~/components/filter-dropdown"
+import { SaveSearchDialog } from "~/components/search/SaveSearchDialog"
+import { Button } from "~/components/ui/button"
 import { useInfiniteQuery } from "~/hooks/use-infinite-query"
 import { useSavedSearch } from "~/hooks/use-saved-search"
 import { useSearchFilters } from "~/hooks/use-search-params"
@@ -31,6 +35,7 @@ export const Route = createFileRoute("/_app/search")({
 function RouteComponent() {
 	const { searchParams, uiFilters, updateFilters } = useSearchFilters()
 	const { useAutoSave } = useSavedSearch()
+	const [showSaveDialog, setShowSaveDialog] = useState(false)
 
 	// Automatically save search params to localStorage when they change
 	useAutoSave(searchParams)
@@ -88,22 +93,33 @@ function RouteComponent() {
 						{isLoading ? "Loading..." : `${totalCount || 0} results`}
 					</span>
 				</div>
-				<FilterDropdown
-					priceRange={uiFilters.priceRange}
-					setPriceRange={(range) => updateFilters({ priceRange: range })}
-					selectedAmenities={uiFilters.amenities}
-					setSelectedAmenities={(amenities) => updateFilters({ amenities })}
-					selectedBedrooms={uiFilters.bedrooms}
-					setSelectedBedrooms={(bedrooms) => updateFilters({ bedrooms })}
-					selectedBathrooms={uiFilters.bathrooms}
-					setSelectedBathrooms={(bathrooms) => updateFilters({ bathrooms })}
-					selectedPropertyType={uiFilters.propertyType}
-					setSelectedPropertyType={(type) => updateFilters({ propertyType: type })}
-					selectedPetPolicy={uiFilters.petFriendly}
-					setSelectedPetPolicy={(policy) => updateFilters({ petFriendly: policy })}
-					selectedFurnished={uiFilters.furnished}
-					setSelectedFurnished={(furnished) => updateFilters({ furnished })}
-				/>
+				<div className="flex items-center gap-3">
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => setShowSaveDialog(true)}
+						className="flex items-center gap-2"
+					>
+						<Save className="h-4 w-4" />
+						Save Search
+					</Button>
+					<FilterDropdown
+						priceRange={uiFilters.priceRange}
+						setPriceRange={(range) => updateFilters({ priceRange: range })}
+						selectedAmenities={uiFilters.amenities}
+						setSelectedAmenities={(amenities) => updateFilters({ amenities })}
+						selectedBedrooms={uiFilters.bedrooms}
+						setSelectedBedrooms={(bedrooms) => updateFilters({ bedrooms })}
+						selectedBathrooms={uiFilters.bathrooms}
+						setSelectedBathrooms={(bathrooms) => updateFilters({ bathrooms })}
+						selectedPropertyType={uiFilters.propertyType}
+						setSelectedPropertyType={(type) => updateFilters({ propertyType: type })}
+						selectedPetPolicy={uiFilters.petFriendly}
+						setSelectedPetPolicy={(policy) => updateFilters({ petFriendly: policy })}
+						selectedFurnished={uiFilters.furnished}
+						setSelectedFurnished={(furnished) => updateFilters({ furnished })}
+					/>
+				</div>
 			</div>
 			<main className="w-full">
 				<ApartmentGrid
@@ -116,6 +132,13 @@ function RouteComponent() {
 					loadMore={() => query.loadMore(24)}
 				/>
 			</main>
+
+			{/* Save Search Dialog */}
+			<SaveSearchDialog
+				open={showSaveDialog}
+				onOpenChange={setShowSaveDialog}
+				searchParams={searchParams}
+			/>
 		</div>
 	)
 }

@@ -11,6 +11,13 @@ export function buildPropertyQuery(
 		city?: string
 		propertyType?: "apartment" | "house" | "condo" | "townhouse" | "studio"
 		country?: string
+		minPrice?: number
+		maxPrice?: number
+		bedrooms?: number
+		bathrooms?: number
+		amenities?: string[]
+		petFriendly?: boolean
+		furnished?: boolean
 	},
 ): Query<DataModel["properties"]> {
 	// Stage 1: Create the initial table query
@@ -41,12 +48,71 @@ export function buildPropertyQuery(
 		indexedQuery = tableQuery.withIndex("by_status", (q) => q.eq("status", "active"))
 	}
 
-	// Stage 3: Apply country filter if provided (no index for country)
+	// Stage 3: Apply additional filters
+	let filteredQuery = indexedQuery
+
+	// Country filter (no index for country)
 	if (filters.country) {
-		return indexedQuery.filter((q) => q.eq(q.field("address.country"), filters.country))
+		filteredQuery = filteredQuery.filter((q) => q.eq(q.field("address.country"), filters.country))
 	}
 
-	return indexedQuery
+	// Price filters
+	if (filters.minPrice || filters.maxPrice) {
+		filteredQuery = filteredQuery.filter((q) => {
+			let priceCondition = q.gt(q.field("monthlyRent.warm"), 0) // Base condition
+			
+			if (filters.minPrice) {
+				const minCondition = q.or(
+					q.gte(q.field("monthlyRent.warm"), filters.minPrice),
+					q.and(
+						q.not(q.field("monthlyRent.warm")),
+						q.gte(q.field("monthlyRent.cold"), filters.minPrice)
+					)
+				)
+				priceCondition = q.and(priceCondition, minCondition)
+			}
+			
+			if (filters.maxPrice) {
+				const maxCondition = q.or(
+					q.lte(q.field("monthlyRent.warm"), filters.maxPrice),
+					q.and(
+						q.not(q.field("monthlyRent.warm")),
+						q.lte(q.field("monthlyRent.cold"), filters.maxPrice)
+					)
+				)
+				priceCondition = q.and(priceCondition, maxCondition)
+			}
+			
+			return priceCondition
+		})
+	}
+
+	// Bedroom filter
+	if (filters.bedrooms !== undefined) {
+		filteredQuery = filteredQuery.filter((q) => q.eq(q.field("rooms.bedrooms"), filters.bedrooms))
+	}
+
+	// Bathroom filter
+	if (filters.bathrooms !== undefined) {
+		filteredQuery = filteredQuery.filter((q) => q.gte(q.field("rooms.bathrooms"), filters.bathrooms!))
+	}
+
+	// Boolean filters
+	if (filters.furnished === true) {
+		filteredQuery = filteredQuery.filter((q) => q.eq(q.field("furnished"), true))
+	}
+
+	if (filters.petFriendly === true) {
+		filteredQuery = filteredQuery.filter((q) => q.eq(q.field("petFriendly"), true))
+	}
+
+	// Amenities filter - simplified check for now
+	// Note: Full amenity matching would require more complex logic
+	if (filters.amenities && filters.amenities.length > 0) {
+		filteredQuery = filteredQuery.filter((q) => q.field("amenities"))
+	}
+
+	return filteredQuery
 }
 
 /**

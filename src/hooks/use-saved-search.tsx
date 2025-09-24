@@ -15,7 +15,7 @@ export function useSavedSearch() {
 	const saveSearchParams = (searchParams: SearchFilters) => {
 		try {
 			// Only save if we have valid params
-			if (searchParams && searchParams.city) {
+			if (searchParams?.city) {
 				localStorage.setItem(STORAGE_KEY, JSON.stringify(searchParams))
 			}
 		} catch (error) {
