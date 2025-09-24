@@ -20,9 +20,7 @@ const menuItems = [
 	{ name: "Search", href: "/search" },
 	{ name: "Search Requests", href: "/search-requests" },
 	{ name: "Saved", href: "/saved" },
-	{ name: "Solution", href: "#link" },
 	{ name: "Pricing", href: "#link" },
-	{ name: "About", href: "#link" },
 ]
 
 export const AppHeader = () => {

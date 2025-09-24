@@ -152,72 +152,68 @@ export function PropertyFormWizard({ mode, initialData, propertyId, onSuccess }:
 	const progress = ((currentStep + 1) / FORM_STEPS.length) * 100
 
 	return (
-		<Card className="mx-auto w-full max-w-4xl">
-			<CardHeader>
+		<div className="flex w-full flex-col gap-6 border-none">
+			<div>
 				<CardTitle>{mode === "create" ? "Add New Property" : "Edit Property"}</CardTitle>
 				<CardDescription>
 					Step {currentStep + 1} of {FORM_STEPS.length}: {FORM_STEPS[currentStep].title}
 				</CardDescription>
 				<Progress value={progress} className="mt-4" />
-			</CardHeader>
-			<CardContent>
-				<form
-					onSubmit={(e) => {
-						e.preventDefault()
-						e.stopPropagation()
-						if (currentStep === FORM_STEPS.length - 1) {
-							void form.handleSubmit()
-						} else {
-							handleNext()
-						}
-					}}
-					className="space-y-6"
-				>
-						<div className="min-h-[400px]">
-							{currentStep === 0 && <BasicInfoStep form={form} />}
-							{currentStep === 1 && <LocationStep form={form} />}
-							{currentStep === 2 && <PropertyDetailsStep form={form} />}
-							{currentStep === 3 && <RentalDetailsStep form={form} />}
-							{currentStep === 4 && <ImagesStep form={form} />}
-						</div>
+			</div>
+			<form
+				onSubmit={(e) => {
+					e.preventDefault()
+					e.stopPropagation()
+					if (currentStep === FORM_STEPS.length - 1) {
+						void form.handleSubmit()
+					} else {
+						handleNext()
+					}
+				}}
+				className="space-y-6"
+			>
+				<div className="min-h-[400px]">
+					{currentStep === 0 && <BasicInfoStep form={form} />}
+					{currentStep === 1 && <LocationStep form={form} />}
+					{currentStep === 2 && <PropertyDetailsStep form={form} />}
+					{currentStep === 3 && <RentalDetailsStep form={form} />}
+					{currentStep === 4 && <ImagesStep form={form} />}
+				</div>
 
-						<div className="flex justify-between border-t pt-6">
-							<Button
-								type="button"
-								variant="outline"
-								onClick={handlePrevious}
-								disabled={currentStep === 0}
-							>
-								<ChevronLeft className="mr-2 h-4 w-4" />
-								Previous
-							</Button>
+				<div className="flex justify-between border-t pt-6">
+					<Button
+						type="button"
+						variant="outline"
+						onClick={handlePrevious}
+						disabled={currentStep === 0}
+					>
+						<ChevronLeft className="mr-2 h-4 w-4" />
+						Previous
+					</Button>
 
-							<div className="flex gap-2">
-								{currentStep === FORM_STEPS.length - 1 ? (
-									<form.Subscribe
-										selector={(state) => [state.canSubmit, state.isSubmitting]}
-									>
-										{([canSubmit, isSubmitting]) => (
-											<Button type="submit" disabled={!canSubmit || isSubmitting}>
-												<SaveIcon className="mr-2 h-4 w-4" />
-												{isSubmitting
-													? "Saving..."
-													: mode === "create"
-														? "Create Property"
-														: "Update Property"}
-											</Button>
-										)}
-									</form.Subscribe>
-								) : (
-									<Button type="submit">
-										Next
-										<ChevronRight className="ml-2 h-4 w-4" />
+					<div className="flex gap-2">
+						{currentStep === FORM_STEPS.length - 1 ? (
+							<form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+								{([canSubmit, isSubmitting]) => (
+									<Button type="submit" disabled={!canSubmit || isSubmitting}>
+										<SaveIcon className="mr-2 h-4 w-4" />
+										{isSubmitting
+											? "Saving..."
+											: mode === "create"
+												? "Create Property"
+												: "Update Property"}
 									</Button>
 								)}
-							</div>
-						</div>
-				</form>
-			</CardContent>
-		</Card>
+							</form.Subscribe>
+						) : (
+							<Button type="submit">
+								Next
+								<ChevronRight className="ml-2 h-4 w-4" />
+							</Button>
+						)}
+					</div>
+				</div>
+			</form>
+		</div>
 	)
 }
