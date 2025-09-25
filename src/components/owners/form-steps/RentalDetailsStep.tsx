@@ -11,7 +11,7 @@ export function RentalDetailsStep({ form }: RentalDetailsStepProps) {
 	return (
 		<div className="space-y-6">
 			<div className="space-y-4">
-				<h3 className="text-lg font-semibold">Monthly Rent</h3>
+				<h3 className="font-semibold text-lg">Monthly Rent</h3>
 				<div className="grid grid-cols-2 gap-4">
 					<form.Field name="monthlyRent.cold">
 						{(field) => (
@@ -32,7 +32,7 @@ export function RentalDetailsStep({ form }: RentalDetailsStepProps) {
 									}
 								/>
 								{field.state.meta.errors ? (
-									<p className="text-sm text-destructive">
+									<p className="text-destructive text-sm">
 										{field.state.meta.errors.join(", ")}
 									</p>
 								) : null}
@@ -59,7 +59,7 @@ export function RentalDetailsStep({ form }: RentalDetailsStepProps) {
 									}
 								/>
 								{field.state.meta.errors ? (
-									<p className="text-sm text-destructive">
+									<p className="text-destructive text-sm">
 										{field.state.meta.errors.join(", ")}
 									</p>
 								) : null}
@@ -86,7 +86,7 @@ export function RentalDetailsStep({ form }: RentalDetailsStepProps) {
 							}
 						/>
 						{field.state.meta.errors ? (
-							<p className="text-sm text-destructive">{field.state.meta.errors.join(", ")}</p>
+							<p className="text-destructive text-sm">{field.state.meta.errors.join(", ")}</p>
 						) : null}
 					</div>
 				)}
@@ -106,9 +106,9 @@ export function RentalDetailsStep({ form }: RentalDetailsStepProps) {
 							onChange={(e) => field.handleChange(Number(e.target.value))}
 						/>
 						{field.state.meta.errors ? (
-							<p className="text-sm text-destructive">{field.state.meta.errors.join(", ")}</p>
+							<p className="text-destructive text-sm">{field.state.meta.errors.join(", ")}</p>
 						) : null}
-						<p className="text-sm text-muted-foreground">Common durations: 6, 12, or 24 months</p>
+						<p className="text-muted-foreground text-sm">Common durations: 6, 12, or 24 months</p>
 					</div>
 				)}
 			</form.Field>
@@ -133,14 +133,14 @@ export function RentalDetailsStep({ form }: RentalDetailsStepProps) {
 							}
 						/>
 						{field.state.meta.errors ? (
-							<p className="text-sm text-destructive">{field.state.meta.errors.join(", ")}</p>
+							<p className="text-destructive text-sm">{field.state.meta.errors.join(", ")}</p>
 						) : null}
 					</div>
 				)}
 			</form.Field>
 
 			<div className="space-y-4">
-				<h3 className="text-lg font-semibold">Contact Information</h3>
+				<h3 className="font-semibold text-lg">Contact Information</h3>
 				<div className="grid grid-cols-2 gap-4">
 					<form.Field name="contactEmail">
 						{(field) => (
@@ -155,7 +155,7 @@ export function RentalDetailsStep({ form }: RentalDetailsStepProps) {
 									onChange={(e) => field.handleChange(e.target.value)}
 								/>
 								{field.state.meta.errors ? (
-									<p className="text-sm text-destructive">
+									<p className="text-destructive text-sm">
 										{field.state.meta.errors.join(", ")}
 									</p>
 								) : null}
@@ -176,7 +176,7 @@ export function RentalDetailsStep({ form }: RentalDetailsStepProps) {
 									onChange={(e) => field.handleChange(e.target.value)}
 								/>
 								{field.state.meta.errors ? (
-									<p className="text-sm text-destructive">
+									<p className="text-destructive text-sm">
 										{field.state.meta.errors.join(", ")}
 									</p>
 								) : null}
