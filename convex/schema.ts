@@ -94,21 +94,11 @@ export default defineSchema({
 			furnished: v.optional(v.boolean()),
 		}),
 
-		// Sorting
-		sortBy: propertySortByValidator,
-
-		// Notification settings
-		notificationsEnabled: v.boolean(),
-		emailNotifications: v.boolean(),
-		lastNotificationSent: v.optional(v.number()), // timestamp
-
 		// Metadata
 		isActive: v.boolean(), // user can disable without deleting
 		createdAt: v.number(),
 		lastModified: v.number(),
 	})
 		.index("by_user", ["userId"])
-		.index("by_user_active", ["userId", "isActive"])
-		.index("by_notifications", ["notificationsEnabled", "isActive"])
-		.index("by_city_notifications", ["criteria.city", "notificationsEnabled", "isActive"]),
+		.index("by_user_active", ["userId", "isActive"]),
 })
