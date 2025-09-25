@@ -1,5 +1,5 @@
-import { PropertyDashboard } from "./PropertyDashboard";
+import { PropertyDashboard } from "./PropertyDashboard"
 
 export function OwnersPage() {
-  return <PropertyDashboard />;
+	return <PropertyDashboard />
 }

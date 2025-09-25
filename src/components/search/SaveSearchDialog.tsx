@@ -1,6 +1,6 @@
 import { useConvexMutation } from "@convex-dev/react-query"
-import { useMutation } from "@tanstack/react-query"
 import { useForm } from "@tanstack/react-form"
+import { useMutation } from "@tanstack/react-query"
 import { api } from "convex/_generated/api"
 import { Bell, BellOff, Save } from "lucide-react"
 import { useEffect } from "react"
@@ -66,7 +66,6 @@ export function SaveSearchDialog({ open, onOpenChange, searchParams }: SaveSearc
 					city: searchParams.city,
 					country: searchParams.country,
 					propertyType: searchParams.propertyType,
-					sortBy: searchParams.sortBy,
 					minPrice: searchParams.minPrice,
 					maxPrice: searchParams.maxPrice,
 					bedrooms: searchParams.bedrooms,
@@ -74,10 +73,6 @@ export function SaveSearchDialog({ open, onOpenChange, searchParams }: SaveSearc
 					amenities: searchParams.amenities,
 					petFriendly: searchParams.petFriendly,
 					furnished: searchParams.furnished,
-
-					// Notification settings
-					notificationsEnabled: v.notificationsEnabled,
-					emailNotifications: v.emailNotifications,
 				})
 
 				toast.success("Search saved successfully!")

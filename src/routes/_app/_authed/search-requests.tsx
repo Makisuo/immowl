@@ -20,7 +20,8 @@ function SearchRequestsPage() {
 							</h1>
 						</div>
 						<span className="text-muted-foreground text-sm">
-							Manage your saved searches and get notified when new matching properties are available
+							Manage your saved searches and get notified when new matching properties are
+							available
 						</span>
 					</div>
 				</div>
