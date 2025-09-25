@@ -3,7 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
 import { api } from "convex/_generated/api"
 import type { Doc, Id } from "convex/_generated/dataModel"
-import { Bell, BellOff, Edit2, Eye, EyeOff, MoreVertical, Search, Trash2 } from "lucide-react"
+import { Edit2, Eye, EyeOff, MoreVertical, Search, Trash2 } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import { Badge } from "~/components/ui/badge"
@@ -16,7 +16,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu"
-import { EmptyState } from "~/components/owners/EmptyState"
+import { EmptyState } from "../properties/PropertyStates"
 
 interface SavedSearchesListProps {
 	onEditSearch?: (search: Doc<"savedSearches">) => void
@@ -39,10 +39,6 @@ export function SavedSearchesList({ onEditSearch }: SavedSearchesListProps) {
 		mutationFn: useConvexMutation(api.savedSearches.toggleSavedSearchStatus),
 	})
 
-	const toggleNotifications = useMutation({
-		mutationFn: useConvexMutation(api.savedSearches.toggleNotifications),
-	})
-
 	const handleDelete = async (searchId: string) => {
 		try {
 			await deleteSearch.mutateAsync({ searchId: searchId as Id<"savedSearches"> })
@@ -63,19 +59,6 @@ export function SavedSearchesList({ onEditSearch }: SavedSearchesListProps) {
 			toast.success(`Search ${!currentStatus ? "activated" : "disabled"}`)
 		} catch (error) {
 			toast.error("Failed to update search status")
-			console.error(error)
-		}
-	}
-
-	const handleToggleNotifications = async (searchId: string, currentStatus: boolean) => {
-		try {
-			await toggleNotifications.mutateAsync({
-				searchId: searchId as Id<"savedSearches">,
-				notificationsEnabled: !currentStatus,
-			})
-			toast.success(`Notifications ${!currentStatus ? "enabled" : "disabled"}`)
-		} catch (error) {
-			toast.error("Failed to update notification settings")
 			console.error(error)
 		}
 	}
@@ -119,7 +102,6 @@ export function SavedSearchesList({ onEditSearch }: SavedSearchesListProps) {
 			/>
 		)
 	}
-
 	return (
 		<div className="space-y-4">
 			{searches.map((search) => (
@@ -129,9 +111,6 @@ export function SavedSearchesList({ onEditSearch }: SavedSearchesListProps) {
 					onEdit={() => onEditSearch?.(search)}
 					onDelete={() => setDeletingSearch(search._id)}
 					onToggleStatus={() => handleToggleStatus(search._id, search.isActive)}
-					onToggleNotifications={() =>
-						handleToggleNotifications(search._id, search.notificationsEnabled)
-					}
 				/>
 			))}
 
@@ -172,16 +151,9 @@ interface SavedSearchCardProps {
 	onEdit: () => void
 	onDelete: () => void
 	onToggleStatus: () => void
-	onToggleNotifications: () => void
 }
 
-function SavedSearchCard({
-	search,
-	onEdit,
-	onDelete,
-	onToggleStatus,
-	onToggleNotifications,
-}: SavedSearchCardProps) {
+function SavedSearchCard({ search, onEdit, onDelete, onToggleStatus }: SavedSearchCardProps) {
 	// Get search result count
 	const { data: resultCount } = useQuery(
 		convexQuery(api.savedSearches.getSavedSearchCount, {
@@ -191,18 +163,20 @@ function SavedSearchCard({
 
 	// Helper to get criteria from either new nested structure or legacy flat fields
 	const getCriteria = () => {
-		return (search as any).criteria ?? {
-			city: (search as any).city,
-			country: (search as any).country,
-			propertyType: (search as any).propertyType,
-			minPrice: (search as any).minPrice,
-			maxPrice: (search as any).maxPrice,
-			bedrooms: (search as any).bedrooms,
-			bathrooms: (search as any).bathrooms,
-			amenities: (search as any).amenities,
-			petFriendly: (search as any).petFriendly,
-			furnished: (search as any).furnished,
-		}
+		return (
+			(search as any).criteria ?? {
+				city: (search as any).city,
+				country: (search as any).country,
+				propertyType: (search as any).propertyType,
+				minPrice: (search as any).minPrice,
+				maxPrice: (search as any).maxPrice,
+				bedrooms: (search as any).bedrooms,
+				bathrooms: (search as any).bathrooms,
+				amenities: (search as any).amenities,
+				petFriendly: (search as any).petFriendly,
+				furnished: (search as any).furnished,
+			}
+		)
 	}
 
 	const getSearchSummary = () => {
@@ -260,53 +234,39 @@ function SavedSearchCard({
 						)}
 					</div>
 					<div className="flex items-center gap-2">
-						{!search.isActive && (
-							<Badge variant="secondary">Disabled</Badge>
-						)}
+						{!search.isActive && <Badge variant="secondary">Disabled</Badge>}
 						<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button variant="ghost" size="icon" className="h-8 w-8">
-								<MoreVertical className="h-4 w-4" />
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end">
-							<DropdownMenuItem onClick={onEdit}>
-								<Edit2 className="mr-2 h-4 w-4" />
-								Edit Search
-							</DropdownMenuItem>
-							<DropdownMenuItem onClick={onToggleStatus}>
-								{search.isActive ? (
-									<>
-										<EyeOff className="mr-2 h-4 w-4" />
-										Disable Search
-									</>
-								) : (
-									<>
-										<Eye className="mr-2 h-4 w-4" />
-										Enable Search
-									</>
-								)}
-							</DropdownMenuItem>
-							<DropdownMenuItem onClick={onToggleNotifications}>
-								{search.notificationsEnabled ? (
-									<>
-										<BellOff className="mr-2 h-4 w-4" />
-										Disable Notifications
-									</>
-								) : (
-									<>
-										<Bell className="mr-2 h-4 w-4" />
-										Enable Notifications
-									</>
-								)}
-							</DropdownMenuItem>
-							<DropdownMenuSeparator />
-							<DropdownMenuItem onClick={onDelete} className="text-destructive">
-								<Trash2 className="mr-2 h-4 w-4" />
-								Delete Search
-							</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<Button variant="ghost" size="icon" className="h-8 w-8">
+									<MoreVertical className="h-4 w-4" />
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="end">
+								<DropdownMenuItem onClick={onEdit}>
+									<Edit2 className="mr-2 h-4 w-4" />
+									Edit Search
+								</DropdownMenuItem>
+								<DropdownMenuItem onClick={onToggleStatus}>
+									{search.isActive ? (
+										<>
+											<EyeOff className="mr-2 h-4 w-4" />
+											Disable Search
+										</>
+									) : (
+										<>
+											<Eye className="mr-2 h-4 w-4" />
+											Enable Search
+										</>
+									)}
+								</DropdownMenuItem>
+
+								<DropdownMenuSeparator />
+								<DropdownMenuItem onClick={onDelete} className="text-destructive">
+									<Trash2 className="mr-2 h-4 w-4" />
+									Delete Search
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
 					</div>
 				</div>
 			</CardHeader>
@@ -316,17 +276,6 @@ function SavedSearchCard({
 
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-4">
-						<div className="flex items-center gap-1">
-							{search.notificationsEnabled ? (
-								<Bell className="h-3 w-3 text-blue-600" />
-							) : (
-								<BellOff className="h-3 w-3 text-muted-foreground" />
-							)}
-							<span className="text-muted-foreground text-xs">
-								{search.notificationsEnabled ? "Notifications on" : "Notifications off"}
-							</span>
-						</div>
-
 						{resultCount !== undefined && (
 							<span className="text-muted-foreground text-xs">
 								{resultCount} {resultCount === 1 ? "property" : "properties"} found
@@ -342,7 +291,6 @@ function SavedSearchCard({
 								city: criteria.city,
 								country: criteria.country,
 								propertyType: criteria.propertyType,
-								sortBy: search.sortBy,
 								minPrice: criteria.minPrice,
 								maxPrice: criteria.maxPrice,
 								bedrooms: criteria.bedrooms,

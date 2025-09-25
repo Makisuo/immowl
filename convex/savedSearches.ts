@@ -1,8 +1,8 @@
 import { paginationOptsValidator } from "convex/server"
 import { v } from "convex/values"
-import { internalMutation, internalQuery, mutation, query } from "./_generated/server"
+import { mutation, query } from "./_generated/server"
 import { getUser } from "./auth"
-import { propertyTypeValidator, propertySortByValidator } from "./validators"
+import { propertyTypeValidator } from "./validators"
 
 // Create a new saved search
 export const createSavedSearch = mutation({
@@ -14,7 +14,6 @@ export const createSavedSearch = mutation({
 		city: v.string(),
 		country: v.string(),
 		propertyType: v.optional(propertyTypeValidator),
-		sortBy: propertySortByValidator,
 		minPrice: v.optional(v.number()),
 		maxPrice: v.optional(v.number()),
 		bedrooms: v.optional(v.number()),
@@ -22,10 +21,6 @@ export const createSavedSearch = mutation({
 		amenities: v.optional(v.array(v.string())),
 		petFriendly: v.optional(v.boolean()),
 		furnished: v.optional(v.boolean()),
-
-		// Notification settings
-		notificationsEnabled: v.boolean(),
-		emailNotifications: v.boolean(),
 	},
 	returns: v.id("savedSearches"),
 	handler: async (ctx, args) => {
@@ -52,14 +47,6 @@ export const createSavedSearch = mutation({
 				furnished: args.furnished,
 			},
 
-			// Sorting
-			sortBy: args.sortBy,
-
-			// Notification settings
-			notificationsEnabled: args.notificationsEnabled,
-			emailNotifications: args.emailNotifications,
-			lastNotificationSent: undefined,
-
 			// Metadata
 			isActive: true,
 			createdAt: now,
@@ -81,7 +68,6 @@ export const updateSavedSearch = mutation({
 		city: v.optional(v.string()),
 		country: v.optional(v.string()),
 		propertyType: v.optional(propertyTypeValidator),
-		sortBy: v.optional(propertySortByValidator),
 		minPrice: v.optional(v.number()),
 		maxPrice: v.optional(v.number()),
 		bedrooms: v.optional(v.number()),
@@ -89,10 +75,6 @@ export const updateSavedSearch = mutation({
 		amenities: v.optional(v.array(v.string())),
 		petFriendly: v.optional(v.boolean()),
 		furnished: v.optional(v.boolean()),
-
-		// Notification settings
-		notificationsEnabled: v.optional(v.boolean()),
-		emailNotifications: v.optional(v.boolean()),
 	},
 	returns: v.null(),
 	handler: async (ctx, args) => {
@@ -114,9 +96,6 @@ export const updateSavedSearch = mutation({
 		// Only update provided fields (top-level)
 		if (args.name !== undefined) updates.name = args.name
 		if (args.description !== undefined) updates.description = args.description
-		if (args.sortBy !== undefined) updates.sortBy = args.sortBy
-		if (args.notificationsEnabled !== undefined) updates.notificationsEnabled = args.notificationsEnabled
-		if (args.emailNotifications !== undefined) updates.emailNotifications = args.emailNotifications
 
 		// Build updated nested criteria (support legacy docs without `criteria`)
 		const baseCriteria: any = (savedSearch as any).criteria ?? {
@@ -202,33 +181,6 @@ export const toggleSavedSearchStatus = mutation({
 })
 
 // Toggle notifications for a saved search
-export const toggleNotifications = mutation({
-	args: {
-		searchId: v.id("savedSearches"),
-		notificationsEnabled: v.boolean(),
-	},
-	returns: v.null(),
-	handler: async (ctx, args) => {
-		const user = await getUser(ctx)
-
-		const savedSearch = await ctx.db.get(args.searchId)
-		if (!savedSearch) {
-			throw new Error("Saved search not found")
-		}
-
-		if (savedSearch.userId !== user._id) {
-			throw new Error("Unauthorized")
-		}
-
-		await ctx.db.patch(args.searchId, {
-			notificationsEnabled: args.notificationsEnabled,
-			lastModified: Date.now(),
-		})
-
-		return null
-	},
-})
-
 // Get user's saved searches (both active and inactive)
 export const listUserSavedSearches = query({
 	args: {
@@ -316,11 +268,11 @@ export const getSavedSearchResults = query({
 			furnished: criteria1.furnished,
 		})
 
-		const orderedQuery = applySorting(filteredQuery, savedSearch.sortBy)
+		const orderedQuery = applySorting(filteredQuery)
 		const result = await orderedQuery.paginate(args.paginationOpts)
 
-		// Apply client-side sorting for price-based sorts
-		sortPaginatedResults(result.page, savedSearch.sortBy)
+		// Apply client-side sorting when needed (uses default newest when no sort specified)
+		sortPaginatedResults(result.page)
 
 		return result
 	},
@@ -375,33 +327,5 @@ export const getSavedSearchCount = query({
 
 		const properties = await filteredQuery.collect()
 		return properties.length
-	},
-})
-
-// Internal query to get saved searches for notification checking
-export const getActiveSearchesForNotification = internalQuery({
-	args: {},
-	handler: async (ctx) => {
-		const searches = await ctx.db
-			.query("savedSearches")
-			.withIndex("by_notifications", (q) => q.eq("notificationsEnabled", true).eq("isActive", true))
-			.collect()
-
-		return searches
-	},
-})
-
-// Internal mutation to update last notification timestamp
-export const updateLastNotificationSent = internalMutation({
-	args: {
-		searchId: v.id("savedSearches"),
-		timestamp: v.number(),
-	},
-	returns: v.null(),
-	handler: async (ctx, args) => {
-		await ctx.db.patch(args.searchId, {
-			lastNotificationSent: args.timestamp,
-		})
-		return null
 	},
 })
