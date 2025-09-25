@@ -8,426 +8,435 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { createServerRootRoute } from "@tanstack/react-start/server"
+import { createServerRootRoute } from '@tanstack/react-start/server'
 
-import { Route as rootRouteImport } from "./routes/__root"
-import { Route as AppAuthedLayoutRouteImport } from "./routes/_app/_authed/layout"
-import { Route as AppAuthedOwnersRouteImport } from "./routes/_app/_authed/owners"
-import { Route as AppAuthedProfileRouteImport } from "./routes/_app/_authed/profile"
-import { Route as AppAuthedSavedRouteImport } from "./routes/_app/_authed/saved"
-import { Route as AppAuthedSavedSearchSearchIdRouteImport } from "./routes/_app/_authed/saved-search.$searchId"
-import { Route as AppAuthedSearchRequestsRouteImport } from "./routes/_app/_authed/search-requests"
-import { Route as AppAuthedUserRouteImport } from "./routes/_app/_authed/user"
-import { Route as AppIndexRouteImport } from "./routes/_app/index"
-import { Route as AppLayoutRouteImport } from "./routes/_app/layout"
-import { Route as AppPropertyPropertyIdRouteImport } from "./routes/_app/property.$propertyId"
-import { Route as AppSearchRouteImport } from "./routes/_app/search"
-import { Route as AuthForgotPasswordRouteImport } from "./routes/_auth/forgot-password"
-import { Route as AuthLayoutRouteImport } from "./routes/_auth/layout"
-import { Route as AuthResetPasswordRouteImport } from "./routes/_auth/reset-password"
-import { Route as AuthSignInRouteImport } from "./routes/_auth/sign-in"
-import { Route as AuthSignUpRouteImport } from "./routes/_auth/sign-up"
-import { ServerRoute as ApiAuthSplatServerRouteImport } from "./routes/api/auth/$"
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthLayoutRouteImport } from './routes/_auth/layout'
+import { Route as AppLayoutRouteImport } from './routes/_app/layout'
+import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AuthSignUpRouteImport } from './routes/_auth/sign-up'
+import { Route as AuthSignInRouteImport } from './routes/_auth/sign-in'
+import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
+import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
+import { Route as AppSearchRouteImport } from './routes/_app/search'
+import { Route as AppAuthedLayoutRouteImport } from './routes/_app/_authed/layout'
+import { Route as AppPropertyPropertyIdRouteImport } from './routes/_app/property.$propertyId'
+import { Route as AppAuthedUserRouteImport } from './routes/_app/_authed/user'
+import { Route as AppAuthedSearchRequestsRouteImport } from './routes/_app/_authed/search-requests'
+import { Route as AppAuthedSavedRouteImport } from './routes/_app/_authed/saved'
+import { Route as AppAuthedProfileRouteImport } from './routes/_app/_authed/profile'
+import { Route as AppAuthedOwnersRouteImport } from './routes/_app/_authed/owners'
+import { Route as AppAuthedSavedSearchSearchIdRouteImport } from './routes/_app/_authed/saved-search.$searchId'
+import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
 
 const rootServerRouteImport = createServerRootRoute()
 
 const AuthLayoutRoute = AuthLayoutRouteImport.update({
-	id: "/_auth",
-	getParentRoute: () => rootRouteImport,
+  id: '/_auth',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AppLayoutRoute = AppLayoutRouteImport.update({
-	id: "/_app",
-	getParentRoute: () => rootRouteImport,
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
-	id: "/",
-	path: "/",
-	getParentRoute: () => AppLayoutRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppLayoutRoute,
 } as any)
 const AuthSignUpRoute = AuthSignUpRouteImport.update({
-	id: "/sign-up",
-	path: "/sign-up",
-	getParentRoute: () => AuthLayoutRoute,
+  id: '/sign-up',
+  path: '/sign-up',
+  getParentRoute: () => AuthLayoutRoute,
 } as any)
 const AuthSignInRoute = AuthSignInRouteImport.update({
-	id: "/sign-in",
-	path: "/sign-in",
-	getParentRoute: () => AuthLayoutRoute,
+  id: '/sign-in',
+  path: '/sign-in',
+  getParentRoute: () => AuthLayoutRoute,
 } as any)
 const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
-	id: "/reset-password",
-	path: "/reset-password",
-	getParentRoute: () => AuthLayoutRoute,
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => AuthLayoutRoute,
 } as any)
 const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
-	id: "/forgot-password",
-	path: "/forgot-password",
-	getParentRoute: () => AuthLayoutRoute,
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => AuthLayoutRoute,
 } as any)
 const AppSearchRoute = AppSearchRouteImport.update({
-	id: "/search",
-	path: "/search",
-	getParentRoute: () => AppLayoutRoute,
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => AppLayoutRoute,
 } as any)
 const AppAuthedLayoutRoute = AppAuthedLayoutRouteImport.update({
-	id: "/_authed",
-	getParentRoute: () => AppLayoutRoute,
+  id: '/_authed',
+  getParentRoute: () => AppLayoutRoute,
 } as any)
 const AppPropertyPropertyIdRoute = AppPropertyPropertyIdRouteImport.update({
-	id: "/property/$propertyId",
-	path: "/property/$propertyId",
-	getParentRoute: () => AppLayoutRoute,
+  id: '/property/$propertyId',
+  path: '/property/$propertyId',
+  getParentRoute: () => AppLayoutRoute,
 } as any)
 const AppAuthedUserRoute = AppAuthedUserRouteImport.update({
-	id: "/user",
-	path: "/user",
-	getParentRoute: () => AppAuthedLayoutRoute,
+  id: '/user',
+  path: '/user',
+  getParentRoute: () => AppAuthedLayoutRoute,
 } as any)
 const AppAuthedSearchRequestsRoute = AppAuthedSearchRequestsRouteImport.update({
-	id: "/search-requests",
-	path: "/search-requests",
-	getParentRoute: () => AppAuthedLayoutRoute,
+  id: '/search-requests',
+  path: '/search-requests',
+  getParentRoute: () => AppAuthedLayoutRoute,
 } as any)
 const AppAuthedSavedRoute = AppAuthedSavedRouteImport.update({
-	id: "/saved",
-	path: "/saved",
-	getParentRoute: () => AppAuthedLayoutRoute,
+  id: '/saved',
+  path: '/saved',
+  getParentRoute: () => AppAuthedLayoutRoute,
 } as any)
 const AppAuthedProfileRoute = AppAuthedProfileRouteImport.update({
-	id: "/profile",
-	path: "/profile",
-	getParentRoute: () => AppAuthedLayoutRoute,
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppAuthedLayoutRoute,
 } as any)
 const AppAuthedOwnersRoute = AppAuthedOwnersRouteImport.update({
-	id: "/owners",
-	path: "/owners",
-	getParentRoute: () => AppAuthedLayoutRoute,
+  id: '/owners',
+  path: '/owners',
+  getParentRoute: () => AppAuthedLayoutRoute,
 } as any)
-const AppAuthedSavedSearchSearchIdRoute = AppAuthedSavedSearchSearchIdRouteImport.update({
-	id: "/saved-search/$searchId",
-	path: "/saved-search/$searchId",
-	getParentRoute: () => AppAuthedLayoutRoute,
-} as any)
+const AppAuthedSavedSearchSearchIdRoute =
+  AppAuthedSavedSearchSearchIdRouteImport.update({
+    id: '/saved-search/$searchId',
+    path: '/saved-search/$searchId',
+    getParentRoute: () => AppAuthedLayoutRoute,
+  } as any)
 const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
-	id: "/api/auth/$",
-	path: "/api/auth/$",
-	getParentRoute: () => rootServerRouteImport,
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootServerRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
-	"/search": typeof AppSearchRoute
-	"/forgot-password": typeof AuthForgotPasswordRoute
-	"/reset-password": typeof AuthResetPasswordRoute
-	"/sign-in": typeof AuthSignInRoute
-	"/sign-up": typeof AuthSignUpRoute
-	"/": typeof AppIndexRoute
-	"/owners": typeof AppAuthedOwnersRoute
-	"/profile": typeof AppAuthedProfileRoute
-	"/saved": typeof AppAuthedSavedRoute
-	"/search-requests": typeof AppAuthedSearchRequestsRoute
-	"/user": typeof AppAuthedUserRoute
-	"/property/$propertyId": typeof AppPropertyPropertyIdRoute
-	"/saved-search/$searchId": typeof AppAuthedSavedSearchSearchIdRoute
+  '/search': typeof AppSearchRoute
+  '/forgot-password': typeof AuthForgotPasswordRoute
+  '/reset-password': typeof AuthResetPasswordRoute
+  '/sign-in': typeof AuthSignInRoute
+  '/sign-up': typeof AuthSignUpRoute
+  '/': typeof AppIndexRoute
+  '/owners': typeof AppAuthedOwnersRoute
+  '/profile': typeof AppAuthedProfileRoute
+  '/saved': typeof AppAuthedSavedRoute
+  '/search-requests': typeof AppAuthedSearchRequestsRoute
+  '/user': typeof AppAuthedUserRoute
+  '/property/$propertyId': typeof AppPropertyPropertyIdRoute
+  '/saved-search/$searchId': typeof AppAuthedSavedSearchSearchIdRoute
 }
 export interface FileRoutesByTo {
-	"/search": typeof AppSearchRoute
-	"/forgot-password": typeof AuthForgotPasswordRoute
-	"/reset-password": typeof AuthResetPasswordRoute
-	"/sign-in": typeof AuthSignInRoute
-	"/sign-up": typeof AuthSignUpRoute
-	"/": typeof AppIndexRoute
-	"/owners": typeof AppAuthedOwnersRoute
-	"/profile": typeof AppAuthedProfileRoute
-	"/saved": typeof AppAuthedSavedRoute
-	"/search-requests": typeof AppAuthedSearchRequestsRoute
-	"/user": typeof AppAuthedUserRoute
-	"/property/$propertyId": typeof AppPropertyPropertyIdRoute
-	"/saved-search/$searchId": typeof AppAuthedSavedSearchSearchIdRoute
+  '/search': typeof AppSearchRoute
+  '/forgot-password': typeof AuthForgotPasswordRoute
+  '/reset-password': typeof AuthResetPasswordRoute
+  '/sign-in': typeof AuthSignInRoute
+  '/sign-up': typeof AuthSignUpRoute
+  '/': typeof AppIndexRoute
+  '/owners': typeof AppAuthedOwnersRoute
+  '/profile': typeof AppAuthedProfileRoute
+  '/saved': typeof AppAuthedSavedRoute
+  '/search-requests': typeof AppAuthedSearchRequestsRoute
+  '/user': typeof AppAuthedUserRoute
+  '/property/$propertyId': typeof AppPropertyPropertyIdRoute
+  '/saved-search/$searchId': typeof AppAuthedSavedSearchSearchIdRoute
 }
 export interface FileRoutesById {
-	__root__: typeof rootRouteImport
-	"/_app": typeof AppLayoutRouteWithChildren
-	"/_auth": typeof AuthLayoutRouteWithChildren
-	"/_app/_authed": typeof AppAuthedLayoutRouteWithChildren
-	"/_app/search": typeof AppSearchRoute
-	"/_auth/forgot-password": typeof AuthForgotPasswordRoute
-	"/_auth/reset-password": typeof AuthResetPasswordRoute
-	"/_auth/sign-in": typeof AuthSignInRoute
-	"/_auth/sign-up": typeof AuthSignUpRoute
-	"/_app/": typeof AppIndexRoute
-	"/_app/_authed/owners": typeof AppAuthedOwnersRoute
-	"/_app/_authed/profile": typeof AppAuthedProfileRoute
-	"/_app/_authed/saved": typeof AppAuthedSavedRoute
-	"/_app/_authed/search-requests": typeof AppAuthedSearchRequestsRoute
-	"/_app/_authed/user": typeof AppAuthedUserRoute
-	"/_app/property/$propertyId": typeof AppPropertyPropertyIdRoute
-	"/_app/_authed/saved-search/$searchId": typeof AppAuthedSavedSearchSearchIdRoute
+  __root__: typeof rootRouteImport
+  '/_app': typeof AppLayoutRouteWithChildren
+  '/_auth': typeof AuthLayoutRouteWithChildren
+  '/_app/_authed': typeof AppAuthedLayoutRouteWithChildren
+  '/_app/search': typeof AppSearchRoute
+  '/_auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/_auth/reset-password': typeof AuthResetPasswordRoute
+  '/_auth/sign-in': typeof AuthSignInRoute
+  '/_auth/sign-up': typeof AuthSignUpRoute
+  '/_app/': typeof AppIndexRoute
+  '/_app/_authed/owners': typeof AppAuthedOwnersRoute
+  '/_app/_authed/profile': typeof AppAuthedProfileRoute
+  '/_app/_authed/saved': typeof AppAuthedSavedRoute
+  '/_app/_authed/search-requests': typeof AppAuthedSearchRequestsRoute
+  '/_app/_authed/user': typeof AppAuthedUserRoute
+  '/_app/property/$propertyId': typeof AppPropertyPropertyIdRoute
+  '/_app/_authed/saved-search/$searchId': typeof AppAuthedSavedSearchSearchIdRoute
 }
 export interface FileRouteTypes {
-	fileRoutesByFullPath: FileRoutesByFullPath
-	fullPaths:
-		| "/search"
-		| "/forgot-password"
-		| "/reset-password"
-		| "/sign-in"
-		| "/sign-up"
-		| "/"
-		| "/owners"
-		| "/profile"
-		| "/saved"
-		| "/search-requests"
-		| "/user"
-		| "/property/$propertyId"
-		| "/saved-search/$searchId"
-	fileRoutesByTo: FileRoutesByTo
-	to:
-		| "/search"
-		| "/forgot-password"
-		| "/reset-password"
-		| "/sign-in"
-		| "/sign-up"
-		| "/"
-		| "/owners"
-		| "/profile"
-		| "/saved"
-		| "/search-requests"
-		| "/user"
-		| "/property/$propertyId"
-		| "/saved-search/$searchId"
-	id:
-		| "__root__"
-		| "/_app"
-		| "/_auth"
-		| "/_app/_authed"
-		| "/_app/search"
-		| "/_auth/forgot-password"
-		| "/_auth/reset-password"
-		| "/_auth/sign-in"
-		| "/_auth/sign-up"
-		| "/_app/"
-		| "/_app/_authed/owners"
-		| "/_app/_authed/profile"
-		| "/_app/_authed/saved"
-		| "/_app/_authed/search-requests"
-		| "/_app/_authed/user"
-		| "/_app/property/$propertyId"
-		| "/_app/_authed/saved-search/$searchId"
-	fileRoutesById: FileRoutesById
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths:
+    | '/search'
+    | '/forgot-password'
+    | '/reset-password'
+    | '/sign-in'
+    | '/sign-up'
+    | '/'
+    | '/owners'
+    | '/profile'
+    | '/saved'
+    | '/search-requests'
+    | '/user'
+    | '/property/$propertyId'
+    | '/saved-search/$searchId'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/search'
+    | '/forgot-password'
+    | '/reset-password'
+    | '/sign-in'
+    | '/sign-up'
+    | '/'
+    | '/owners'
+    | '/profile'
+    | '/saved'
+    | '/search-requests'
+    | '/user'
+    | '/property/$propertyId'
+    | '/saved-search/$searchId'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/_auth'
+    | '/_app/_authed'
+    | '/_app/search'
+    | '/_auth/forgot-password'
+    | '/_auth/reset-password'
+    | '/_auth/sign-in'
+    | '/_auth/sign-up'
+    | '/_app/'
+    | '/_app/_authed/owners'
+    | '/_app/_authed/profile'
+    | '/_app/_authed/saved'
+    | '/_app/_authed/search-requests'
+    | '/_app/_authed/user'
+    | '/_app/property/$propertyId'
+    | '/_app/_authed/saved-search/$searchId'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-	AppLayoutRoute: typeof AppLayoutRouteWithChildren
-	AuthLayoutRoute: typeof AuthLayoutRouteWithChildren
+  AppLayoutRoute: typeof AppLayoutRouteWithChildren
+  AuthLayoutRoute: typeof AuthLayoutRouteWithChildren
 }
 export interface FileServerRoutesByFullPath {
-	"/api/auth/$": typeof ApiAuthSplatServerRoute
+  '/api/auth/$': typeof ApiAuthSplatServerRoute
 }
 export interface FileServerRoutesByTo {
-	"/api/auth/$": typeof ApiAuthSplatServerRoute
+  '/api/auth/$': typeof ApiAuthSplatServerRoute
 }
 export interface FileServerRoutesById {
-	__root__: typeof rootServerRouteImport
-	"/api/auth/$": typeof ApiAuthSplatServerRoute
+  __root__: typeof rootServerRouteImport
+  '/api/auth/$': typeof ApiAuthSplatServerRoute
 }
 export interface FileServerRouteTypes {
-	fileServerRoutesByFullPath: FileServerRoutesByFullPath
-	fullPaths: "/api/auth/$"
-	fileServerRoutesByTo: FileServerRoutesByTo
-	to: "/api/auth/$"
-	id: "__root__" | "/api/auth/$"
-	fileServerRoutesById: FileServerRoutesById
+  fileServerRoutesByFullPath: FileServerRoutesByFullPath
+  fullPaths: '/api/auth/$'
+  fileServerRoutesByTo: FileServerRoutesByTo
+  to: '/api/auth/$'
+  id: '__root__' | '/api/auth/$'
+  fileServerRoutesById: FileServerRoutesById
 }
 export interface RootServerRouteChildren {
-	ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
+  ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
 }
 
-declare module "@tanstack/react-router" {
-	interface FileRoutesByPath {
-		"/_auth": {
-			id: "/_auth"
-			path: ""
-			fullPath: ""
-			preLoaderRoute: typeof AuthLayoutRouteImport
-			parentRoute: typeof rootRouteImport
-		}
-		"/_app": {
-			id: "/_app"
-			path: ""
-			fullPath: ""
-			preLoaderRoute: typeof AppLayoutRouteImport
-			parentRoute: typeof rootRouteImport
-		}
-		"/_app/": {
-			id: "/_app/"
-			path: "/"
-			fullPath: "/"
-			preLoaderRoute: typeof AppIndexRouteImport
-			parentRoute: typeof AppLayoutRoute
-		}
-		"/_auth/sign-up": {
-			id: "/_auth/sign-up"
-			path: "/sign-up"
-			fullPath: "/sign-up"
-			preLoaderRoute: typeof AuthSignUpRouteImport
-			parentRoute: typeof AuthLayoutRoute
-		}
-		"/_auth/sign-in": {
-			id: "/_auth/sign-in"
-			path: "/sign-in"
-			fullPath: "/sign-in"
-			preLoaderRoute: typeof AuthSignInRouteImport
-			parentRoute: typeof AuthLayoutRoute
-		}
-		"/_auth/reset-password": {
-			id: "/_auth/reset-password"
-			path: "/reset-password"
-			fullPath: "/reset-password"
-			preLoaderRoute: typeof AuthResetPasswordRouteImport
-			parentRoute: typeof AuthLayoutRoute
-		}
-		"/_auth/forgot-password": {
-			id: "/_auth/forgot-password"
-			path: "/forgot-password"
-			fullPath: "/forgot-password"
-			preLoaderRoute: typeof AuthForgotPasswordRouteImport
-			parentRoute: typeof AuthLayoutRoute
-		}
-		"/_app/search": {
-			id: "/_app/search"
-			path: "/search"
-			fullPath: "/search"
-			preLoaderRoute: typeof AppSearchRouteImport
-			parentRoute: typeof AppLayoutRoute
-		}
-		"/_app/_authed": {
-			id: "/_app/_authed"
-			path: ""
-			fullPath: ""
-			preLoaderRoute: typeof AppAuthedLayoutRouteImport
-			parentRoute: typeof AppLayoutRoute
-		}
-		"/_app/property/$propertyId": {
-			id: "/_app/property/$propertyId"
-			path: "/property/$propertyId"
-			fullPath: "/property/$propertyId"
-			preLoaderRoute: typeof AppPropertyPropertyIdRouteImport
-			parentRoute: typeof AppLayoutRoute
-		}
-		"/_app/_authed/user": {
-			id: "/_app/_authed/user"
-			path: "/user"
-			fullPath: "/user"
-			preLoaderRoute: typeof AppAuthedUserRouteImport
-			parentRoute: typeof AppAuthedLayoutRoute
-		}
-		"/_app/_authed/search-requests": {
-			id: "/_app/_authed/search-requests"
-			path: "/search-requests"
-			fullPath: "/search-requests"
-			preLoaderRoute: typeof AppAuthedSearchRequestsRouteImport
-			parentRoute: typeof AppAuthedLayoutRoute
-		}
-		"/_app/_authed/saved": {
-			id: "/_app/_authed/saved"
-			path: "/saved"
-			fullPath: "/saved"
-			preLoaderRoute: typeof AppAuthedSavedRouteImport
-			parentRoute: typeof AppAuthedLayoutRoute
-		}
-		"/_app/_authed/profile": {
-			id: "/_app/_authed/profile"
-			path: "/profile"
-			fullPath: "/profile"
-			preLoaderRoute: typeof AppAuthedProfileRouteImport
-			parentRoute: typeof AppAuthedLayoutRoute
-		}
-		"/_app/_authed/owners": {
-			id: "/_app/_authed/owners"
-			path: "/owners"
-			fullPath: "/owners"
-			preLoaderRoute: typeof AppAuthedOwnersRouteImport
-			parentRoute: typeof AppAuthedLayoutRoute
-		}
-		"/_app/_authed/saved-search/$searchId": {
-			id: "/_app/_authed/saved-search/$searchId"
-			path: "/saved-search/$searchId"
-			fullPath: "/saved-search/$searchId"
-			preLoaderRoute: typeof AppAuthedSavedSearchSearchIdRouteImport
-			parentRoute: typeof AppAuthedLayoutRoute
-		}
-	}
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthLayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AppLayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/': {
+      id: '/_app/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppLayoutRoute
+    }
+    '/_auth/sign-up': {
+      id: '/_auth/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof AuthSignUpRouteImport
+      parentRoute: typeof AuthLayoutRoute
+    }
+    '/_auth/sign-in': {
+      id: '/_auth/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof AuthSignInRouteImport
+      parentRoute: typeof AuthLayoutRoute
+    }
+    '/_auth/reset-password': {
+      id: '/_auth/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
+      parentRoute: typeof AuthLayoutRoute
+    }
+    '/_auth/forgot-password': {
+      id: '/_auth/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof AuthForgotPasswordRouteImport
+      parentRoute: typeof AuthLayoutRoute
+    }
+    '/_app/search': {
+      id: '/_app/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof AppSearchRouteImport
+      parentRoute: typeof AppLayoutRoute
+    }
+    '/_app/_authed': {
+      id: '/_app/_authed'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AppAuthedLayoutRouteImport
+      parentRoute: typeof AppLayoutRoute
+    }
+    '/_app/property/$propertyId': {
+      id: '/_app/property/$propertyId'
+      path: '/property/$propertyId'
+      fullPath: '/property/$propertyId'
+      preLoaderRoute: typeof AppPropertyPropertyIdRouteImport
+      parentRoute: typeof AppLayoutRoute
+    }
+    '/_app/_authed/user': {
+      id: '/_app/_authed/user'
+      path: '/user'
+      fullPath: '/user'
+      preLoaderRoute: typeof AppAuthedUserRouteImport
+      parentRoute: typeof AppAuthedLayoutRoute
+    }
+    '/_app/_authed/search-requests': {
+      id: '/_app/_authed/search-requests'
+      path: '/search-requests'
+      fullPath: '/search-requests'
+      preLoaderRoute: typeof AppAuthedSearchRequestsRouteImport
+      parentRoute: typeof AppAuthedLayoutRoute
+    }
+    '/_app/_authed/saved': {
+      id: '/_app/_authed/saved'
+      path: '/saved'
+      fullPath: '/saved'
+      preLoaderRoute: typeof AppAuthedSavedRouteImport
+      parentRoute: typeof AppAuthedLayoutRoute
+    }
+    '/_app/_authed/profile': {
+      id: '/_app/_authed/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AppAuthedProfileRouteImport
+      parentRoute: typeof AppAuthedLayoutRoute
+    }
+    '/_app/_authed/owners': {
+      id: '/_app/_authed/owners'
+      path: '/owners'
+      fullPath: '/owners'
+      preLoaderRoute: typeof AppAuthedOwnersRouteImport
+      parentRoute: typeof AppAuthedLayoutRoute
+    }
+    '/_app/_authed/saved-search/$searchId': {
+      id: '/_app/_authed/saved-search/$searchId'
+      path: '/saved-search/$searchId'
+      fullPath: '/saved-search/$searchId'
+      preLoaderRoute: typeof AppAuthedSavedSearchSearchIdRouteImport
+      parentRoute: typeof AppAuthedLayoutRoute
+    }
+  }
 }
-declare module "@tanstack/react-start/server" {
-	interface ServerFileRoutesByPath {
-		"/api/auth/$": {
-			id: "/api/auth/$"
-			path: "/api/auth/$"
-			fullPath: "/api/auth/$"
-			preLoaderRoute: typeof ApiAuthSplatServerRouteImport
-			parentRoute: typeof rootServerRouteImport
-		}
-	}
+declare module '@tanstack/react-start/server' {
+  interface ServerFileRoutesByPath {
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+  }
 }
 
 interface AppAuthedLayoutRouteChildren {
-	AppAuthedOwnersRoute: typeof AppAuthedOwnersRoute
-	AppAuthedProfileRoute: typeof AppAuthedProfileRoute
-	AppAuthedSavedRoute: typeof AppAuthedSavedRoute
-	AppAuthedSearchRequestsRoute: typeof AppAuthedSearchRequestsRoute
-	AppAuthedUserRoute: typeof AppAuthedUserRoute
-	AppAuthedSavedSearchSearchIdRoute: typeof AppAuthedSavedSearchSearchIdRoute
+  AppAuthedOwnersRoute: typeof AppAuthedOwnersRoute
+  AppAuthedProfileRoute: typeof AppAuthedProfileRoute
+  AppAuthedSavedRoute: typeof AppAuthedSavedRoute
+  AppAuthedSearchRequestsRoute: typeof AppAuthedSearchRequestsRoute
+  AppAuthedUserRoute: typeof AppAuthedUserRoute
+  AppAuthedSavedSearchSearchIdRoute: typeof AppAuthedSavedSearchSearchIdRoute
 }
 
 const AppAuthedLayoutRouteChildren: AppAuthedLayoutRouteChildren = {
-	AppAuthedOwnersRoute: AppAuthedOwnersRoute,
-	AppAuthedProfileRoute: AppAuthedProfileRoute,
-	AppAuthedSavedRoute: AppAuthedSavedRoute,
-	AppAuthedSearchRequestsRoute: AppAuthedSearchRequestsRoute,
-	AppAuthedUserRoute: AppAuthedUserRoute,
-	AppAuthedSavedSearchSearchIdRoute: AppAuthedSavedSearchSearchIdRoute,
+  AppAuthedOwnersRoute: AppAuthedOwnersRoute,
+  AppAuthedProfileRoute: AppAuthedProfileRoute,
+  AppAuthedSavedRoute: AppAuthedSavedRoute,
+  AppAuthedSearchRequestsRoute: AppAuthedSearchRequestsRoute,
+  AppAuthedUserRoute: AppAuthedUserRoute,
+  AppAuthedSavedSearchSearchIdRoute: AppAuthedSavedSearchSearchIdRoute,
 }
 
-const AppAuthedLayoutRouteWithChildren = AppAuthedLayoutRoute._addFileChildren(AppAuthedLayoutRouteChildren)
+const AppAuthedLayoutRouteWithChildren = AppAuthedLayoutRoute._addFileChildren(
+  AppAuthedLayoutRouteChildren,
+)
 
 interface AppLayoutRouteChildren {
-	AppAuthedLayoutRoute: typeof AppAuthedLayoutRouteWithChildren
-	AppSearchRoute: typeof AppSearchRoute
-	AppIndexRoute: typeof AppIndexRoute
-	AppPropertyPropertyIdRoute: typeof AppPropertyPropertyIdRoute
+  AppAuthedLayoutRoute: typeof AppAuthedLayoutRouteWithChildren
+  AppSearchRoute: typeof AppSearchRoute
+  AppIndexRoute: typeof AppIndexRoute
+  AppPropertyPropertyIdRoute: typeof AppPropertyPropertyIdRoute
 }
 
 const AppLayoutRouteChildren: AppLayoutRouteChildren = {
-	AppAuthedLayoutRoute: AppAuthedLayoutRouteWithChildren,
-	AppSearchRoute: AppSearchRoute,
-	AppIndexRoute: AppIndexRoute,
-	AppPropertyPropertyIdRoute: AppPropertyPropertyIdRoute,
+  AppAuthedLayoutRoute: AppAuthedLayoutRouteWithChildren,
+  AppSearchRoute: AppSearchRoute,
+  AppIndexRoute: AppIndexRoute,
+  AppPropertyPropertyIdRoute: AppPropertyPropertyIdRoute,
 }
 
-const AppLayoutRouteWithChildren = AppLayoutRoute._addFileChildren(AppLayoutRouteChildren)
+const AppLayoutRouteWithChildren = AppLayoutRoute._addFileChildren(
+  AppLayoutRouteChildren,
+)
 
 interface AuthLayoutRouteChildren {
-	AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
-	AuthResetPasswordRoute: typeof AuthResetPasswordRoute
-	AuthSignInRoute: typeof AuthSignInRoute
-	AuthSignUpRoute: typeof AuthSignUpRoute
+  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
+  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
+  AuthSignInRoute: typeof AuthSignInRoute
+  AuthSignUpRoute: typeof AuthSignUpRoute
 }
 
 const AuthLayoutRouteChildren: AuthLayoutRouteChildren = {
-	AuthForgotPasswordRoute: AuthForgotPasswordRoute,
-	AuthResetPasswordRoute: AuthResetPasswordRoute,
-	AuthSignInRoute: AuthSignInRoute,
-	AuthSignUpRoute: AuthSignUpRoute,
+  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
+  AuthResetPasswordRoute: AuthResetPasswordRoute,
+  AuthSignInRoute: AuthSignInRoute,
+  AuthSignUpRoute: AuthSignUpRoute,
 }
 
-const AuthLayoutRouteWithChildren = AuthLayoutRoute._addFileChildren(AuthLayoutRouteChildren)
+const AuthLayoutRouteWithChildren = AuthLayoutRoute._addFileChildren(
+  AuthLayoutRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
-	AppLayoutRoute: AppLayoutRouteWithChildren,
-	AuthLayoutRoute: AuthLayoutRouteWithChildren,
+  AppLayoutRoute: AppLayoutRouteWithChildren,
+  AuthLayoutRoute: AuthLayoutRouteWithChildren,
 }
-export const routeTree = rootRouteImport._addFileChildren(rootRouteChildren)._addFileTypes<FileRouteTypes>()
+export const routeTree = rootRouteImport
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()
 const rootServerRouteChildren: RootServerRouteChildren = {
-	ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
+  ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
 }
 export const serverRouteTree = rootServerRouteImport
-	._addFileChildren(rootServerRouteChildren)
-	._addFileTypes<FileServerRouteTypes>()
+  ._addFileChildren(rootServerRouteChildren)
+  ._addFileTypes<FileServerRouteTypes>()
