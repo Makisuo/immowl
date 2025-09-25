@@ -417,21 +417,6 @@ export const upsertScrapedProperty = internalMutation({
 			// Insert new property
 			const id = await ctx.db.insert("properties", propertyData)
 
-			// 🆕 NEW: Check for saved search matches immediately for new properties
-			await ctx.scheduler.runAfter(0, internal.notifications.checkPropertyMatches, {
-				propertyId: id,
-				property: {
-					title: propertyData.title,
-					address: propertyData.address,
-					propertyType: propertyData.propertyType,
-					monthlyRent: propertyData.monthlyRent,
-					rooms: propertyData.rooms,
-					amenities: propertyData.amenities,
-					furnished: propertyData.furnished,
-					petFriendly: propertyData.petFriendly,
-				},
-			})
-
 			return { action: "created", id }
 		}
 	},
