@@ -41,4 +41,23 @@ http.route({
 	}),
 })
 
+// CORS preflight handler for MapKit token endpoint
+http.route({
+	path: "/mapkit-token",
+	method: "OPTIONS",
+	handler: httpAction(async (ctx, request) => {
+		const origin = request.headers.get("origin") || "*"
+
+		return new Response(null, {
+			status: 204,
+			headers: {
+				"Access-Control-Allow-Origin": origin,
+				"Access-Control-Allow-Methods": "GET, OPTIONS",
+				"Access-Control-Allow-Headers": "Content-Type",
+				"Access-Control-Max-Age": "86400",
+			},
+		})
+	}),
+})
+
 export default http
