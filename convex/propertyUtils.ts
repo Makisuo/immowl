@@ -60,29 +60,29 @@ export function buildPropertyQuery(
 	if (filters.minPrice || filters.maxPrice) {
 		filteredQuery = filteredQuery.filter((q) => {
 			let priceCondition = q.gt(q.field("monthlyRent.warm"), 0) // Base condition
-			
+
 			if (filters.minPrice) {
 				const minCondition = q.or(
 					q.gte(q.field("monthlyRent.warm"), filters.minPrice),
 					q.and(
 						q.not(q.field("monthlyRent.warm")),
-						q.gte(q.field("monthlyRent.cold"), filters.minPrice)
-					)
+						q.gte(q.field("monthlyRent.cold"), filters.minPrice),
+					),
 				)
 				priceCondition = q.and(priceCondition, minCondition)
 			}
-			
+
 			if (filters.maxPrice) {
 				const maxCondition = q.or(
 					q.lte(q.field("monthlyRent.warm"), filters.maxPrice),
 					q.and(
 						q.not(q.field("monthlyRent.warm")),
-						q.lte(q.field("monthlyRent.cold"), filters.maxPrice)
-					)
+						q.lte(q.field("monthlyRent.cold"), filters.maxPrice),
+					),
 				)
 				priceCondition = q.and(priceCondition, maxCondition)
 			}
-			
+
 			return priceCondition
 		})
 	}

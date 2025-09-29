@@ -167,9 +167,7 @@ function RouteComponent() {
 						<h1 className="mb-2 font-semibold text-foreground text-2xl sm:text-3xl">
 							Saved Properties
 						</h1>
-						<p className="text-muted-foreground text-sm">
-							{totalCount || 0} saved properties
-						</p>
+						<p className="text-muted-foreground text-sm">{totalCount || 0} saved properties</p>
 					</div>
 				</div>
 			</div>

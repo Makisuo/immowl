@@ -127,7 +127,9 @@ export const getNearbyAmenities = internalAction({
 			// Process and categorize results
 			const categorized = categorizeResults(data, latitude, longitude, limitPerCategory)
 
-			console.log(`[Overpass] Found ${categorized.summary.totalCount} amenities across ${Object.keys(categorized.summary.categoryCounts).length} categories`)
+			console.log(
+				`[Overpass] Found ${categorized.summary.totalCount} amenities across ${Object.keys(categorized.summary.categoryCounts).length} categories`,
+			)
 
 			return categorized
 		} catch (error) {
@@ -158,7 +160,7 @@ export const countNearbyAmenities = internalAction({
 			// Build a simple count query
 			const query = `[out:json][timeout:25];
 (
-  ${amenityTypes.map(type => `node["amenity"="${type}"](around:${radius},${latitude},${longitude});`).join("\n  ")}
+  ${amenityTypes.map((type) => `node["amenity"="${type}"](around:${radius},${latitude},${longitude});`).join("\n  ")}
 );
 out count;`
 
@@ -198,15 +200,8 @@ out count;`
 /**
  * Build Overpass QL query for multiple amenity types
  */
-function buildOverpassQuery(
-	lat: number,
-	lon: number,
-	radius: number,
-	categories?: string[]
-): string {
-	const categoriesToQuery = categories && categories.length > 0
-		? categories
-		: Object.keys(AMENITY_TYPES)
+function buildOverpassQuery(lat: number, lon: number, radius: number, categories?: string[]): string {
+	const categoriesToQuery = categories && categories.length > 0 ? categories : Object.keys(AMENITY_TYPES)
 
 	const queries: string[] = []
 
@@ -255,7 +250,7 @@ function categorizeResults(
 	data: OverpassResponse,
 	originLat: number,
 	originLon: number,
-	limitPerCategory: number
+	limitPerCategory: number,
 ): any {
 	const results: Record<string, any[]> = {
 		restaurants: [],
@@ -328,7 +323,8 @@ function parseElement(element: any, originLat: number, originLon: number): any |
 	if (!lat || !lon) return null
 
 	// Determine amenity type
-	const amenityType = element.tags?.amenity || element.tags?.railway || element.tags?.aeroway || element.tags?.leisure
+	const amenityType =
+		element.tags?.amenity || element.tags?.railway || element.tags?.aeroway || element.tags?.leisure
 	if (!amenityType) return null
 
 	// Calculate distance

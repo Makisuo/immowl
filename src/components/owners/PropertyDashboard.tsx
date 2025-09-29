@@ -155,7 +155,9 @@ export function PropertyDashboard() {
 					<div className="flex flex-col gap-2">
 						<div className="flex items-center gap-2">
 							<Home className="h-6 w-6 text-blue-600" />
-							<h1 className="font-semibold text-foreground text-xl sm:text-2xl">My Properties</h1>
+							<h1 className="font-semibold text-foreground text-xl sm:text-2xl">
+								My Properties
+							</h1>
 						</div>
 						<span className="text-muted-foreground text-sm">
 							Manage your property listings and track their performance
@@ -227,7 +229,9 @@ export function PropertyDashboard() {
 								<div className="flex items-center justify-between">
 									<div>
 										<p className="text-muted-foreground text-sm">Total Properties</p>
-										<p className="mt-1 font-bold text-2xl text-foreground">{stats.total}</p>
+										<p className="mt-1 font-bold text-2xl text-foreground">
+											{stats.total}
+										</p>
 									</div>
 									<div className="rounded-full bg-blue-100 p-3 dark:bg-blue-900/20">
 										<Home className="h-5 w-5 text-blue-600" />
@@ -241,7 +245,9 @@ export function PropertyDashboard() {
 								<div className="flex items-center justify-between">
 									<div>
 										<p className="text-muted-foreground text-sm">Active Listings</p>
-										<p className="mt-1 font-bold text-2xl text-foreground">{stats.active}</p>
+										<p className="mt-1 font-bold text-2xl text-foreground">
+											{stats.active}
+										</p>
 									</div>
 									<div className="rounded-full bg-green-100 p-3 dark:bg-green-900/20">
 										<Eye className="h-5 w-5 text-green-600" />
@@ -255,7 +261,9 @@ export function PropertyDashboard() {
 								<div className="flex items-center justify-between">
 									<div>
 										<p className="text-muted-foreground text-sm">Disabled</p>
-										<p className="mt-1 font-bold text-2xl text-foreground">{stats.disabled}</p>
+										<p className="mt-1 font-bold text-2xl text-foreground">
+											{stats.disabled}
+										</p>
 									</div>
 									<div className="rounded-full bg-gray-100 p-3 dark:bg-gray-900/20">
 										<Power className="h-5 w-5 text-gray-600" />
@@ -480,19 +488,25 @@ export function PropertyDashboard() {
 												{property.rooms?.bedrooms && (
 													<div className="flex items-center gap-1.5">
 														<Bed className="h-4 w-4" />
-														<span className="font-medium">{property.rooms.bedrooms}</span>
+														<span className="font-medium">
+															{property.rooms.bedrooms}
+														</span>
 													</div>
 												)}
 												{property.rooms?.bathrooms && (
 													<div className="flex items-center gap-1.5">
 														<Bath className="h-4 w-4" />
-														<span className="font-medium">{property.rooms.bathrooms}</span>
+														<span className="font-medium">
+															{property.rooms.bathrooms}
+														</span>
 													</div>
 												)}
 												{property.squareMeters && (
 													<div className="flex items-center gap-1.5">
 														<Square className="h-4 w-4" />
-														<span className="font-medium">{property.squareMeters}m²</span>
+														<span className="font-medium">
+															{property.squareMeters}m²
+														</span>
 													</div>
 												)}
 											</div>
@@ -503,13 +517,12 @@ export function PropertyDashboard() {
 														<Calendar className="h-3.5 w-3.5" />
 														<span>
 															Available{" "}
-															{new Date(property.availableFrom).toLocaleDateString(
-																"en-US",
-																{
-																	month: "short",
-																	year: "numeric",
-																},
-															)}
+															{new Date(
+																property.availableFrom,
+															).toLocaleDateString("en-US", {
+																month: "short",
+																year: "numeric",
+															})}
 														</span>
 													</div>
 												) : (
@@ -517,10 +530,13 @@ export function PropertyDashboard() {
 												)}
 												<div className="text-muted-foreground/60">
 													Listed{" "}
-													{new Date(property._creationTime).toLocaleDateString("en-US", {
-														month: "short",
-														day: "numeric",
-													})}
+													{new Date(property._creationTime).toLocaleDateString(
+														"en-US",
+														{
+															month: "short",
+															day: "numeric",
+														},
+													)}
 												</div>
 											</div>
 										</div>

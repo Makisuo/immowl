@@ -1,8 +1,8 @@
 "use node"
 
 import { v } from "convex/values"
-import { action, internalAction } from "./_generated/server"
 import { api, internal } from "./_generated/api"
+import { action, internalAction } from "./_generated/server"
 
 /**
  * Fetch and cache nearby amenities for a property
@@ -21,9 +21,12 @@ export const fetchAndCachePropertyAmenities = action({
 	handler: async (ctx, args): Promise<{ success: boolean; error?: string; amenitiesCount?: number }> => {
 		try {
 			// Get property coordinates
-			const property: { latitude?: number; longitude?: number } | null = await ctx.runQuery(internal.amenities.getPropertyCoordinates, {
-				propertyId: args.propertyId,
-			})
+			const property: { latitude?: number; longitude?: number } | null = await ctx.runQuery(
+				internal.amenities.getPropertyCoordinates,
+				{
+					propertyId: args.propertyId,
+				},
+			)
 
 			if (!property) {
 				return {

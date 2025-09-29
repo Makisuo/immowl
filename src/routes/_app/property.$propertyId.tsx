@@ -190,6 +190,7 @@ function PropertyDetails() {
 														size="icon"
 														className="-translate-y-1/2 absolute top-1/2 left-4 h-10 w-10 rounded-full bg-black/50 text-white hover:bg-black/70"
 														onClick={() => navigateImage("prev")}
+														aria-label="Previous image"
 													>
 														<ChevronLeft className="h-5 w-5" />
 													</Button>
@@ -198,6 +199,7 @@ function PropertyDetails() {
 														size="icon"
 														className="-translate-y-1/2 absolute top-1/2 right-4 h-10 w-10 rounded-full bg-black/50 text-white hover:bg-black/70"
 														onClick={() => navigateImage("next")}
+														aria-label="Next image"
 													>
 														<ChevronRight className="h-5 w-5" />
 													</Button>
@@ -222,17 +224,63 @@ function PropertyDetails() {
 
 								{/* Thumbnail Strip */}
 								{images.length > 1 && (
-									<div className="mt-4 flex gap-2 overflow-x-auto pb-2">
+									<div className="mt-4 flex gap-2 overflow-x-auto py-1 pb-2">
 										{images.slice(0, 8).map((image, index) => (
 											<button
 												key={index}
 												type="button"
+												tabIndex={0}
 												className={`relative flex-shrink-0 overflow-hidden rounded-lg transition-all ${
 													currentImageIndex === index
-														? "ring-2 ring-primary"
-														: "opacity-70 hover:opacity-100"
-												}`}
+														? "ring-2 ring-primary ring-offset-2"
+														: "opacity-70 hover:opacity-100 focus-visible:opacity-100"
+												} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2`}
 												onClick={() => setCurrentImageIndex(index)}
+												onKeyDown={(e) => {
+													if (e.key === "ArrowLeft") {
+														e.preventDefault()
+														const newIndex =
+															index === 0
+																? Math.min(images.length - 1, 7)
+																: index - 1
+														setCurrentImageIndex(newIndex)
+														// Focus the previous thumbnail
+														const buttons =
+															e.currentTarget.parentElement?.querySelectorAll(
+																"button",
+															)
+														const prevButton =
+															buttons?.[
+																index > 0
+																	? index - 1
+																	: Math.min(images.length - 1, 7)
+															]
+														if (prevButton) {
+															;(prevButton as HTMLElement).focus()
+														}
+													} else if (e.key === "ArrowRight") {
+														e.preventDefault()
+														const newIndex =
+															index === Math.min(images.length - 1, 7)
+																? 0
+																: index + 1
+														setCurrentImageIndex(newIndex)
+														// Focus the next thumbnail
+														const buttons =
+															e.currentTarget.parentElement?.querySelectorAll(
+																"button",
+															)
+														const nextButton = buttons?.[newIndex]
+														if (nextButton) {
+															;(nextButton as HTMLElement).focus()
+														}
+													} else if (e.key === "Enter" || e.key === " ") {
+														e.preventDefault()
+														setCurrentImageIndex(index)
+													}
+												}}
+												aria-label={`View image ${index + 1} of ${images.length}`}
+												aria-pressed={currentImageIndex === index}
 											>
 												<img
 													src={image}
@@ -244,8 +292,16 @@ function PropertyDetails() {
 										{images.length > 8 && (
 											<button
 												type="button"
-												className="flex h-20 w-28 flex-shrink-0 items-center justify-center rounded-lg bg-muted transition-colors hover:bg-muted/80"
+												tabIndex={0}
+												className="flex h-20 w-28 flex-shrink-0 items-center justify-center rounded-lg bg-muted transition-colors hover:bg-muted/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
 												onClick={() => setIsGalleryOpen(true)}
+												onKeyDown={(e) => {
+													if (e.key === "Enter" || e.key === " ") {
+														e.preventDefault()
+														setIsGalleryOpen(true)
+													}
+												}}
+												aria-label={`View all ${images.length} images`}
 											>
 												<span className="font-medium text-sm">
 													+{images.length - 8} more

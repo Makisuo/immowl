@@ -217,43 +217,43 @@ export default defineSchema({
 		.index("by_user", ["userId"])
 		.index("by_user_and_property", ["userId", "propertyId"]),
 
-		savedSearches: defineTable({
-			userId: v.id("users"),
-			name: v.string(), // User-defined name for the search
-			description: v.optional(v.string()), // Optional description
-			
-			// Search criteria grouped under a single object for extensibility
-			criteria: v.object({
-				city: v.string(),
-				country: v.string(),
-				propertyType: v.optional(propertyTypeValidator),
-				minPrice: v.optional(v.number()),
-				maxPrice: v.optional(v.number()),
-				bedrooms: v.optional(v.number()),
-				bathrooms: v.optional(v.number()),
-				amenities: v.optional(v.array(v.string())),
-				petFriendly: v.optional(v.boolean()),
-				furnished: v.optional(v.boolean()),
-				// Grouped weights for criteria importance (0-100 integers)
-				weights: v.optional(
-					v.object({
-						location: v.optional(v.number()),
-						price: v.optional(v.number()),
-						bedrooms: v.optional(v.number()),
-						bathrooms: v.optional(v.number()),
-						amenities: v.optional(v.number()),
-						petFriendly: v.optional(v.number()),
-						furnished: v.optional(v.number()),
-						propertyType: v.optional(v.number()),
-					}),
-				),
-			}),
-			
-			// Metadata
-			isActive: v.boolean(), // user can disable without deleting
-			createdAt: v.number(),
-			lastModified: v.number(),
-		})
+	savedSearches: defineTable({
+		userId: v.id("users"),
+		name: v.string(), // User-defined name for the search
+		description: v.optional(v.string()), // Optional description
+
+		// Search criteria grouped under a single object for extensibility
+		criteria: v.object({
+			city: v.string(),
+			country: v.string(),
+			propertyType: v.optional(propertyTypeValidator),
+			minPrice: v.optional(v.number()),
+			maxPrice: v.optional(v.number()),
+			bedrooms: v.optional(v.number()),
+			bathrooms: v.optional(v.number()),
+			amenities: v.optional(v.array(v.string())),
+			petFriendly: v.optional(v.boolean()),
+			furnished: v.optional(v.boolean()),
+			// Grouped weights for criteria importance (0-100 integers)
+			weights: v.optional(
+				v.object({
+					location: v.optional(v.number()),
+					price: v.optional(v.number()),
+					bedrooms: v.optional(v.number()),
+					bathrooms: v.optional(v.number()),
+					amenities: v.optional(v.number()),
+					petFriendly: v.optional(v.number()),
+					furnished: v.optional(v.number()),
+					propertyType: v.optional(v.number()),
+				}),
+			),
+		}),
+
+		// Metadata
+		isActive: v.boolean(), // user can disable without deleting
+		createdAt: v.number(),
+		lastModified: v.number(),
+	})
 		.index("by_user", ["userId"])
 		.index("by_user_active", ["userId", "isActive"]),
 })

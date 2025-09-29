@@ -19,31 +19,25 @@ http.route({
 		const result = await ctx.runAction(api.mapkit.generateToken, { origin })
 
 		if (result.error) {
-			return new Response(
-				JSON.stringify({ error: result.error }),
-				{
-					status: 500,
-					headers: {
-						"Content-Type": "application/json",
-						"Access-Control-Allow-Origin": "*",
-						"Access-Control-Allow-Methods": "GET, OPTIONS",
-					},
-				}
-			)
-		}
-
-		return new Response(
-			JSON.stringify({ token: result.token }),
-			{
-				status: 200,
+			return new Response(JSON.stringify({ error: result.error }), {
+				status: 500,
 				headers: {
 					"Content-Type": "application/json",
-					"Access-Control-Allow-Origin": origin,
+					"Access-Control-Allow-Origin": "*",
 					"Access-Control-Allow-Methods": "GET, OPTIONS",
-					"Cache-Control": "private, max-age=1500", // Cache for 25 minutes
 				},
-			}
-		)
+			})
+		}
+
+		return new Response(JSON.stringify({ token: result.token }), {
+			status: 200,
+			headers: {
+				"Content-Type": "application/json",
+				"Access-Control-Allow-Origin": origin,
+				"Access-Control-Allow-Methods": "GET, OPTIONS",
+				"Cache-Control": "private, max-age=1500", // Cache for 25 minutes
+			},
+		})
 	}),
 })
 

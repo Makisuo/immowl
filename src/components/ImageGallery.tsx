@@ -82,6 +82,7 @@ export function ImageGallery({ images, title, open, onOpenChange, initialIndex =
 										e.stopPropagation()
 										navigateImage("prev")
 									}}
+									aria-label="Previous image"
 								>
 									<ChevronLeft className="h-6 w-6" />
 								</Button>
@@ -93,6 +94,7 @@ export function ImageGallery({ images, title, open, onOpenChange, initialIndex =
 										e.stopPropagation()
 										navigateImage("next")
 									}}
+									aria-label="Next image"
 								>
 									<ChevronRight className="h-6 w-6" />
 								</Button>

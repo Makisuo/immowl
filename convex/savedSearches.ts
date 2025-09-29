@@ -36,31 +36,31 @@ export const createSavedSearch = mutation({
 		),
 	},
 	returns: v.id("savedSearches"),
-		handler: async (ctx, args) => {
-			const user = await getUser(ctx)
+	handler: async (ctx, args) => {
+		const user = await getUser(ctx)
 
-			const now = Date.now()
+		const now = Date.now()
 
-			// Normalize grouped weights with defaults and boolean overrides (0/100 for booleans)
-			const clampInt = (n: number) => Math.max(0, Math.min(100, Math.round(n)))
-			const normalizedWeights = {
-				location: clampInt(args.weights?.location ?? 50),
-				price: clampInt(args.weights?.price ?? 50),
-				bedrooms: clampInt(args.weights?.bedrooms ?? 50),
-				bathrooms: clampInt(args.weights?.bathrooms ?? 50),
-				amenities: clampInt(args.weights?.amenities ?? 50),
-				petFriendly: 0,
-				furnished: 0,
-				propertyType: clampInt(args.weights?.propertyType ?? 50),
-			}
-			// Boolean selectable criteria => 0 or 100 based on selection
-			normalizedWeights.petFriendly = args.petFriendly === true ? 100 : 0
-			normalizedWeights.furnished = args.furnished === true ? 100 : 0
+		// Normalize grouped weights with defaults and boolean overrides (0/100 for booleans)
+		const clampInt = (n: number) => Math.max(0, Math.min(100, Math.round(n)))
+		const normalizedWeights = {
+			location: clampInt(args.weights?.location ?? 50),
+			price: clampInt(args.weights?.price ?? 50),
+			bedrooms: clampInt(args.weights?.bedrooms ?? 50),
+			bathrooms: clampInt(args.weights?.bathrooms ?? 50),
+			amenities: clampInt(args.weights?.amenities ?? 50),
+			petFriendly: 0,
+			furnished: 0,
+			propertyType: clampInt(args.weights?.propertyType ?? 50),
+		}
+		// Boolean selectable criteria => 0 or 100 based on selection
+		normalizedWeights.petFriendly = args.petFriendly === true ? 100 : 0
+		normalizedWeights.furnished = args.furnished === true ? 100 : 0
 
-			const savedSearchId = await ctx.db.insert("savedSearches", {
-				userId: user._id,
-				name: args.name,
-				description: args.description,
+		const savedSearchId = await ctx.db.insert("savedSearches", {
+			userId: user._id,
+			name: args.name,
+			description: args.description,
 
 			// Search criteria (nested)
 			criteria: {
@@ -73,9 +73,9 @@ export const createSavedSearch = mutation({
 				bathrooms: args.bathrooms,
 				amenities: args.amenities,
 				petFriendly: args.petFriendly,
-					furnished: args.furnished,
-					weights: normalizedWeights,
-				},
+				furnished: args.furnished,
+				weights: normalizedWeights,
+			},
 
 			// Metadata
 			isActive: true,
@@ -89,36 +89,36 @@ export const createSavedSearch = mutation({
 
 // Update an existing saved search
 export const updateSavedSearch = mutation({
-    args: {
-        searchId: v.id("savedSearches"),
-        name: v.optional(v.string()),
-        description: v.optional(v.string()),
+	args: {
+		searchId: v.id("savedSearches"),
+		name: v.optional(v.string()),
+		description: v.optional(v.string()),
 
-        // Search criteria
-        city: v.optional(v.string()),
-        country: v.optional(v.string()),
-        propertyType: v.optional(propertyTypeValidator),
-        minPrice: v.optional(v.number()),
-        maxPrice: v.optional(v.number()),
-        bedrooms: v.optional(v.number()),
-        bathrooms: v.optional(v.number()),
-        amenities: v.optional(v.array(v.string())),
-        petFriendly: v.optional(v.boolean()),
-        furnished: v.optional(v.boolean()),
-        // Grouped weights (optional)
-        weights: v.optional(
-            v.object({
-                location: v.optional(v.number()),
-                price: v.optional(v.number()),
-                bedrooms: v.optional(v.number()),
-                bathrooms: v.optional(v.number()),
-                amenities: v.optional(v.number()),
-                petFriendly: v.optional(v.number()),
-                furnished: v.optional(v.number()),
-                propertyType: v.optional(v.number()),
-            }),
-        ),
-    },
+		// Search criteria
+		city: v.optional(v.string()),
+		country: v.optional(v.string()),
+		propertyType: v.optional(propertyTypeValidator),
+		minPrice: v.optional(v.number()),
+		maxPrice: v.optional(v.number()),
+		bedrooms: v.optional(v.number()),
+		bathrooms: v.optional(v.number()),
+		amenities: v.optional(v.array(v.string())),
+		petFriendly: v.optional(v.boolean()),
+		furnished: v.optional(v.boolean()),
+		// Grouped weights (optional)
+		weights: v.optional(
+			v.object({
+				location: v.optional(v.number()),
+				price: v.optional(v.number()),
+				bedrooms: v.optional(v.number()),
+				bathrooms: v.optional(v.number()),
+				amenities: v.optional(v.number()),
+				petFriendly: v.optional(v.number()),
+				furnished: v.optional(v.number()),
+				propertyType: v.optional(v.number()),
+			}),
+		),
+	},
 	returns: v.null(),
 	handler: async (ctx, args) => {
 		const user = await getUser(ctx)
@@ -183,11 +183,16 @@ export const updateSavedSearch = mutation({
 			if (args.weights.location !== undefined) mergedWeights.location = clampInt2(args.weights.location)
 			if (args.weights.price !== undefined) mergedWeights.price = clampInt2(args.weights.price)
 			if (args.weights.bedrooms !== undefined) mergedWeights.bedrooms = clampInt2(args.weights.bedrooms)
-			if (args.weights.bathrooms !== undefined) mergedWeights.bathrooms = clampInt2(args.weights.bathrooms)
-			if (args.weights.amenities !== undefined) mergedWeights.amenities = clampInt2(args.weights.amenities)
-			if (args.weights.petFriendly !== undefined) mergedWeights.petFriendly = clampInt2(args.weights.petFriendly)
-			if (args.weights.furnished !== undefined) mergedWeights.furnished = clampInt2(args.weights.furnished)
-			if (args.weights.propertyType !== undefined) mergedWeights.propertyType = clampInt2(args.weights.propertyType)
+			if (args.weights.bathrooms !== undefined)
+				mergedWeights.bathrooms = clampInt2(args.weights.bathrooms)
+			if (args.weights.amenities !== undefined)
+				mergedWeights.amenities = clampInt2(args.weights.amenities)
+			if (args.weights.petFriendly !== undefined)
+				mergedWeights.petFriendly = clampInt2(args.weights.petFriendly)
+			if (args.weights.furnished !== undefined)
+				mergedWeights.furnished = clampInt2(args.weights.furnished)
+			if (args.weights.propertyType !== undefined)
+				mergedWeights.propertyType = clampInt2(args.weights.propertyType)
 		}
 		// Boolean selectable criteria => 0 or 100 based on selection
 		mergedWeights.petFriendly = updatedCriteria.petFriendly === true ? 100 : 0
