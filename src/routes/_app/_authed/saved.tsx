@@ -128,17 +128,14 @@ function RouteComponent() {
 		<div className="container mx-auto px-4 py-6">
 			{/* Header */}
 			<div className="mb-8">
-				<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-					<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-						<div className="flex items-center gap-2">
-							<Bookmark className="h-6 w-6 text-blue-600" />
-							<h1 className="font-semibold text-foreground text-xl sm:text-2xl">
-								Saved Properties
-							</h1>
-						</div>
-						<span className="text-muted-foreground text-sm">
-							{isLoading ? "Loading..." : `${totalCount || 0} saved`}
-						</span>
+				<div className="flex items-center justify-between">
+					<div>
+						<h1 className="mb-2 font-semibold text-foreground text-2xl sm:text-3xl">
+							Saved Properties
+						</h1>
+						<p className="text-muted-foreground text-sm">
+							{isLoading ? "Loading..." : `${totalCount || 0} saved properties`}
+						</p>
 					</div>
 				</div>
 			</div>

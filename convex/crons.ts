@@ -16,9 +16,9 @@ crons.interval(
 // This runs at: 00:00, 12:00 UTC
 crons.interval(
 	"enrich-property-amenities",
-	{ hours: 12 },
+	{ hours: 1 },
 	internal.amenitiesBackground.enrichPropertiesInBackground,
-	{ batchSize: 50, radius: 1000 }, // Process up to 50 properties within 1km radius
+	{ batchSize: 50, radius: 1000 },
 )
 
 export default crons

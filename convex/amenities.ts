@@ -102,28 +102,34 @@ export const getPropertiesNeedingAmenities = internalQuery({
 	handler: async (ctx, args) => {
 		const limit = args.limit || 100
 
-		// Get all active properties
-		const properties = await ctx.db
+		// Iterate through active properties and filter during iteration
+		// to ensure we find all properties that need amenities
+		const needingAmenities = []
+
+		const query = ctx.db
 			.query("properties")
 			.withIndex("by_status", (q) => q.eq("status", "active"))
-			.take(limit)
 
-		// Filter for properties with coordinates but no amenities
-		const needingAmenities = properties
-			.filter((p) => {
-				const hasCoordinates = p.address.latitude !== undefined && p.address.longitude !== undefined
-				const hasAmenities = p.nearbyAmenities !== undefined
-				return hasCoordinates && !hasAmenities
-			})
-			.map((p) => ({
-				_id: p._id,
-				title: p.title,
-				city: p.address.city,
-				hasCoordinates: true,
-				hasAmenities: false,
-			}))
+		for await (const property of query) {
+			const hasCoordinates = property.address.latitude !== undefined && property.address.longitude !== undefined
+			const hasAmenities = property.nearbyAmenities !== undefined
+
+			if (hasCoordinates && !hasAmenities) {
+				needingAmenities.push({
+					_id: property._id,
+					title: property.title,
+					city: property.address.city,
+					hasCoordinates: true,
+					hasAmenities: false,
+				})
+
+				// Stop once we've collected enough
+				if (needingAmenities.length >= limit) {
+					break
+				}
+			}
+		}
 
 		return needingAmenities
 	},
 })
-
