@@ -11,10 +11,11 @@ import { PropertyCard } from "~/components/properties/PropertyCard"
 import { EmptyState, ErrorState, LoadingGrid } from "~/components/properties/PropertyStates"
 import { AnimatedGroup } from "~/components/ui/animated-group"
 import { Button } from "~/components/ui/button"
-import { Card } from "~/components/ui/card"
+import { Card, CardContent } from "~/components/ui/card"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select"
+import { Skeleton } from "~/components/ui/skeleton"
 import { Slider } from "~/components/ui/slider"
 import type { PropertyType, SavedPropertyWithDate, SortOption } from "~/types/property"
 import { DEFAULT_PRICE_RANGE } from "~/types/property"
@@ -124,6 +125,39 @@ function RouteComponent() {
 		})
 	}, [updateFilters])
 
+	if (isLoading) {
+		return (
+			<div className="container mx-auto px-4 py-6">
+				{/* Header Skeleton */}
+				<div className="mb-8">
+					<Skeleton className="mb-2 h-9 w-64" />
+					<Skeleton className="h-4 w-32" />
+				</div>
+
+				{/* Filters Skeleton */}
+				<Card className="mb-8 border-border/40">
+					<CardContent className="p-6">
+						<div className="mb-6 flex flex-wrap items-center gap-4">
+							<Skeleton className="h-10 w-48" />
+							<Skeleton className="h-10 w-56" />
+							<Skeleton className="h-10 w-60" />
+						</div>
+						<div className="border-t pt-6">
+							<div className="mb-4 flex items-center justify-between">
+								<Skeleton className="h-4 w-24" />
+								<Skeleton className="h-4 w-32" />
+							</div>
+							<Skeleton className="h-2 w-full" />
+						</div>
+					</CardContent>
+				</Card>
+
+				{/* Properties Grid Skeleton */}
+				<LoadingGrid />
+			</div>
+		)
+	}
+
 	return (
 		<div className="container mx-auto px-4 py-6">
 			{/* Header */}
@@ -134,137 +168,130 @@ function RouteComponent() {
 							Saved Properties
 						</h1>
 						<p className="text-muted-foreground text-sm">
-							{isLoading ? "Loading..." : `${totalCount || 0} saved properties`}
+							{totalCount || 0} saved properties
 						</p>
 					</div>
 				</div>
 			</div>
 
 			{/* Filters */}
-			<div className="mb-6 space-y-4">
-				<div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
-					{/* Property Type Filter */}
-					<div className="flex items-center gap-2">
-						<Label className="font-medium text-sm">Type:</Label>
-						<Select
-							value={propertyTypeFilter ?? "all"}
-							onValueChange={(value) => {
-								const newValue = value === "all" ? undefined : (value as PropertyType)
-								setPropertyTypeFilter(newValue)
-								updateFilters({
-									propertyType: newValue,
-								})
-							}}
-						>
-							<SelectTrigger className="w-32 sm:w-40">
-								<SelectValue />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="all">All Types</SelectItem>
-								<SelectItem value="apartment">Apartment</SelectItem>
-								<SelectItem value="house">House</SelectItem>
-								<SelectItem value="condo">Condo</SelectItem>
-								<SelectItem value="townhouse">Townhouse</SelectItem>
-								<SelectItem value="studio">Studio</SelectItem>
-							</SelectContent>
-						</Select>
-					</div>
-
-					{/* City Filter */}
-					<div className="flex items-center gap-2">
-						<Label className="font-medium text-sm">City:</Label>
-						<div className="relative">
-							<Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground" />
-							<Input
-								placeholder="Enter city..."
-								value={cityFilter}
-								onChange={(e) => setCityFilter(e.target.value)}
-								onBlur={applyCityFilter}
-								onKeyDown={(e) => e.key === "Enter" && applyCityFilter()}
-								className="w-36 pl-10 sm:w-48"
-							/>
-							{cityFilter && (
-								<Button
-									variant="ghost"
-									size="icon"
-									className="-translate-y-1/2 absolute top-1/2 right-1 h-6 w-6"
-									onClick={() => {
-										setCityFilter("")
-										updateFilters({ city: undefined })
-									}}
-								>
-									<X className="h-3 w-3" />
-								</Button>
-							)}
-						</div>
-					</div>
-
-					{/* Sort Filter */}
-					<div className="flex items-center gap-2">
-						<Label className="font-medium text-sm">Sort by:</Label>
-						<Select
-							value={sortBy}
-							onValueChange={(value) => {
-								const newSortBy = value as SortOption
-								setSortBy(newSortBy)
-								updateFilters({ sortBy: newSortBy })
-							}}
-						>
-							<SelectTrigger className="w-40 sm:w-48">
-								<SelectValue />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="date-saved">Date Saved</SelectItem>
-								<SelectItem value="price-low">Price: Low to High</SelectItem>
-								<SelectItem value="price-high">Price: High to Low</SelectItem>
-								<SelectItem value="newest">Newest First</SelectItem>
-							</SelectContent>
-						</Select>
-					</div>
-
-					{getActiveFiltersCount > 0 && (
-						<Button
-							variant="outline"
-							size="sm"
-							onClick={clearFilters}
-							className="w-full sm:w-auto"
-						>
-							Clear Filters ({getActiveFiltersCount})
-						</Button>
-					)}
-				</div>
-
-				{/* Price Range Filter */}
-				<Card className="p-4">
-					<div className="space-y-4">
-						<div className="flex items-center justify-between">
-							<Label className="font-medium text-sm">Price Range</Label>
-							<Button
-								variant="ghost"
-								size="sm"
-								onClick={applyPriceFilter}
-								className="text-xs underline"
+			<Card className="mb-8 border-border/40">
+				<CardContent className="p-6">
+					<div className="mb-6 flex flex-wrap items-center gap-4">
+						{/* Property Type Filter */}
+						<div className="flex items-center gap-2">
+							<Label className="text-muted-foreground text-sm">Type</Label>
+							<Select
+								value={propertyTypeFilter ?? "all"}
+								onValueChange={(value) => {
+									const newValue = value === "all" ? undefined : (value as PropertyType)
+									setPropertyTypeFilter(newValue)
+									updateFilters({
+										propertyType: newValue,
+									})
+								}}
 							>
-								Apply
+								<SelectTrigger className="w-36 sm:w-40">
+									<SelectValue />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="all">All Types</SelectItem>
+									<SelectItem value="apartment">Apartment</SelectItem>
+									<SelectItem value="house">House</SelectItem>
+									<SelectItem value="condo">Condo</SelectItem>
+									<SelectItem value="townhouse">Townhouse</SelectItem>
+									<SelectItem value="studio">Studio</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
+
+						{/* City Filter */}
+						<div className="flex items-center gap-2">
+							<Label className="text-muted-foreground text-sm">City</Label>
+							<div className="relative">
+								<Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground" />
+								<Input
+									placeholder="Search city..."
+									value={cityFilter}
+									onChange={(e) => setCityFilter(e.target.value)}
+									onBlur={applyCityFilter}
+									onKeyDown={(e) => e.key === "Enter" && applyCityFilter()}
+									className="w-40 pl-10 sm:w-48"
+								/>
+								{cityFilter && (
+									<Button
+										variant="ghost"
+										size="icon"
+										className="-translate-y-1/2 absolute top-1/2 right-1 h-6 w-6"
+										onClick={() => {
+											setCityFilter("")
+											updateFilters({ city: undefined })
+										}}
+									>
+										<X className="h-3 w-3" />
+									</Button>
+								)}
+							</div>
+						</div>
+
+						{/* Sort Filter */}
+						<div className="flex items-center gap-2">
+							<Label className="text-muted-foreground text-sm">Sort</Label>
+							<Select
+								value={sortBy}
+								onValueChange={(value) => {
+									const newSortBy = value as SortOption
+									setSortBy(newSortBy)
+									updateFilters({ sortBy: newSortBy })
+								}}
+							>
+								<SelectTrigger className="w-44 sm:w-52">
+									<SelectValue />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="date-saved">Date Saved</SelectItem>
+									<SelectItem value="price-low">Price: Low to High</SelectItem>
+									<SelectItem value="price-high">Price: High to Low</SelectItem>
+									<SelectItem value="newest">Newest First</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
+
+						<div className="flex-1" />
+
+						{getActiveFiltersCount > 0 && (
+							<Button variant="ghost" size="sm" onClick={clearFilters} className="text-sm">
+								Clear all ({getActiveFiltersCount})
 							</Button>
-						</div>
-						<div className="px-2">
-							<Slider
-								value={priceRange}
-								onValueChange={(value) => setPriceRange(value as [number, number])}
-								max={5000}
-								min={0}
-								step={100}
-								className="w-full"
-							/>
-						</div>
-						<div className="flex items-center justify-between text-muted-foreground text-sm">
-							<span>${priceRange[0].toLocaleString()}</span>
-							<span>${priceRange[1].toLocaleString()}+</span>
-						</div>
+						)}
 					</div>
-				</Card>
-			</div>
+
+					{/* Price Range Filter */}
+					<div className="border-t pt-6">
+						<div className="mb-4 flex items-center justify-between">
+							<Label className="text-sm">Price Range</Label>
+							<div className="text-muted-foreground text-sm">
+								€{priceRange[0].toLocaleString()} - €{priceRange[1].toLocaleString()}
+								{priceRange[1] === 5000 && "+"}
+							</div>
+						</div>
+						<Slider
+							value={priceRange}
+							onValueChange={(value) => setPriceRange(value as [number, number])}
+							onValueCommit={(value) =>
+								updateFilters({
+									minPrice: value[0],
+									maxPrice: value[1],
+								})
+							}
+							max={5000}
+							min={0}
+							step={100}
+							className="w-full"
+						/>
+					</div>
+				</CardContent>
+			</Card>
 
 			{/* Properties Grid */}
 			<PropertiesGrid
