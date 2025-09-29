@@ -31,14 +31,6 @@ export const generateToken = action({
 		try {
 			privateKey = `-----BEGIN PRIVATE KEY-----\n${privateKey}\n-----END PRIVATE KEY-----`
 
-			// Log key format for debugging (without exposing the actual key)
-			console.log("Private key format check:", {
-				hasBeginMarker: privateKey.includes("BEGIN PRIVATE KEY"),
-				hasEndMarker: privateKey.includes("END PRIVATE KEY"),
-				keyLength: privateKey.length,
-				firstChars: `${privateKey.substring(0, 30)}...`,
-			})
-
 			// Generate JWT token for MapKit JS
 			const token = jwt.sign(
 				{
@@ -62,7 +54,6 @@ export const generateToken = action({
 				},
 			)
 
-			console.log("Successfully generated MapKit token for origin:", args.origin)
 			return { token }
 		} catch (error) {
 			console.error("Error generating MapKit token:", error)

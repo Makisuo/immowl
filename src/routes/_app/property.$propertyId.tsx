@@ -132,7 +132,6 @@ function PropertyDetails() {
 	}
 
 	const propertyTypeLabel = property.propertyType.charAt(0).toUpperCase() + property.propertyType.slice(1)
-	const squareFeet = Math.round(property.squareMeters * 10.764)
 
 	return (
 		<>
@@ -300,7 +299,7 @@ function PropertyDetails() {
 									</div>
 									<div className="flex items-center gap-1">
 										<Square className="h-4 w-4 text-muted-foreground" />
-										<span>{squareFeet} sqft</span>
+										<span>{property.squareMeters} m²</span>
 									</div>
 								</div>
 							</div>
@@ -374,7 +373,7 @@ function PropertyDetails() {
 										<div className="mb-6">
 											<div className="mb-2 flex items-baseline gap-1">
 												<span className="font-bold text-3xl">
-													$
+													€
 													{(
 														property.monthlyRent.warm ||
 														property.monthlyRent.cold ||
@@ -405,7 +404,7 @@ function PropertyDetails() {
 													Deposit
 												</span>
 												<span className="font-medium">
-													$
+													€
 													{(
 														property.deposit ||
 														property.monthlyRent.warm ||

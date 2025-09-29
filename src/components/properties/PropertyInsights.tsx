@@ -4,18 +4,21 @@ import {
 	Calendar,
 	CheckCircle,
 	Clock,
-	Coffee,
 	Heart,
 	Home,
 	MapPin,
-	ShoppingBag,
 	Sparkles,
-	Train,
 	TrendingUp,
-	Users,
 } from "lucide-react"
 import { Badge } from "~/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
+import {
+	formatAmenityDistance,
+	formatLastUpdated,
+	getAmenityDisplayName,
+	getAmenityIcon,
+	getPriorityAmenityCategories,
+} from "~/utils/amenities"
 
 interface PropertyInsightsProps {
 	property: Doc<"properties">
@@ -23,7 +26,6 @@ interface PropertyInsightsProps {
 
 export function PropertyInsights({ property }: PropertyInsightsProps) {
 	const rent = property.monthlyRent.warm || property.monthlyRent.cold || 0
-	const squareFeet = Math.round(property.squareMeters * 10.764)
 	const pricePerSqM = rent / property.squareMeters
 
 	// Mock market average for Berlin/Munich/Hamburg
@@ -124,13 +126,35 @@ export function PropertyInsights({ property }: PropertyInsightsProps) {
 		})
 	}
 
-	// Mock neighborhood features
-	const neighborhoodFeatures = [
-		{ icon: Train, label: "U-Bahn", time: "5 min walk" },
-		{ icon: Coffee, label: "Cafés", time: "2 min walk" },
-		{ icon: ShoppingBag, label: "Supermarket", time: "3 min walk" },
-		{ icon: Users, label: "Family Area", time: "Quiet neighborhood" },
-	]
+	// Get real neighborhood amenities from OpenStreetMap data
+	const nearbyAmenities = property.nearbyAmenities
+	const hasAmenityData = nearbyAmenities !== undefined
+
+	// Filter and format amenity data for display
+	const neighborhoodFeatures = hasAmenityData
+		? getPriorityAmenityCategories()
+				.map((category) => {
+					const amenityData = nearbyAmenities[category as keyof typeof nearbyAmenities]
+					if (!amenityData || typeof amenityData === "number") return null
+
+					const { count, closest } = amenityData as {
+						count: number
+						closest?: { name?: string; distance: number; amenityType: string }
+					}
+
+					if (count === 0) return null
+
+					return {
+						icon: getAmenityIcon(category),
+						label: getAmenityDisplayName(category),
+						distance: closest ? formatAmenityDistance(closest.distance) : undefined,
+						count,
+						closestName: closest?.name,
+					}
+				})
+				.filter(Boolean)
+				.slice(0, 8) // Show top 8 amenities
+		: []
 
 	return (
 		<Card>
@@ -139,7 +163,7 @@ export function PropertyInsights({ property }: PropertyInsightsProps) {
 					<CardTitle className="text-lg">Property Insights</CardTitle>
 					<div className={`flex items-center gap-1.5 ${availability.color}`}>
 						<AvailabilityIcon className="h-4 w-4" />
-						<span className="text-sm font-medium">{availability.label}</span>
+						<span className="font-medium text-sm">{availability.label}</span>
 					</div>
 				</div>
 			</CardHeader>
@@ -153,9 +177,9 @@ export function PropertyInsights({ property }: PropertyInsightsProps) {
 								<div className={`mt-0.5 ${insight.color}`}>
 									<Icon className="h-4 w-4" />
 								</div>
-								<div className="flex-1 min-w-0">
+								<div className="min-w-0 flex-1">
 									<p className="font-medium text-sm">{insight.label}</p>
-									<p className="text-xs text-muted-foreground">{insight.description}</p>
+									<p className="text-muted-foreground text-xs">{insight.description}</p>
 								</div>
 							</div>
 						)
@@ -163,10 +187,10 @@ export function PropertyInsights({ property }: PropertyInsightsProps) {
 				</div>
 
 				{/* Market Comparison */}
-				<div className="rounded-lg bg-muted/50 p-3 space-y-2">
+				<div className="space-y-2 rounded-lg bg-muted/50 p-3">
 					<p className="font-medium text-sm">Market Comparison</p>
 					<div className="flex items-baseline justify-between">
-						<span className="text-xs text-muted-foreground">€{pricePerSqM.toFixed(2)}/m²</span>
+						<span className="text-muted-foreground text-xs">€{pricePerSqM.toFixed(2)}/m²</span>
 						<Badge
 							variant={isGoodDeal ? "default" : "secondary"}
 							className={isGoodDeal ? "bg-green-100 text-green-700 hover:bg-green-100" : ""}
@@ -176,36 +200,71 @@ export function PropertyInsights({ property }: PropertyInsightsProps) {
 					</div>
 				</div>
 
-				{/* Neighborhood */}
-				<div className="border-t pt-4">
-					<p className="font-medium text-sm mb-3">Neighborhood Amenities</p>
-					<div className="grid grid-cols-2 gap-2">
-						{neighborhoodFeatures.map((feature, index) => {
-							const Icon = feature.icon
-							return (
-								<div key={index} className="flex items-center gap-2 text-xs">
-									<Icon className="h-3.5 w-3.5 text-muted-foreground" />
-									<span>{feature.label}</span>
-									<span className="text-muted-foreground ml-auto">{feature.time}</span>
-								</div>
-							)
-						})}
+				{/* Neighborhood Amenities - only show if data exists */}
+				{hasAmenityData && (
+					<div className="border-t pt-4">
+						<div className="mb-3 flex items-center justify-between">
+							<p className="font-medium text-sm">Nearby Amenities</p>
+							{nearbyAmenities.lastUpdated && (
+								<span className="text-muted-foreground text-xs">
+									{formatLastUpdated(nearbyAmenities.lastUpdated)}
+								</span>
+							)}
+						</div>
+						{neighborhoodFeatures.length > 0 ? (
+							<div className="space-y-2">
+								{neighborhoodFeatures.map((feature, index) => {
+									if (!feature) return null
+									const Icon = feature.icon
+									return (
+										<div key={index} className="flex items-start gap-2 text-xs">
+											<Icon className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
+											<div className="min-w-0 flex-1">
+												<div className="flex items-baseline justify-between gap-2">
+													<span className="font-medium">{feature.label}</span>
+													{feature.distance && (
+														<span className="whitespace-nowrap text-muted-foreground">
+															{feature.distance}
+														</span>
+													)}
+												</div>
+												{feature.closestName && (
+													<p className="truncate text-muted-foreground">
+														{feature.closestName}
+													</p>
+												)}
+												{!feature.closestName && feature.count > 0 && (
+													<p className="text-muted-foreground">
+														{feature.count} nearby
+													</p>
+												)}
+											</div>
+										</div>
+									)
+								})}
+							</div>
+						) : (
+							<div className="py-4 text-center text-muted-foreground text-xs">
+								<MapPin className="mx-auto mb-2 h-8 w-8 opacity-50" />
+								<p>No amenities data available</p>
+							</div>
+						)}
 					</div>
-				</div>
+				)}
 
 				{/* Quick Stats */}
-				<div className="border-t pt-4 flex justify-around text-center">
+				<div className="flex justify-around border-t pt-4 text-center">
 					<div>
 						<p className="font-bold text-lg">{property.rooms.bedrooms || "Studio"}</p>
-						<p className="text-xs text-muted-foreground">Bedrooms</p>
+						<p className="text-muted-foreground text-xs">Bedrooms</p>
 					</div>
 					<div>
 						<p className="font-bold text-lg">{property.rooms.bathrooms}</p>
-						<p className="text-xs text-muted-foreground">Bathrooms</p>
+						<p className="text-muted-foreground text-xs">Bathrooms</p>
 					</div>
 					<div>
-						<p className="font-bold text-lg">{squareFeet}</p>
-						<p className="text-xs text-muted-foreground">Sq ft</p>
+						<p className="font-bold text-lg">{property.squareMeters}</p>
+						<p className="text-muted-foreground text-xs">m²</p>
 					</div>
 				</div>
 			</CardContent>

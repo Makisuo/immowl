@@ -245,7 +245,7 @@ export const PropertyCard = memo(function PropertyCard({
 						<div className="flex items-center justify-between pt-1">
 							<div>
 								<span className="font-semibold text-foreground text-lg dark:text-white">
-									$
+									€
 									{(
 										property.monthlyRent.warm ||
 										property.monthlyRent.cold ||
