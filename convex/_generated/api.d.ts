@@ -20,9 +20,12 @@ import type * as emails_components_BaseEmail from "../emails/components/BaseEmai
 import type * as emails_resetPassword from "../emails/resetPassword.js";
 import type * as emails_verifyEmail from "../emails/verifyEmail.js";
 import type * as emails_verifyOtp from "../emails/verifyOtp.js";
+import type * as geocoding from "../geocoding.js";
+import type * as geocodingQueries from "../geocodingQueries.js";
 import type * as http from "../http.js";
 import type * as mapkit from "../mapkit.js";
 import type * as ownerProperties from "../ownerProperties.js";
+import type * as places from "../places.js";
 import type * as properties from "../properties.js";
 import type * as propertyUtils from "../propertyUtils.js";
 import type * as savedProperties from "../savedProperties.js";
@@ -57,9 +60,12 @@ declare const fullApi: ApiFromModules<{
   "emails/resetPassword": typeof emails_resetPassword;
   "emails/verifyEmail": typeof emails_verifyEmail;
   "emails/verifyOtp": typeof emails_verifyOtp;
+  geocoding: typeof geocoding;
+  geocodingQueries: typeof geocodingQueries;
   http: typeof http;
   mapkit: typeof mapkit;
   ownerProperties: typeof ownerProperties;
+  places: typeof places;
   properties: typeof properties;
   propertyUtils: typeof propertyUtils;
   savedProperties: typeof savedProperties;
