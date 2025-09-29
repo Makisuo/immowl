@@ -3,8 +3,11 @@ import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { type } from "arktype"
 import { api } from "convex/_generated/api"
+
+import { useState } from "react"
 import { ApartmentGrid } from "~/components/apartment-grid"
 import { FilterDropdown } from "~/components/filter-dropdown"
+
 import { useInfiniteQuery } from "~/hooks/use-infinite-query"
 import { useSavedSearch } from "~/hooks/use-saved-search"
 import { useSearchFilters } from "~/hooks/use-search-params"
@@ -31,6 +34,7 @@ export const Route = createFileRoute("/_app/search")({
 function RouteComponent() {
 	const { searchParams, uiFilters, updateFilters } = useSearchFilters()
 	const { useAutoSave } = useSavedSearch()
+	const [_showSaveDialog, _setShowSaveDialogg] = useState(false)
 
 	// Automatically save search params to localStorage when they change
 	useAutoSave(searchParams)
@@ -88,22 +92,24 @@ function RouteComponent() {
 						{isLoading ? "Loading..." : `${totalCount || 0} results`}
 					</span>
 				</div>
-				<FilterDropdown
-					priceRange={uiFilters.priceRange}
-					setPriceRange={(range) => updateFilters({ priceRange: range })}
-					selectedAmenities={uiFilters.amenities}
-					setSelectedAmenities={(amenities) => updateFilters({ amenities })}
-					selectedBedrooms={uiFilters.bedrooms}
-					setSelectedBedrooms={(bedrooms) => updateFilters({ bedrooms })}
-					selectedBathrooms={uiFilters.bathrooms}
-					setSelectedBathrooms={(bathrooms) => updateFilters({ bathrooms })}
-					selectedPropertyType={uiFilters.propertyType}
-					setSelectedPropertyType={(type) => updateFilters({ propertyType: type })}
-					selectedPetPolicy={uiFilters.petFriendly}
-					setSelectedPetPolicy={(policy) => updateFilters({ petFriendly: policy })}
-					selectedFurnished={uiFilters.furnished}
-					setSelectedFurnished={(furnished) => updateFilters({ furnished })}
-				/>
+				<div className="flex items-center gap-3">
+					<FilterDropdown
+						priceRange={uiFilters.priceRange}
+						setPriceRange={(range) => updateFilters({ priceRange: range })}
+						selectedAmenities={uiFilters.amenities}
+						setSelectedAmenities={(amenities) => updateFilters({ amenities })}
+						selectedBedrooms={uiFilters.bedrooms}
+						setSelectedBedrooms={(bedrooms) => updateFilters({ bedrooms })}
+						selectedBathrooms={uiFilters.bathrooms}
+						setSelectedBathrooms={(bathrooms) => updateFilters({ bathrooms })}
+						selectedPropertyType={uiFilters.propertyType}
+						setSelectedPropertyType={(type) => updateFilters({ propertyType: type })}
+						selectedPetPolicy={uiFilters.petFriendly}
+						setSelectedPetPolicy={(policy) => updateFilters({ petFriendly: policy })}
+						selectedFurnished={uiFilters.furnished}
+						setSelectedFurnished={(furnished) => updateFilters({ furnished })}
+					/>
+				</div>
 			</div>
 			<main className="w-full">
 				<ApartmentGrid

@@ -26,6 +26,7 @@ import type * as ownerProperties from "../ownerProperties.js";
 import type * as properties from "../properties.js";
 import type * as propertyUtils from "../propertyUtils.js";
 import type * as savedProperties from "../savedProperties.js";
+import type * as savedSearches from "../savedSearches.js";
 import type * as user from "../user.js";
 import type * as validators from "../validators.js";
 
@@ -62,6 +63,7 @@ declare const fullApi: ApiFromModules<{
   properties: typeof properties;
   propertyUtils: typeof propertyUtils;
   savedProperties: typeof savedProperties;
+  savedSearches: typeof savedSearches;
   user: typeof user;
   validators: typeof validators;
 }>;

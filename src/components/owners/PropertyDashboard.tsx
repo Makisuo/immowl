@@ -22,7 +22,7 @@ import { toast } from "sonner"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent } from "~/components/ui/card"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "~/components/ui/dialog"
+import { Dialog, DialogContent } from "~/components/ui/dialog"
 import {
 	DropdownMenu,
 	DropdownMenuContent,

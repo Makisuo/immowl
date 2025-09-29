@@ -21,6 +21,7 @@ import {
 import { paginationOptsValidator } from "convex/server"
 import { v } from "convex/values"
 import { internalMutation, mutation, query } from "./_generated/server"
+import { internal } from "./_generated/api"
 import { applySorting, buildPropertyQuery, sortPaginatedResults } from "./propertyUtils"
 import { externalSourceValidator, propertySortByValidator, propertyTypeValidator } from "./validators"
 
@@ -415,6 +416,7 @@ export const upsertScrapedProperty = internalMutation({
 		} else {
 			// Insert new property
 			const id = await ctx.db.insert("properties", propertyData)
+
 			return { action: "created", id }
 		}
 	},
