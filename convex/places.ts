@@ -79,9 +79,6 @@ export const searchNearbyPlaces = action({
 				}
 			}
 
-			// First, get Maps Access Token from the auth token
-			const fetch = (await import("node-fetch")).default
-
 			// Exchange the auth token for an access token
 			const tokenResponse = await fetch("https://maps-api.apple.com/v1/token", {
 				headers: {

@@ -59,6 +59,148 @@ export default defineSchema({
 		// Status
 		status: v.union(v.literal("active"), v.literal("disabled")),
 		isExternal: v.boolean(),
+
+		// Nearby amenities from OpenStreetMap (cached)
+		nearbyAmenities: v.optional(
+			v.object({
+				lastUpdated: v.number(),
+				radius: v.number(), // search radius in meters
+				summary: v.object({
+					totalCount: v.number(),
+					categoryCounts: v.record(v.string(), v.number()),
+				}),
+				restaurants: v.object({
+					count: v.number(),
+					closest: v.optional(
+						v.object({
+							name: v.optional(v.string()),
+							distance: v.number(),
+							amenityType: v.string(),
+						}),
+					),
+				}),
+				publicTransit: v.object({
+					count: v.number(),
+					closest: v.optional(
+						v.object({
+							name: v.optional(v.string()),
+							distance: v.number(),
+							amenityType: v.string(),
+						}),
+					),
+				}),
+				trainStations: v.object({
+					count: v.number(),
+					closest: v.optional(
+						v.object({
+							name: v.optional(v.string()),
+							distance: v.number(),
+							amenityType: v.string(),
+						}),
+					),
+				}),
+				airports: v.object({
+					count: v.number(),
+					closest: v.optional(
+						v.object({
+							name: v.optional(v.string()),
+							distance: v.number(),
+							amenityType: v.string(),
+						}),
+					),
+				}),
+				shopping: v.object({
+					count: v.number(),
+					closest: v.optional(
+						v.object({
+							name: v.optional(v.string()),
+							distance: v.number(),
+							amenityType: v.string(),
+						}),
+					),
+				}),
+				healthcare: v.object({
+					count: v.number(),
+					closest: v.optional(
+						v.object({
+							name: v.optional(v.string()),
+							distance: v.number(),
+							amenityType: v.string(),
+						}),
+					),
+				}),
+				financial: v.object({
+					count: v.number(),
+					closest: v.optional(
+						v.object({
+							name: v.optional(v.string()),
+							distance: v.number(),
+							amenityType: v.string(),
+						}),
+					),
+				}),
+				education: v.object({
+					count: v.number(),
+					closest: v.optional(
+						v.object({
+							name: v.optional(v.string()),
+							distance: v.number(),
+							amenityType: v.string(),
+						}),
+					),
+				}),
+				recreation: v.object({
+					count: v.number(),
+					closest: v.optional(
+						v.object({
+							name: v.optional(v.string()),
+							distance: v.number(),
+							amenityType: v.string(),
+						}),
+					),
+				}),
+				sports: v.object({
+					count: v.number(),
+					closest: v.optional(
+						v.object({
+							name: v.optional(v.string()),
+							distance: v.number(),
+							amenityType: v.string(),
+						}),
+					),
+				}),
+				parks: v.object({
+					count: v.number(),
+					closest: v.optional(
+						v.object({
+							name: v.optional(v.string()),
+							distance: v.number(),
+							amenityType: v.string(),
+						}),
+					),
+				}),
+				services: v.object({
+					count: v.number(),
+					closest: v.optional(
+						v.object({
+							name: v.optional(v.string()),
+							distance: v.number(),
+							amenityType: v.string(),
+						}),
+					),
+				}),
+				worship: v.object({
+					count: v.number(),
+					closest: v.optional(
+						v.object({
+							name: v.optional(v.string()),
+							distance: v.number(),
+							amenityType: v.string(),
+						}),
+					),
+				}),
+			}),
+		),
 	})
 		.index("by_status", ["status"])
 		.index("by_city", ["address.city"])

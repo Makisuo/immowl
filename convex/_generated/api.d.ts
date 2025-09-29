@@ -8,6 +8,9 @@
  * @module
  */
 
+import type * as amenities from "../amenities.js";
+import type * as amenitiesActions from "../amenitiesActions.js";
+import type * as amenitiesBackground from "../amenitiesBackground.js";
 import type * as auth from "../auth.js";
 import type * as betterAuth__generated_api from "../betterAuth/_generated/api.js";
 import type * as betterAuth__generated_server from "../betterAuth/_generated/server.js";
@@ -25,6 +28,7 @@ import type * as geocoding from "../geocoding.js";
 import type * as geocodingQueries from "../geocodingQueries.js";
 import type * as http from "../http.js";
 import type * as mapkit from "../mapkit.js";
+import type * as overpass from "../overpass.js";
 import type * as ownerProperties from "../ownerProperties.js";
 import type * as places from "../places.js";
 import type * as properties from "../properties.js";
@@ -49,6 +53,9 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  amenities: typeof amenities;
+  amenitiesActions: typeof amenitiesActions;
+  amenitiesBackground: typeof amenitiesBackground;
   auth: typeof auth;
   "betterAuth/_generated/api": typeof betterAuth__generated_api;
   "betterAuth/_generated/server": typeof betterAuth__generated_server;
@@ -66,6 +73,7 @@ declare const fullApi: ApiFromModules<{
   geocodingQueries: typeof geocodingQueries;
   http: typeof http;
   mapkit: typeof mapkit;
+  overpass: typeof overpass;
   ownerProperties: typeof ownerProperties;
   places: typeof places;
   properties: typeof properties;
@@ -1375,6 +1383,92 @@ export declare const components: {
     };
   };
   geocodeWorkpool: {
+    lib: {
+      cancel: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          id: string;
+          logLevel: "DEBUG" | "TRACE" | "INFO" | "REPORT" | "WARN" | "ERROR";
+        },
+        any
+      >;
+      cancelAll: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          before?: number;
+          logLevel: "DEBUG" | "TRACE" | "INFO" | "REPORT" | "WARN" | "ERROR";
+        },
+        any
+      >;
+      enqueue: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          config: {
+            logLevel: "DEBUG" | "TRACE" | "INFO" | "REPORT" | "WARN" | "ERROR";
+            maxParallelism: number;
+          };
+          fnArgs: any;
+          fnHandle: string;
+          fnName: string;
+          fnType: "action" | "mutation" | "query";
+          onComplete?: { context?: any; fnHandle: string };
+          retryBehavior?: {
+            base: number;
+            initialBackoffMs: number;
+            maxAttempts: number;
+          };
+          runAt: number;
+        },
+        string
+      >;
+      enqueueBatch: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          config: {
+            logLevel: "DEBUG" | "TRACE" | "INFO" | "REPORT" | "WARN" | "ERROR";
+            maxParallelism: number;
+          };
+          items: Array<{
+            fnArgs: any;
+            fnHandle: string;
+            fnName: string;
+            fnType: "action" | "mutation" | "query";
+            onComplete?: { context?: any; fnHandle: string };
+            retryBehavior?: {
+              base: number;
+              initialBackoffMs: number;
+              maxAttempts: number;
+            };
+            runAt: number;
+          }>;
+        },
+        Array<string>
+      >;
+      status: FunctionReference<
+        "query",
+        "internal",
+        { id: string },
+        | { previousAttempts: number; state: "pending" }
+        | { previousAttempts: number; state: "running" }
+        | { state: "finished" }
+      >;
+      statusBatch: FunctionReference<
+        "query",
+        "internal",
+        { ids: Array<string> },
+        Array<
+          | { previousAttempts: number; state: "pending" }
+          | { previousAttempts: number; state: "running" }
+          | { state: "finished" }
+        >
+      >;
+    };
+  };
+  amenitiesWorkpool: {
     lib: {
       cancel: FunctionReference<
         "mutation",

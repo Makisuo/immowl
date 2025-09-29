@@ -2,8 +2,8 @@
 
 import { Workpool } from "@convex-dev/workpool"
 import { v } from "convex/values"
-import { action, internalAction } from "./_generated/server"
 import { components, internal } from "./_generated/api"
+import { action, internalAction } from "./_generated/server"
 
 const geocodePool = new Workpool(components.geocodeWorkpool, {
 	maxParallelism: 1, // Respect Nominatim's 1 req/sec rate limit
@@ -34,8 +34,6 @@ export const geocodeAddress = action({
 	),
 	handler: async (_ctx, args) => {
 		try {
-			const fetch = (await import("node-fetch")).default
-
 			// Build structured query parameters
 			const params = new URLSearchParams()
 			params.append("street", args.street)
@@ -77,9 +75,7 @@ export const geocodeAddress = action({
 			const latitude = Number.parseFloat(result.lat)
 			const longitude = Number.parseFloat(result.lon)
 
-			console.log(
-				`[Geocoding] Success: ${args.street}, ${args.city} -> (${latitude}, ${longitude})`,
-			)
+			console.log(`[Geocoding] Success: ${args.street}, ${args.city} -> (${latitude}, ${longitude})`)
 
 			return {
 				latitude,
@@ -118,8 +114,6 @@ export const geocodeSingleProperty = internalAction({
 	}),
 	handler: async (ctx, args) => {
 		try {
-			const fetch = (await import("node-fetch")).default
-
 			// Build structured query parameters
 			const params = new URLSearchParams()
 			params.append("street", args.street)
@@ -176,9 +170,7 @@ export const geocodeSingleProperty = internalAction({
 				longitude,
 			})
 
-			console.log(
-				`[Geocoding] Success for property ${args.propertyId}: (${latitude}, ${longitude})`,
-			)
+			console.log(`[Geocoding] Success for property ${args.propertyId}: (${latitude}, ${longitude})`)
 
 			return {
 				success: true,
@@ -223,13 +215,10 @@ export const geocodePropertiesInBackground = internalAction({
 				country: string
 				zipCode: string
 			}
-		}> = await ctx.runQuery(
-			internal.geocodingQueries.getPropertiesWithoutCoordinates,
-			{
-				limit: batchSize,
-				city: args.city,
-			},
-		)
+		}> = await ctx.runQuery(internal.geocodingQueries.getPropertiesWithoutCoordinates, {
+			limit: batchSize,
+			city: args.city,
+		})
 
 		if (properties.length === 0) {
 			console.log("[Geocoding] No properties found without coordinates")

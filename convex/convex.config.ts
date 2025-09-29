@@ -8,5 +8,6 @@ app.use(betterAuth)
 app.use(resend)
 app.use(workpool, { name: "scrapeWorkpool" })
 app.use(workpool, { name: "geocodeWorkpool" })
+app.use(workpool, { name: "amenitiesWorkpool" })
 
 export default app
