@@ -7,5 +7,6 @@ const app = defineApp()
 app.use(betterAuth)
 app.use(resend)
 app.use(workpool, { name: "scrapeWorkpool" })
+app.use(workpool, { name: "geocodeWorkpool" })
 
 export default app
