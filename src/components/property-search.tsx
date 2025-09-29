@@ -75,7 +75,7 @@ export function PropertySearch() {
 							</SelectTrigger>
 							<SelectContent className="z-[100]">
 								<SelectItem value="Berlin">Berlin</SelectItem>
-								<SelectItem value="Potsdam">Potsdam</SelectItem>
+								{/* <SelectItem value="Potsdam">Potsdam</SelectItem> */}
 							</SelectContent>
 						</Select>
 					</div>

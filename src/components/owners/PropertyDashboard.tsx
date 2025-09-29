@@ -113,6 +113,21 @@ export function PropertyDashboard() {
 
 	const propertyTypes = Array.from(new Set(properties.map((p) => p.propertyType).filter(Boolean)))
 
+	const stats = useMemo(() => {
+		const activeCount = properties.filter((p) => p.status === "active").length
+		const disabledCount = properties.filter((p) => p.status === "disabled").length
+		const totalRevenue = properties
+			.filter((p) => p.status === "active")
+			.reduce((sum, p) => sum + (p.monthlyRent?.warm || p.monthlyRent?.cold || 0), 0)
+
+		return {
+			total: properties.length,
+			active: activeCount,
+			disabled: disabledCount,
+			revenue: totalRevenue,
+		}
+	}, [properties])
+
 	const handleEditProperty = (propertyId: string) => {
 		const property = properties.find((p) => p._id === propertyId)
 		if (property) {
@@ -137,10 +152,13 @@ export function PropertyDashboard() {
 			{/* Header */}
 			<div className="mb-8">
 				<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-					<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-						<h1 className="font-semibold text-foreground text-xl sm:text-2xl">My Properties</h1>
+					<div className="flex flex-col gap-2">
+						<div className="flex items-center gap-2">
+							<Home className="h-6 w-6 text-blue-600" />
+							<h1 className="font-semibold text-foreground text-xl sm:text-2xl">My Properties</h1>
+						</div>
 						<span className="text-muted-foreground text-sm">
-							{isLoading ? "Loading..." : `${properties.length} properties`}
+							Manage your property listings and track their performance
 						</span>
 					</div>
 					<Button className="w-full sm:w-auto" onClick={() => setShowAddProperty(true)}>
@@ -151,9 +169,50 @@ export function PropertyDashboard() {
 			</div>
 
 			{isLoading ? (
-				<div className="flex items-center justify-center py-12">
-					<div className="h-8 w-8 animate-spin rounded-full border-4 border-muted-foreground border-t-transparent" />
-				</div>
+				<>
+					{/* Loading Stats Skeleton */}
+					<div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
+						{[1, 2, 3, 4].map((i) => (
+							<Card key={i} className="border-border bg-card">
+								<CardContent className="p-4 sm:p-6">
+									<div className="flex items-center justify-between">
+										<div className="flex-1">
+											<div className="mb-2 h-4 w-24 animate-pulse rounded bg-muted" />
+											<div className="h-8 w-16 animate-pulse rounded bg-muted" />
+										</div>
+										<div className="h-11 w-11 animate-pulse rounded-full bg-muted" />
+									</div>
+								</CardContent>
+							</Card>
+						))}
+					</div>
+
+					{/* Loading Property Cards Skeleton */}
+					<div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
+						{[1, 2, 3, 4, 5, 6].map((i) => (
+							<Card key={i} className="overflow-hidden border-border bg-card pt-0">
+								<div className="h-48 w-full animate-pulse bg-muted sm:h-52" />
+								<CardContent className="p-5 sm:p-6">
+									<div className="space-y-4">
+										<div>
+											<div className="mb-2 h-6 w-3/4 animate-pulse rounded bg-muted" />
+											<div className="h-4 w-1/2 animate-pulse rounded bg-muted" />
+										</div>
+										<div className="flex items-center justify-between border-border border-t pt-3">
+											<div className="h-8 w-24 animate-pulse rounded bg-muted" />
+											<div className="h-6 w-16 animate-pulse rounded bg-muted" />
+										</div>
+										<div className="flex gap-5 border-border border-t pt-3">
+											<div className="h-4 w-12 animate-pulse rounded bg-muted" />
+											<div className="h-4 w-12 animate-pulse rounded bg-muted" />
+											<div className="h-4 w-12 animate-pulse rounded bg-muted" />
+										</div>
+									</div>
+								</CardContent>
+							</Card>
+						))}
+					</div>
+				</>
 			) : error ? (
 				<div className="py-12 text-center">
 					<p className="text-destructive">Failed to load properties</p>
@@ -161,6 +220,66 @@ export function PropertyDashboard() {
 				</div>
 			) : (
 				<>
+					{/* Stats Overview */}
+					<div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
+						<Card className="border-border bg-card">
+							<CardContent className="p-4 sm:p-6">
+								<div className="flex items-center justify-between">
+									<div>
+										<p className="text-muted-foreground text-sm">Total Properties</p>
+										<p className="mt-1 font-bold text-2xl text-foreground">{stats.total}</p>
+									</div>
+									<div className="rounded-full bg-blue-100 p-3 dark:bg-blue-900/20">
+										<Home className="h-5 w-5 text-blue-600" />
+									</div>
+								</div>
+							</CardContent>
+						</Card>
+
+						<Card className="border-border bg-card">
+							<CardContent className="p-4 sm:p-6">
+								<div className="flex items-center justify-between">
+									<div>
+										<p className="text-muted-foreground text-sm">Active Listings</p>
+										<p className="mt-1 font-bold text-2xl text-foreground">{stats.active}</p>
+									</div>
+									<div className="rounded-full bg-green-100 p-3 dark:bg-green-900/20">
+										<Eye className="h-5 w-5 text-green-600" />
+									</div>
+								</div>
+							</CardContent>
+						</Card>
+
+						<Card className="border-border bg-card">
+							<CardContent className="p-4 sm:p-6">
+								<div className="flex items-center justify-between">
+									<div>
+										<p className="text-muted-foreground text-sm">Disabled</p>
+										<p className="mt-1 font-bold text-2xl text-foreground">{stats.disabled}</p>
+									</div>
+									<div className="rounded-full bg-gray-100 p-3 dark:bg-gray-900/20">
+										<Power className="h-5 w-5 text-gray-600" />
+									</div>
+								</div>
+							</CardContent>
+						</Card>
+
+						<Card className="border-border bg-card">
+							<CardContent className="p-4 sm:p-6">
+								<div className="flex items-center justify-between">
+									<div>
+										<p className="text-muted-foreground text-sm">Monthly Revenue</p>
+										<p className="mt-1 font-bold text-2xl text-foreground">
+											€{stats.revenue.toLocaleString()}
+										</p>
+									</div>
+									<div className="rounded-full bg-emerald-100 p-3 dark:bg-emerald-900/20">
+										<Calendar className="h-5 w-5 text-emerald-600" />
+									</div>
+								</div>
+							</CardContent>
+						</Card>
+					</div>
 					{/* Filters */}
 					<div className="mb-6 space-y-4">
 						<div className="flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -260,22 +379,23 @@ export function PropertyDashboard() {
 							{filteredProperties.map((property) => (
 								<Card
 									key={property._id}
-									className="border-border bg-card pt-0 transition-colors hover:border-border/80"
+									className="group overflow-hidden border-border bg-card pt-0 transition-all duration-200 hover:shadow-lg hover:border-border/80"
 								>
-									<div className="relative">
+									<div className="relative overflow-hidden">
 										{property.imageUrls && property.imageUrls.length > 0 ? (
 											<img
 												src={property.imageUrls[0]}
 												alt={property.title}
-												className="h-40 w-full rounded-t-lg object-cover sm:h-48"
+												className="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105 sm:h-52"
 											/>
 										) : (
-											<div className="flex h-40 w-full items-center justify-center rounded-t-lg bg-muted sm:h-48">
-												<Home className="h-12 w-12 text-muted-foreground/50" />
+											<div className="flex h-48 w-full items-center justify-center bg-gradient-to-br from-muted to-muted/50 sm:h-52">
+												<Home className="h-16 w-16 text-muted-foreground/30" />
 											</div>
 										)}
+										<div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
 										<Badge
-											className={`absolute top-3 left-3 text-xs ${statusColors[property.status]}`}
+											className={`absolute top-3 left-3 text-xs shadow-md ${statusColors[property.status]}`}
 										>
 											{statusLabels[property.status]}
 										</Badge>
@@ -284,7 +404,7 @@ export function PropertyDashboard() {
 												<Button
 													variant="ghost"
 													size="sm"
-													className="absolute top-3 right-3 h-8 w-8 bg-background/80 p-0 hover:bg-background"
+													className="absolute top-3 right-3 h-8 w-8 bg-background/90 p-0 shadow-md backdrop-blur-sm transition-all hover:bg-background hover:scale-110"
 												>
 													<MoreHorizontal className="h-4 w-4" />
 												</Button>
@@ -320,14 +440,14 @@ export function PropertyDashboard() {
 										</DropdownMenu>
 									</div>
 
-									<CardContent className="p-4 sm:p-6">
-										<div className="space-y-3 sm:space-y-4">
+									<CardContent className="p-5 sm:p-6">
+										<div className="space-y-4">
 											<div>
-												<h3 className="mb-1 text-balance font-semibold text-base text-foreground sm:text-lg">
+												<h3 className="mb-2 line-clamp-2 text-balance font-semibold text-base text-foreground sm:text-lg">
 													{property.title}
 												</h3>
-												<div className="flex items-center text-muted-foreground text-sm">
-													<MapPin className="mr-1 h-4 w-4 flex-shrink-0" />
+												<div className="flex items-center gap-1 text-muted-foreground text-sm">
+													<MapPin className="h-4 w-4 flex-shrink-0" />
 													<span className="truncate">
 														{property.address.street &&
 															`${property.address.street}, `}
@@ -336,74 +456,71 @@ export function PropertyDashboard() {
 												</div>
 											</div>
 
-											<div className="flex items-center justify-between">
+											<div className="flex items-center justify-between border-border border-t pt-3">
 												<div className="font-bold text-foreground text-xl sm:text-2xl">
 													€
 													{property.monthlyRent?.warm?.toLocaleString() ||
 														property.monthlyRent?.cold?.toLocaleString() ||
 														0}
 													<span className="font-normal text-muted-foreground text-sm">
-														/month
+														/mo
 													</span>
 												</div>
 												{property.propertyType && (
 													<Badge
 														variant="outline"
-														className="border-border text-muted-foreground text-xs capitalize"
+														className="border-border/60 bg-muted/30 text-muted-foreground text-xs capitalize"
 													>
 														{property.propertyType}
 													</Badge>
 												)}
 											</div>
 
-											<div className="flex items-center gap-4 text-muted-foreground text-sm">
+											<div className="flex items-center gap-5 border-border border-t pt-3 text-muted-foreground text-sm">
 												{property.rooms?.bedrooms && (
-													<div className="flex items-center gap-1">
+													<div className="flex items-center gap-1.5">
 														<Bed className="h-4 w-4" />
-														{property.rooms.bedrooms}
+														<span className="font-medium">{property.rooms.bedrooms}</span>
 													</div>
 												)}
 												{property.rooms?.bathrooms && (
-													<div className="flex items-center gap-1">
+													<div className="flex items-center gap-1.5">
 														<Bath className="h-4 w-4" />
-														{property.rooms.bathrooms}
+														<span className="font-medium">{property.rooms.bathrooms}</span>
 													</div>
 												)}
 												{property.squareMeters && (
-													<div className="flex items-center gap-1">
+													<div className="flex items-center gap-1.5">
 														<Square className="h-4 w-4" />
-														{property.squareMeters}m²
+														<span className="font-medium">{property.squareMeters}m²</span>
 													</div>
 												)}
 											</div>
 
-											<div className="flex items-center justify-between border-border border-t pt-3 sm:pt-4">
-												<div className="flex items-center gap-4 text-muted-foreground text-sm">
-													{property.availableFrom && (
-														<div className="flex items-center gap-1">
-															<span className="text-xs">Available from:</span>
-															<span className="text-xs">
-																{new Date(
-																	property.availableFrom,
-																).toLocaleDateString("en-US", {
+											<div className="flex items-center justify-between border-border border-t pt-3 text-muted-foreground text-xs">
+												{property.availableFrom ? (
+													<div className="flex items-center gap-1.5">
+														<Calendar className="h-3.5 w-3.5" />
+														<span>
+															Available{" "}
+															{new Date(property.availableFrom).toLocaleDateString(
+																"en-US",
+																{
 																	month: "short",
 																	year: "numeric",
-																})}
-															</span>
-														</div>
-													)}
-												</div>
-												<div className="flex items-center gap-1 text-muted-foreground text-xs">
-													<Calendar className="h-3 w-3" />
-													<span>
-														{new Date(property._creationTime).toLocaleDateString(
-															"en-US",
-															{
-																month: "short",
-																day: "numeric",
-															},
-														)}
-													</span>
+																},
+															)}
+														</span>
+													</div>
+												) : (
+													<div />
+												)}
+												<div className="text-muted-foreground/60">
+													Listed{" "}
+													{new Date(property._creationTime).toLocaleDateString("en-US", {
+														month: "short",
+														day: "numeric",
+													})}
 												</div>
 											</div>
 										</div>
