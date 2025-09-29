@@ -1,10 +1,14 @@
 "use client"
 
+import { convexQuery, useConvexMutation } from "@convex-dev/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
-import type { Doc } from "convex/_generated/dataModel"
+import { api } from "convex/_generated/api"
+import type { Doc, Id } from "convex/_generated/dataModel"
 import { Bath, Bed, ChevronLeft, ChevronRight, Heart, Loader2, MapPin, Square } from "lucide-react"
 import { motion } from "motion/react"
-import { useState } from "react"
+import { useCallback, useState } from "react"
+import { toast } from "sonner"
 import { ExternalSourceIndicator } from "~/components/properties/ExternalSourceIndicator"
 import { AnimatedGroup } from "~/components/ui/animated-group"
 import { Badge } from "~/components/ui/badge"
@@ -12,6 +16,7 @@ import { Button } from "~/components/ui/button"
 import { Card, CardContent } from "~/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select"
 import { Skeleton } from "~/components/ui/skeleton"
+import { useAuth } from "~/hooks/use-auth"
 import {
 	formatAvailability,
 	formatBathCount,
@@ -39,12 +44,41 @@ export function ApartmentGrid({
 	canLoadMore,
 	loadMore,
 }: ApartmentGridProps) {
-	const [favorites, setFavorites] = useState<string[]>([])
+	const { isAuthenticated } = useAuth()
 	const [currentImageIndex, setCurrentImageIndex] = useState<Record<string, number>>({})
 
-	const toggleFavorite = (id: string) => {
-		setFavorites((prev) => (prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id]))
-	}
+	// Fetch saved property IDs from backend
+	const { data: savedPropertyIds = [] } = useQuery(
+		convexQuery(api.savedProperties.getSavedPropertyIds, {}),
+	)
+
+	// Setup toggle save mutation
+	const toggleSaveMutationFn = useConvexMutation(api.savedProperties.toggleSaveProperty)
+	const toggleSave = useMutation({
+		mutationFn: toggleSaveMutationFn,
+	})
+
+	const handleToggleSave = useCallback(
+		async (propertyId: Id<"properties">) => {
+			if (!isAuthenticated) {
+				toast.error("Please sign in to save properties")
+				return
+			}
+
+			try {
+				const result = await toggleSave.mutateAsync({ propertyId })
+				if (result.saved) {
+					toast.success("Property saved to your list")
+				} else {
+					toast.success("Property removed from saved list")
+				}
+			} catch (error) {
+				console.error("Failed to toggle save property:", error)
+				toast.error("Failed to save property. Please try again.")
+			}
+		},
+		[isAuthenticated, toggleSave],
+	)
 
 	const navigateImage = (propertyId: string, direction: "prev" | "next", totalImages: number) => {
 		setCurrentImageIndex((prev) => {
@@ -191,6 +225,7 @@ export function ApartmentGrid({
 						const currentImage = property.imageUrls?.[currentIndex]
 						const hasMultipleImages = (property.imageUrls?.length || 0) > 1
 						const showThumbnails = (property.imageUrls?.length || 0) > 3
+						const isSaved = savedPropertyIds.includes(property._id)
 
 						return (
 							<motion.div
@@ -330,24 +365,31 @@ export function ApartmentGrid({
 															{property.address.street}, {property.address.city}
 														</div>
 													</div>
-													<Button
-														variant="ghost"
-														size="icon"
-														className="ml-2 flex-shrink-0 rounded-full bg-gray-50 shadow-sm transition-all duration-200 hover:scale-110 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600"
-														onClick={(e) => {
-															e.preventDefault()
-															e.stopPropagation()
-															toggleFavorite(property._id)
-														}}
-													>
-														<Heart
-															className={`h-4 w-4 ${
-																favorites.includes(property._id)
-																	? "fill-red-500 text-red-500"
-																	: "text-gray-600 dark:text-gray-300"
-															}`}
-														/>
-													</Button>
+													{isAuthenticated && (
+														<Button
+															variant="ghost"
+															size="icon"
+															className="ml-2 flex-shrink-0 rounded-full bg-gray-50 shadow-sm transition-all duration-200 hover:scale-110 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600"
+															onClick={(e) => {
+																e.preventDefault()
+																e.stopPropagation()
+																handleToggleSave(property._id)
+															}}
+															disabled={toggleSave.isPending}
+														>
+															{toggleSave.isPending ? (
+																<Loader2 className="h-4 w-4 animate-spin text-gray-600 dark:text-gray-300" />
+															) : (
+																<Heart
+																	className={`h-4 w-4 ${
+																		isSaved
+																			? "fill-red-500 text-red-500"
+																			: "text-gray-600 dark:text-gray-300"
+																	}`}
+																/>
+															)}
+														</Button>
+													)}
 												</div>
 											</div>
 

@@ -519,10 +519,15 @@ function PropertyDetails() {
 												)}
 											</div>
 											<div className="mt-6 space-y-3">
-												<Button className="w-full" size="lg">
+												<Button className="w-full" size="lg" disabled>
 													Schedule a Viewing
 												</Button>
-												<Button variant="outline" className="w-full" size="lg">
+												<Button
+													variant="outline"
+													className="w-full"
+													size="lg"
+													disabled
+												>
 													Ask a Question
 												</Button>
 											</div>
