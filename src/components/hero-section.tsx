@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router"
 import { ArrowRight } from "lucide-react"
+import { PropertiesOverviewMap } from "~/components/properties/PropertiesOverviewMap"
 import { PropertySearch } from "~/components/property-search"
 import { AnimatedGroup } from "~/components/ui/animated-group"
 import { TextEffect } from "~/components/ui/text-effect"
@@ -155,26 +156,13 @@ export default function HeroSection() {
 					>
 						<div className="mask-b-from-55% -mr-56 relative mt-8 overflow-hidden px-2 sm:mt-12 sm:mr-0 md:mt-20">
 							<div className="relative inset-shadow-2xs mx-auto max-w-6xl overflow-hidden rounded-2xl border bg-background p-4 shadow-lg shadow-zinc-950/15 ring-1 ring-background dark:inset-shadow-white/20">
-								<img
-									className="relative hidden aspect-15/8 rounded-2xl bg-background dark:block"
-									src="/mail2.png"
-									alt="app screen"
-									width="2700"
-									height="1440"
-								/>
-								<img
-									className="relative z-2 aspect-15/8 rounded-2xl border border-border/25 dark:hidden"
-									src="/mail2-light.png"
-									alt="app screen"
-									width="2700"
-									height="1440"
-								/>
+								<PropertiesOverviewMap city="Berlin" />
 							</div>
 						</div>
 					</AnimatedGroup>
 				</div>
 			</section>
-			<section className="bg-background pt-16 pb-16 md:pb-32">
+			{/* <section className="bg-background pt-16 pb-16 md:pb-32">
 				<AnimatedGroup
 					variants={{
 						container: {
@@ -206,7 +194,7 @@ export default function HeroSection() {
 						<div className="text-slate-600 dark:text-slate-400">Countries</div>
 					</div>
 				</AnimatedGroup>
-			</section>
+			</section> */}
 		</main>
 	)
 }

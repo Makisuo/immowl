@@ -355,6 +355,9 @@ function PropertyDetails() {
 								longitude={property.address.longitude}
 								address={property.address}
 								title={property.title}
+								monthlyRent={property.monthlyRent}
+								bedrooms={property.rooms.bedrooms}
+								squareMeters={property.squareMeters}
 							/>
 						</div>
 

@@ -15,10 +15,25 @@ interface PropertyMapProps {
 		zipCode?: string | null
 	}
 	title: string
+	monthlyRent?: {
+		cold?: number
+		warm?: number
+	}
+	bedrooms?: number
+	squareMeters?: number
 	className?: string
 }
 
-export function PropertyMap({ latitude, longitude, address, title, className = "" }: PropertyMapProps) {
+export function PropertyMap({
+	latitude,
+	longitude,
+	address,
+	title,
+	monthlyRent,
+	bedrooms,
+	squareMeters,
+	className = "",
+}: PropertyMapProps) {
 	const mapRef = useRef<HTMLDivElement>(null)
 	const mapInstanceRef = useRef<any>(null)
 	const [mapError, setMapError] = useState<string | null>(null)
@@ -64,10 +79,24 @@ export function PropertyMap({ latitude, longitude, address, title, className = "
 				colorScheme: mapkit.Map.ColorSchemes.Light,
 			})
 
+			// Calculate rent display
+			const rent = monthlyRent?.warm || monthlyRent?.cold
+			const rentText = rent ? `€${rent.toLocaleString()}/mo` : "Price on request"
+
+			// Build subtitle with available info
+			const subtitleParts = []
+			if (bedrooms !== undefined) {
+				subtitleParts.push(`${bedrooms} bed`)
+			}
+			if (squareMeters !== undefined) {
+				subtitleParts.push(`${squareMeters}m²`)
+			}
+			const subtitle = subtitleParts.length > 0 ? subtitleParts.join(" • ") : undefined
+
 			// Create a marker annotation for the property
 			const marker = new mapkit.MarkerAnnotation(coordinate, {
-				title: title,
-				subtitle: `${address.street}, ${address.city}`,
+				title: rentText,
+				subtitle: subtitle,
 				color: "#ef4444", // Red color for the pin
 				glyphText: "🏠",
 			})
@@ -90,7 +119,7 @@ export function PropertyMap({ latitude, longitude, address, title, className = "
 				mapInstanceRef.current = null
 			}
 		}
-	}, [isLoaded, mapkit, latitude, longitude, title, address])
+	}, [isLoaded, mapkit, latitude, longitude, title, address, monthlyRent, bedrooms, squareMeters])
 
 	// Don't render anything if no coordinates
 	if (!latitude || !longitude) {
