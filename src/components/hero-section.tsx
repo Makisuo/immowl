@@ -84,7 +84,7 @@ export default function HeroSection() {
 									className="group mx-auto flex w-fit items-center gap-4 rounded-full border bg-muted p-1 pl-4 shadow-md shadow-zinc-950/5 transition-colors duration-300 hover:bg-background dark:border-t-white/5 dark:shadow-zinc-950 dark:hover:border-t-border"
 								>
 									<span className="text-foreground text-sm">
-										Introducing Support for AI Models
+										Introducing AI Powered Property Search
 									</span>
 									<span className="block h-4 w-0.5 border-l bg-white dark:border-background dark:bg-zinc-700"></span>
 

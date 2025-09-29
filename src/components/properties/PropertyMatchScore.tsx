@@ -1,8 +1,11 @@
 import type { Doc } from "convex/_generated/dataModel"
+import { Link } from "@tanstack/react-router"
 import { AlertCircle, CheckCircle2, DollarSign, Home, MapPin, Ruler, TrendingUp, XCircle } from "lucide-react"
 import { Badge } from "~/components/ui/badge"
+import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { Progress } from "~/components/ui/progress"
+import { useAuth } from "~/hooks/use-auth"
 
 interface PropertyMatchScoreProps {
 	property: Doc<"properties">
@@ -21,6 +24,8 @@ const MOCK_USER_PREFERENCES = {
 }
 
 export function PropertyMatchScore({ property }: PropertyMatchScoreProps) {
+	const { isAuthenticated } = useAuth()
+
 	// Calculate individual scores
 	const calculatePriceScore = () => {
 		const rent = property.monthlyRent.warm || property.monthlyRent.cold || 0
@@ -135,7 +140,17 @@ export function PropertyMatchScore({ property }: PropertyMatchScoreProps) {
 	const rent = property.monthlyRent.warm || property.monthlyRent.cold || 0
 
 	return (
-		<Card>
+		<Card className="relative overflow-hidden">
+			{!isAuthenticated && (
+				<div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm">
+					<div className="text-center space-y-4 px-6">
+						<p className="font-semibold text-lg">Login to unlock your match score</p>
+						<Link to="/sign-in">
+							<Button>Sign In</Button>
+						</Link>
+					</div>
+				</div>
+			)}
 			<CardHeader className="pb-4">
 				<div className="flex items-center justify-between">
 					<CardTitle className="text-lg">Match Score</CardTitle>
