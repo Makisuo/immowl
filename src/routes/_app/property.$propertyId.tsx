@@ -29,6 +29,7 @@ import { toast } from "sonner"
 import { ImageGallery } from "~/components/ImageGallery"
 import { ExternalSourceIndicator } from "~/components/properties/ExternalSourceIndicator"
 import { PropertyInsights } from "~/components/properties/PropertyInsights"
+import { PropertyMap } from "~/components/properties/PropertyMap"
 import { PropertyMatchScore } from "~/components/properties/PropertyMatchScore"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
@@ -318,7 +319,7 @@ function PropertyDetails() {
 
 							{/* Amenities */}
 							{property.amenities && property.amenities.length > 0 && (
-								<Card>
+								<Card className="mb-6">
 									<CardContent className="pt-6">
 										<h2 className="mb-4 font-semibold text-xl">Amenities</h2>
 										<div className="grid grid-cols-2 gap-3 md:grid-cols-3">
@@ -348,6 +349,14 @@ function PropertyDetails() {
 									</CardContent>
 								</Card>
 							)}
+
+							{/* Property Map */}
+							<PropertyMap
+								latitude={property.address.latitude}
+								longitude={property.address.longitude}
+								address={property.address}
+								title={property.title}
+							/>
 						</div>
 
 						{/* Right Column - Match Score, Insights, Pricing & Contact */}
