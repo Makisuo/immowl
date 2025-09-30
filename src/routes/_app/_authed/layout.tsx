@@ -5,26 +5,9 @@ import Threads from "~/components/shaders/threads"
 export const Route = createFileRoute("/_app/_authed")({
 	component: RouteComponent,
 
-	beforeLoad: async ({ context, location }) => {
+	beforeLoad: async ({ context }) => {
 		if (!context.userId) {
 			throw redirect({ to: "/sign-in" })
-		}
-
-		if (location.pathname === "/onboarding") {
-			return
-		}
-
-		try {
-			// const profile = await fetchQuery(api.userProfiles.getUserProfile, {})
-
-			// if (!profile) {
-			// 	throw redirect({ to: "/onboarding" })
-			// }
-		} catch (error) {
-			if (error && typeof error === "object" && "href" in error) {
-				throw error
-			}
-			console.error("Failed to check user profile:", error)
 		}
 	},
 })

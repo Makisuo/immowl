@@ -3,7 +3,7 @@ import { useForm } from "@tanstack/react-form"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { api } from "convex/_generated/api"
-import { Filter, Plus, Sparkles } from "lucide-react"
+import { Plus, Sparkles } from "lucide-react"
 import { useMemo, useState } from "react"
 import { toast } from "sonner"
 
@@ -516,7 +516,7 @@ function SearchRequestsPage() {
 													>
 														<RadioGroupItem
 															value={num.toString()}
-															id={"bath-${num}"}
+															id={`bath-${num}`}
 															className="sr-only"
 														/>
 														<span className="font-medium text-sm">{num}+</span>

@@ -36,7 +36,6 @@ import type * as propertyUtils from "../propertyUtils.js";
 import type * as savedProperties from "../savedProperties.js";
 import type * as savedSearches from "../savedSearches.js";
 import type * as user from "../user.js";
-import type * as userProfiles from "../userProfiles.js";
 import type * as validators from "../validators.js";
 
 import type {
@@ -82,7 +81,6 @@ declare const fullApi: ApiFromModules<{
   savedProperties: typeof savedProperties;
   savedSearches: typeof savedSearches;
   user: typeof user;
-  userProfiles: typeof userProfiles;
   validators: typeof validators;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
