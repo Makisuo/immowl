@@ -76,7 +76,7 @@ export default function HeroSection() {
 						className="-z-10 absolute inset-0 size-full [background:radial-gradient(125%_125%_at_50%_100%,transparent_0%,var(--color-background)_75%)]"
 					/>
 
-					<div className="mx-auto max-w-7xl px-6">
+					<div className="mx-auto max-w-7xl px-4 sm:px-6">
 						<div className="text-center sm:mx-auto lg:mt-0 lg:mr-auto">
 							<AnimatedGroup variants={transitionVariants}>
 								<Link
@@ -105,7 +105,7 @@ export default function HeroSection() {
 								preset="fade-in-blur"
 								speedSegment={0.3}
 								as="h1"
-								className="mx-auto mt-8 max-w-4xl text-balance text-5xl max-md:font-semibold md:text-7xl lg:mt-16 xl:text-[5.25rem]"
+								className="mx-auto mt-6 max-w-4xl text-balance text-4xl font-semibold sm:text-5xl md:mt-8 md:text-7xl lg:mt-16 xl:text-[5.25rem]"
 							>
 								Find your perfect next home
 							</TextEffect>
@@ -115,13 +115,13 @@ export default function HeroSection() {
 								speedSegment={0.3}
 								delay={0.5}
 								as="p"
-								className="mx-auto mt-8 max-w-2xl text-balance text-lg"
+								className="mx-auto mt-4 max-w-2xl px-4 text-balance text-base sm:mt-8 sm:px-0 sm:text-lg"
 							>
 								Search through thousands of verified properties to find your next dream home
 								with ease.
 							</TextEffect>
 
-							<div className="mt-12 flex w-full justify-center">
+							<div className="mt-8 flex w-full justify-center sm:mt-12">
 								<AnimatedGroup
 									variants={{
 										container: {
@@ -134,6 +134,7 @@ export default function HeroSection() {
 										},
 										...transitionVariants,
 									}}
+									className="w-full max-w-4xl"
 								>
 									<PropertySearch />
 								</AnimatedGroup>
@@ -154,8 +155,8 @@ export default function HeroSection() {
 							...transitionVariants,
 						}}
 					>
-						<div className="mask-b-from-55% -mr-56 relative mt-8 overflow-hidden px-2 sm:mt-12 sm:mr-0 md:mt-20">
-							<div className="relative inset-shadow-2xs mx-auto max-w-6xl overflow-hidden rounded-2xl border bg-background p-4 shadow-lg shadow-zinc-950/15 ring-1 ring-background dark:inset-shadow-white/20">
+						<div className="mask-b-from-55% relative mt-6 overflow-hidden px-4 sm:mt-12 sm:px-2 md:mt-20">
+							<div className="relative inset-shadow-2xs mx-auto max-w-6xl overflow-hidden rounded-xl border bg-background p-2 shadow-lg shadow-zinc-950/15 ring-1 ring-background sm:rounded-2xl sm:p-4 dark:inset-shadow-white/20">
 								<PropertiesOverviewMap city="Berlin" />
 							</div>
 						</div>
