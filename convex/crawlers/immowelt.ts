@@ -5,7 +5,7 @@ import { action, internalAction, internalQuery } from "../_generated/server"
 import { firecrawl } from "./client"
 
 const scrapePool = new Workpool(components.scrapeWorkpool, {
-	maxParallelism: 20,
+	maxParallelism: 4,
 })
 
 export const crawlImmowelt = action({
