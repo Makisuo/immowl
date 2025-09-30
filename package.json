@@ -17,6 +17,7 @@
 		"@convex-dev/react-query": "0.0.0-alpha.11",
 		"@convex-dev/resend": "^0.1.13",
 		"@convex-dev/workpool": "^0.2.18",
+		"@fontsource/inter": "^5.2.8",
 		"@mendable/firecrawl-js": "^4.3.5",
 		"@ngneat/falso": "^8.0.2",
 		"@radix-ui/react-alert-dialog": "^1.1.15",
