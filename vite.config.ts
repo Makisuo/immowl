@@ -1,4 +1,3 @@
-import netlify from "@netlify/vite-plugin-tanstack-start"
 import tailwindcss from "@tailwindcss/vite"
 import { nitroV2Plugin } from "@tanstack/nitro-v2-vite-plugin"
 import { tanstackStart } from "@tanstack/react-start/plugin/vite"
@@ -20,7 +19,7 @@ export default defineConfig({
 				routeToken: "layout",
 			},
 		}),
-		netlify(),
+		nitroV2Plugin({ preset: "vercel" }),
 		viteReact(),
 	],
 })
