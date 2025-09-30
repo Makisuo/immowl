@@ -1,12 +1,32 @@
 import { createFileRoute, Navigate, Outlet, redirect } from "@tanstack/react-router"
 import { Authenticated, AuthLoading, Unauthenticated } from "convex/react"
+import { api } from "convex/_generated/api"
+import { fetchQuery } from "~/lib/auth.server"
 import Threads from "~/components/shaders/threads"
 
 export const Route = createFileRoute("/_app/_authed")({
 	component: RouteComponent,
-	beforeLoad: ({ context }) => {
+
+	beforeLoad: async ({ context, location }) => {
 		if (!context.userId) {
 			throw redirect({ to: "/sign-in" })
+		}
+
+		if (location.pathname === "/onboarding") {
+			return
+		}
+
+		try {
+			const profile = await fetchQuery(api.userProfiles.getUserProfile, {})
+
+			if (!profile) {
+				throw redirect({ to: "/onboarding" })
+			}
+		} catch (error) {
+			if (error && typeof error === "object" && "href" in error) {
+				throw error
+			}
+			console.error("Failed to check user profile:", error)
 		}
 	},
 })

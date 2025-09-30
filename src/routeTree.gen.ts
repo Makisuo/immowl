@@ -25,6 +25,7 @@ import { Route as AppAuthedSearchProfileRouteImport } from './routes/_app/_authe
 import { Route as AppAuthedSavedRouteImport } from './routes/_app/_authed/saved'
 import { Route as AppAuthedProfileRouteImport } from './routes/_app/_authed/profile'
 import { Route as AppAuthedOwnersRouteImport } from './routes/_app/_authed/owners'
+import { Route as AppAuthedOnboardingRouteImport } from './routes/_app/_authed/onboarding'
 
 const AuthLayoutRoute = AuthLayoutRouteImport.update({
   id: '/_auth',
@@ -103,6 +104,11 @@ const AppAuthedOwnersRoute = AppAuthedOwnersRouteImport.update({
   path: '/owners',
   getParentRoute: () => AppAuthedLayoutRoute,
 } as any)
+const AppAuthedOnboardingRoute = AppAuthedOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => AppAuthedLayoutRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/search': typeof AppSearchRoute
@@ -111,6 +117,7 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof AuthSignInRoute
   '/sign-up': typeof AuthSignUpRoute
   '/': typeof AppIndexRoute
+  '/onboarding': typeof AppAuthedOnboardingRoute
   '/owners': typeof AppAuthedOwnersRoute
   '/profile': typeof AppAuthedProfileRoute
   '/saved': typeof AppAuthedSavedRoute
@@ -126,6 +133,7 @@ export interface FileRoutesByTo {
   '/sign-in': typeof AuthSignInRoute
   '/sign-up': typeof AuthSignUpRoute
   '/': typeof AppIndexRoute
+  '/onboarding': typeof AppAuthedOnboardingRoute
   '/owners': typeof AppAuthedOwnersRoute
   '/profile': typeof AppAuthedProfileRoute
   '/saved': typeof AppAuthedSavedRoute
@@ -145,6 +153,7 @@ export interface FileRoutesById {
   '/_auth/sign-in': typeof AuthSignInRoute
   '/_auth/sign-up': typeof AuthSignUpRoute
   '/_app/': typeof AppIndexRoute
+  '/_app/_authed/onboarding': typeof AppAuthedOnboardingRoute
   '/_app/_authed/owners': typeof AppAuthedOwnersRoute
   '/_app/_authed/profile': typeof AppAuthedProfileRoute
   '/_app/_authed/saved': typeof AppAuthedSavedRoute
@@ -162,6 +171,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/'
+    | '/onboarding'
     | '/owners'
     | '/profile'
     | '/saved'
@@ -177,6 +187,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/'
+    | '/onboarding'
     | '/owners'
     | '/profile'
     | '/saved'
@@ -195,6 +206,7 @@ export interface FileRouteTypes {
     | '/_auth/sign-in'
     | '/_auth/sign-up'
     | '/_app/'
+    | '/_app/_authed/onboarding'
     | '/_app/_authed/owners'
     | '/_app/_authed/profile'
     | '/_app/_authed/saved'
@@ -324,10 +336,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAuthedOwnersRouteImport
       parentRoute: typeof AppAuthedLayoutRoute
     }
+    '/_app/_authed/onboarding': {
+      id: '/_app/_authed/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof AppAuthedOnboardingRouteImport
+      parentRoute: typeof AppAuthedLayoutRoute
+    }
   }
 }
 
 interface AppAuthedLayoutRouteChildren {
+  AppAuthedOnboardingRoute: typeof AppAuthedOnboardingRoute
   AppAuthedOwnersRoute: typeof AppAuthedOwnersRoute
   AppAuthedProfileRoute: typeof AppAuthedProfileRoute
   AppAuthedSavedRoute: typeof AppAuthedSavedRoute
@@ -336,6 +356,7 @@ interface AppAuthedLayoutRouteChildren {
 }
 
 const AppAuthedLayoutRouteChildren: AppAuthedLayoutRouteChildren = {
+  AppAuthedOnboardingRoute: AppAuthedOnboardingRoute,
   AppAuthedOwnersRoute: AppAuthedOwnersRoute,
   AppAuthedProfileRoute: AppAuthedProfileRoute,
   AppAuthedSavedRoute: AppAuthedSavedRoute,
