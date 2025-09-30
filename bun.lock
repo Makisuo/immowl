@@ -9,7 +9,7 @@
         "@convex-dev/resend": "^0.1.13",
         "@convex-dev/workpool": "^0.2.18",
         "@fontsource/inter": "^5.2.8",
-        "@mendable/firecrawl-js": "^4.3.5",
+        "@mendable/firecrawl-js": "^4.3.6",
         "@ngneat/falso": "^8.0.2",
         "@radix-ui/react-alert-dialog": "^1.1.15",
         "@radix-ui/react-avatar": "^1.1.10",
@@ -267,7 +267,7 @@
 
     "@mapbox/node-pre-gyp": ["@mapbox/node-pre-gyp@2.0.0", "", { "dependencies": { "consola": "^3.2.3", "detect-libc": "^2.0.0", "https-proxy-agent": "^7.0.5", "node-fetch": "^2.6.7", "nopt": "^8.0.0", "semver": "^7.5.3", "tar": "^7.4.0" }, "bin": { "node-pre-gyp": "bin/node-pre-gyp" } }, "sha512-llMXd39jtP0HpQLVI37Bf1m2ADlEb35GYSh1SDSLsBhR+5iCxiNGlT31yqbNtVHygHAtMy6dWFERpU2JgufhPg=="],
 
-    "@mendable/firecrawl-js": ["@mendable/firecrawl-js@4.3.5", "", { "dependencies": { "axios": "^1.12.2", "typescript-event-target": "^1.1.1", "zod": "^3.23.8", "zod-to-json-schema": "^3.23.0" } }, "sha512-6Vd0bEVD0hOS4SXlmrBnOkm86WWqEITHSTXwdnjm6SkTz6ZF6o85gGHUvOYoky4w7AoLctAv8yqrm6aZsy4lfQ=="],
+    "@mendable/firecrawl-js": ["@mendable/firecrawl-js@4.3.6", "", { "dependencies": { "axios": "^1.12.2", "typescript-event-target": "^1.1.1", "zod": "^3.23.8", "zod-to-json-schema": "^3.23.0" } }, "sha512-gha1nICp+yJJt/fjLj1EsptTvlYdjkJRa66clEV+R2F5hJlDOWOjdGAPUU7IO/RXJ+coR1JmxUJ3P6R/ziPyLg=="],
 
     "@netlify/blobs": ["@netlify/blobs@10.0.11", "", { "dependencies": { "@netlify/dev-utils": "4.2.0", "@netlify/runtime-utils": "2.1.0" } }, "sha512-/pa7eD2gxkhJ6aUIJULrRu3tvAaimy+sA6vHUuGRMvncjOuRpeatXLHxuzdn8DyK1CZCjN3E33oXsdEpoqG7SA=="],
 

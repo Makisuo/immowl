@@ -4,6 +4,8 @@ import { components, internal } from "../_generated/api"
 import { action, internalAction, internalQuery } from "../_generated/server"
 import { firecrawl } from "./client"
 
+import { z } from "zod";
+
 const scrapePool = new Workpool(components.scrapeWorkpool, {
 	maxParallelism: 4,
 })
@@ -113,6 +115,51 @@ export const getExistingListingIds = internalQuery({
 	},
 })
 
+const schema = z.object({
+  title: z.string(),
+  description: z.string().describe("Very brief description of the property (max. 50 words)"),
+  address: z.string(),
+  city: z.string(),
+  state: z.string(),
+  zipCode: z.optional(z.string()),
+  propertyType: z.string(),
+  bedrooms: z.optional(z.number()),
+  bathrooms: z.optional(z.number()),
+  squareMeters: z.number(),
+  livingArea: z.optional(z.number()),
+  rooms: z.optional(z.number()),
+  floor: z.optional(z.number()),
+  totalFloors: z.optional(z.number()),
+  rent: z.object({
+	  cold: z.optional(z.number()),
+	  warm: z.optional(z.number()),
+	  utilities: z.optional(z.number()),
+	  heating: z.optional(z.number()),
+  }),
+  securityDeposit: z.optional(z.number()),
+  availableFrom: z.optional(z.string()),
+  availableDate: z.optional(z.string()),
+  furnished: z.optional(z.boolean()),
+  amenities:z.object({
+	  hasBalcony: z.optional(z.boolean()),
+	  hasTerrace: z.optional(z.boolean()),
+	  hasGarden: z.optional(z.boolean()),
+	  hasBasement: z.optional(z.boolean()),
+	  hasElevator: z.optional(z.boolean()),
+	  hasParking: z.optional(z.boolean()),
+	  hasGarage: z.optional(z.boolean()),
+	  hasBuiltInKitchen: z.optional(z.boolean()),
+  }),
+  petFriendly: z.boolean(),
+  images: z.array(z.string()),
+  contactName: z.optional(z.string()),
+  contactPhone: z.optional(z.string()),
+  yearBuilt:  z.optional(z.number()),
+  energyClass: z.optional(z.string()),
+});
+
+type ImmoweltProperty = z.infer<typeof schema>;
+
 export const scrapeListing = internalAction({
 	args: {
 		listingId: v.string(),
@@ -123,66 +170,26 @@ export const scrapeListing = internalAction({
 
 		try {
 			const res = await firecrawl.scrape(`https://www.immowelt.de/expose/${args.listingId}`, {
+				proxy: 'auto',
+				maxAge: 3000,
+
 				formats: [
 					{
 						type: "json",
-						schema: {
-							type: "object",
-							properties: {
-								title: { type: "string" },
-								description: {
-									type: "string",
-									prompt: "Very brief description of the property (max. 50 words)",
-								},
-								address: { type: "string" },
-								city: { type: "string" },
-								state: { type: "string" },
-								zipCode: { type: "string" },
-								propertyType: { type: "string" },
-								bedrooms: { type: "number" },
-								bathrooms: { type: "number" },
-								squareMeters: { type: "number" },
-								livingArea: { type: "number" },
-								rooms: { type: "number" },
-								floor: { type: "number" },
-								totalFloors: { type: "number" },
-								furnished: { type: "boolean" },
-								monthlyRent: { type: "number" },
-								coldRent: { type: "number" },
-								warmRent: { type: "number" },
-								utilities: { type: "number" },
-								heatingCosts: { type: "number" },
-								securityDeposit: { type: "number" },
-								availableFrom: { type: "string" },
-								availableDate: { type: "string" },
-								balcony: { type: "boolean" },
-								terrace: { type: "boolean" },
-								garden: { type: "boolean" },
-								basement: { type: "boolean" },
-								elevator: { type: "boolean" },
-								parking: { type: "boolean" },
-								garage: { type: "boolean" },
-								builtInKitchen: { type: "boolean" },
-								petFriendly: { type: "boolean" },
-								images: { type: "array" },
-								contactName: { type: "string" },
-								contactPhone: { type: "string" },
-								yearBuilt: { type: "number" },
-								energyClass: { type: "string" },
-							},
-						},
+						schema: schema
 					},
 				],
 			})
 
 			console.log(`Scraped listing`, res)
 
-			if (!res || !(res as any).json) {
+
+			if (!res || !("json" in res) || !res.json) {
 				console.error(`No data returned for listing ${args.listingId}`)
 				return
 			}
 
-			const data = (res as any).json
+			const data = res.json as ImmoweltProperty
 
 			// Map property type from German to English
 			const propertyTypeMap: Record<string, "apartment" | "house" | "studio" | "condo" | "townhouse"> =
@@ -229,7 +236,7 @@ export const scrapeListing = internalAction({
 				const dateStr = data.availableFrom || data.availableDate
 				if (dateStr === "sofort" || dateStr === "immediately" || dateStr === "ab sofort") {
 					availableFrom = Date.now()
-				} else {
+				} else if (dateStr) {
 					const parsed = Date.parse(dateStr)
 					if (!Number.isNaN(parsed)) {
 						availableFrom = parsed
@@ -239,27 +246,24 @@ export const scrapeListing = internalAction({
 
 			// Collect amenities from boolean fields
 			const amenities = []
-			if (data.balcony) amenities.push("Balcony")
-			if (data.terrace) amenities.push("Terrace")
-			if (data.garden) amenities.push("Garden")
-			if (data.basement) amenities.push("Storage", "Basement")
-			if (data.elevator) amenities.push("Elevator")
-			if (data.parking) amenities.push("Parking")
-			if (data.garage) amenities.push("Garage")
-			if (data.builtInKitchen) amenities.push("Built-in Kitchen")
+			if (data.amenities?.hasBalcony) amenities.push("Balcony")
+			if (data.amenities?.hasTerrace) amenities.push("Terrace")
+			if (data.amenities?.hasGarden) amenities.push("Garden")
+			if (data.amenities?.hasBasement) amenities.push("Storage", "Basement")
+			if (data.amenities?.hasElevator) amenities.push("Elevator")
+			if (data.amenities?.hasParking) amenities.push("Parking")
+			if (data.amenities?.hasGarage) amenities.push("Garage")
+			if (data.amenities?.hasBuiltInKitchen) amenities.push("Built-in Kitchen")
 
 			// Extract images
 			let imageUrls: string[] = []
 			if (data.images && Array.isArray(data.images)) {
-				imageUrls = data.images
-					.filter((img: any) => typeof img === "string" || (img && typeof img.url === "string"))
-					.map((img: any) => (typeof img === "string" ? img : img.url))
-					.slice(0, 20) // Limit to 20 images
+				imageUrls = data.images.slice(0, 20) // Limit to 20 images
 			}
 
 			// Determine rent - set warm and cold appropriately
-			const coldRent = data.coldRent || data.monthlyRent || 0
-			const warmRent = data.warmRent || undefined
+			const coldRent = data.rent?.cold || 0
+			const warmRent = data.rent?.warm || undefined
 
 			// Get square meters
 			const squareMeters = data.squareMeters || data.livingArea || 50
