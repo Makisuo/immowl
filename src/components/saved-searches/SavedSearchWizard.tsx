@@ -148,9 +148,6 @@ export function SavedSearchWizard({ onComplete, initialData }: SavedSearchWizard
 
 	const form = useForm({
 		defaultValues,
-		validators: {
-			onChange: wizardFormSchema,
-		},
 		onSubmit: async ({ value }) => {
 			// Transform wizard form data to saved search format
 			const transformedData: SavedSearchFormData = {
@@ -218,11 +215,19 @@ export function SavedSearchWizard({ onComplete, initialData }: SavedSearchWizard
 
 		switch (currentStep) {
 			case 1:
-				return formState.values.name && formState.values.name.length > 0
+				// Step 1: Name is required
+				return !!(formState.values.name && formState.values.name.trim().length > 0)
 			case 2:
-				return formState.values.criteria.city && formState.values.criteria.country
+				// Step 2: City and country are required
+				return !!(
+					formState.values.criteria?.city &&
+					formState.values.criteria.city.trim().length > 0 &&
+					formState.values.criteria?.country &&
+					formState.values.criteria.country.trim().length > 0
+				)
 			default:
-				return currentStep < TOTAL_STEPS
+				// All other steps can proceed
+				return true
 		}
 	}
 
@@ -318,36 +323,46 @@ export function SavedSearchWizard({ onComplete, initialData }: SavedSearchWizard
 				</div>
 
 				{/* Navigation Buttons */}
-				<div className="flex justify-between border-t pt-6">
-					<Button
-						type="button"
-						variant="outline"
-						onClick={handlePrevious}
-						disabled={!canGoPrevious()}
-						className="flex items-center gap-2"
-					>
-						<ChevronLeft className="h-4 w-4" />
-						Previous
-					</Button>
-
-					<div className="flex gap-2">
-						{currentStep === TOTAL_STEPS ? (
-							<Button type="submit" className="flex items-center gap-2">
-								Save Profile
-							</Button>
-						) : (
+				<form.Subscribe
+					selector={(state) => ({
+						name: state.values.name,
+						city: state.values.criteria?.city,
+						country: state.values.criteria?.country,
+					})}
+				>
+					{() => (
+						<div className="flex justify-between border-t pt-6">
 							<Button
 								type="button"
-								onClick={handleNext}
-								disabled={!canGoNext()}
+								variant="outline"
+								onClick={handlePrevious}
+								disabled={!canGoPrevious()}
 								className="flex items-center gap-2"
 							>
-								Next
-								<ChevronRight className="h-4 w-4" />
+								<ChevronLeft className="h-4 w-4" />
+								Previous
 							</Button>
-						)}
-					</div>
-				</div>
+
+							<div className="flex gap-2">
+								{currentStep === TOTAL_STEPS ? (
+									<Button type="submit" className="flex items-center gap-2">
+										Save Profile
+									</Button>
+								) : (
+									<Button
+										type="button"
+										onClick={handleNext}
+										disabled={!canGoNext()}
+										className="flex items-center gap-2"
+									>
+										Next
+										<ChevronRight className="h-4 w-4" />
+									</Button>
+								)}
+							</div>
+						</div>
+					)}
+				</form.Subscribe>
 			</form>
 		</div>
 	)

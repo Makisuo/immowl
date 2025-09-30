@@ -57,7 +57,7 @@ export function Step1BasicInfo({ form }: { form: any }) {
 						value={nameField.state.value}
 						onChange={(e) => nameField.handleChange(e.target.value)}
 						onBlur={nameField.handleBlur}
-						placeholder="e.g., Downtown Berlin Apartment"
+						placeholder="Your name"
 						className="w-full"
 					/>
 				</FormField>
@@ -67,7 +67,7 @@ export function Step1BasicInfo({ form }: { form: any }) {
 						value={descriptionField.state.value || ""}
 						onChange={(e) => descriptionField.handleChange(e.target.value)}
 						onBlur={descriptionField.handleBlur}
-						placeholder="Optional: Add more details about what you're looking for..."
+						placeholder="Optional: Add more details about you and what you're looking for..."
 						className="min-h-[80px] w-full"
 					/>
 				</FormField>
