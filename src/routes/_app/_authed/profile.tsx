@@ -159,16 +159,13 @@ function SearchRequestsPage() {
 		<div className="container mx-auto max-w-4xl px-4 py-8">
 			{/* Header */}
 			<div className="mb-12">
-				<div className="flex items-center gap-3">
-					<Filter className="h-6 w-6 text-blue-600" />
-					<div>
-						<h1 className="font-light text-2xl tracking-tight sm:text-3xl">Search Profile</h1>
-						<p className="mt-1 text-muted-foreground text-sm">
-							{existingSearch
-								? "Your personalized search preferences for finding properties"
-								: "Create your search profile to find the perfect property"}
-						</p>
-					</div>
+				<div className="space-y-1">
+					<h1 className="font-light text-3xl tracking-tight">Search Profile</h1>
+					<p className="text-muted-foreground text-sm">
+						{existingSearch
+							? "Your personalized search preferences for finding properties"
+							: "Create your search profile to find the perfect property"}
+					</p>
 				</div>
 			</div>
 
@@ -266,7 +263,7 @@ function SearchRequestsPage() {
 										<div className="relative h-2 overflow-hidden rounded-full bg-muted">
 											<div
 												className="absolute inset-y-0 left-0 rounded-full bg-primary transition-all duration-500 ease-out"
-												style={{ width: "${completion}%" }}
+												style={{ width: `${completion}%` }}
 											/>
 										</div>
 									</div>
@@ -492,7 +489,7 @@ function SearchRequestsPage() {
 													>
 														<RadioGroupItem
 															value={num.toString()}
-															id={"bed-${num}"}
+															id={`bed-${num}`}
 															className="sr-only"
 														/>
 														<span className="font-medium text-sm">{num}+</span>
