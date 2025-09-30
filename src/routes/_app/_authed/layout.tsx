@@ -1,7 +1,5 @@
 import { createFileRoute, Navigate, Outlet, redirect } from "@tanstack/react-router"
 import { Authenticated, AuthLoading, Unauthenticated } from "convex/react"
-import { api } from "convex/_generated/api"
-import { fetchQuery } from "~/lib/auth.server"
 import Threads from "~/components/shaders/threads"
 
 export const Route = createFileRoute("/_app/_authed")({
@@ -17,11 +15,11 @@ export const Route = createFileRoute("/_app/_authed")({
 		}
 
 		try {
-			const profile = await fetchQuery(api.userProfiles.getUserProfile, {})
+			// const profile = await fetchQuery(api.userProfiles.getUserProfile, {})
 
-			if (!profile) {
-				throw redirect({ to: "/onboarding" })
-			}
+			// if (!profile) {
+			// 	throw redirect({ to: "/onboarding" })
+			// }
 		} catch (error) {
 			if (error && typeof error === "object" && "href" in error) {
 				throw error

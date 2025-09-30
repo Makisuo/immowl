@@ -665,4 +665,3 @@ function SearchRequestsPage() {
 	)
 }
 
-export default SearchRequestsPage
