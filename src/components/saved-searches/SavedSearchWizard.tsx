@@ -6,7 +6,6 @@ import { z } from "zod"
 import { Button } from "~/components/ui/button"
 import { Progress } from "~/components/ui/progress"
 import {
-	Step1BasicInfo,
 	Step2Location,
 	Step3PriceRange,
 	Step4Rooms,
@@ -17,8 +16,6 @@ import {
 
 // Zod validation schema
 const savedSearchSchema = z.object({
-	name: z.string().min(1, "Search name is required"),
-	description: z.string().optional(),
 	criteria: z.object({
 		city: z.string().min(1, "City is required"),
 		country: z.string().min(1, "Country is required"),
@@ -62,13 +59,12 @@ const wizardFormSchema = savedSearchSchema.extend({
 type WizardFormData = z.infer<typeof wizardFormSchema>
 
 const STEPS = [
-	{ id: 1, title: "Basic Info", description: "Name and description" },
-	{ id: 2, title: "Location", description: "City and country" },
-	{ id: 3, title: "Price Range", description: "Budget preferences" },
-	{ id: 4, title: "Rooms", description: "Bedrooms and bathrooms" },
-	{ id: 5, title: "Property Type", description: "Type and furnishing" },
-	{ id: 6, title: "Pet Policy", description: "Pet preferences" },
-	{ id: 7, title: "Amenities", description: "Additional features" },
+	{ id: 1, title: "Location", description: "City and country" },
+	{ id: 2, title: "Price Range", description: "Budget preferences" },
+	{ id: 3, title: "Rooms", description: "Bedrooms and bathrooms" },
+	{ id: 4, title: "Property Type", description: "Type and furnishing" },
+	{ id: 5, title: "Pet Policy", description: "Pet preferences" },
+	{ id: 6, title: "Amenities", description: "Additional features" },
 ]
 
 const TOTAL_STEPS = STEPS.length
@@ -84,8 +80,6 @@ export function SavedSearchWizard({ onComplete, initialData }: SavedSearchWizard
 
 	// Default form values with "Any" selections
 	const defaultValues: WizardFormData = {
-		name: initialData?.name || "",
-		description: initialData?.description || "",
 		criteria: {
 			city: initialData?.criteria?.city || "",
 			country: initialData?.criteria?.country || "",
@@ -151,8 +145,6 @@ export function SavedSearchWizard({ onComplete, initialData }: SavedSearchWizard
 		onSubmit: async ({ value }) => {
 			// Transform wizard form data to saved search format
 			const transformedData: SavedSearchFormData = {
-				name: value.name,
-				description: value.description,
 				criteria: {
 					city: value.criteria.city,
 					country: value.criteria.country,
@@ -215,10 +207,7 @@ export function SavedSearchWizard({ onComplete, initialData }: SavedSearchWizard
 
 		switch (currentStep) {
 			case 1:
-				// Step 1: Name is required
-				return !!(formState.values.name && formState.values.name.trim().length > 0)
-			case 2:
-				// Step 2: City and country are required
+				// Step 1: City and country are required
 				return !!(
 					formState.values.criteria?.city &&
 					formState.values.criteria.city.trim().length > 0 &&
@@ -311,13 +300,12 @@ export function SavedSearchWizard({ onComplete, initialData }: SavedSearchWizard
 							exit={{ opacity: 0, x: -20 }}
 							transition={{ duration: 0.2 }}
 						>
-							{currentStep === 1 && <Step1BasicInfo form={form} />}
-							{currentStep === 2 && <Step2Location form={form} />}
-							{currentStep === 3 && <Step3PriceRange form={form} />}
-							{currentStep === 4 && <Step4Rooms form={form} />}
-							{currentStep === 5 && <Step5PropertyType form={form} />}
-							{currentStep === 6 && <Step6PetPolicy form={form} />}
-							{currentStep === 7 && <Step7Amenities form={form} />}
+							{currentStep === 1 && <Step2Location form={form} />}
+							{currentStep === 2 && <Step3PriceRange form={form} />}
+							{currentStep === 3 && <Step4Rooms form={form} />}
+							{currentStep === 4 && <Step5PropertyType form={form} />}
+							{currentStep === 5 && <Step6PetPolicy form={form} />}
+							{currentStep === 6 && <Step7Amenities form={form} />}
 						</motion.div>
 					</AnimatePresence>
 				</div>
@@ -325,7 +313,6 @@ export function SavedSearchWizard({ onComplete, initialData }: SavedSearchWizard
 				{/* Navigation Buttons */}
 				<form.Subscribe
 					selector={(state) => ({
-						name: state.values.name,
 						city: state.values.criteria?.city,
 						country: state.values.criteria?.country,
 					})}

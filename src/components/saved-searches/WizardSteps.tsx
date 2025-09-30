@@ -24,7 +24,6 @@ import {
 } from "lucide-react"
 import { AnimatePresence } from "motion/react"
 import { Input } from "~/components/ui/input"
-import { Textarea } from "~/components/ui/textarea"
 import {
 	CheckboxCard,
 	FormField,
@@ -33,48 +32,6 @@ import {
 	SelectionGrid,
 	StepContainer,
 } from "./WizardComponents"
-
-// Step 1: Basic Info (Name and Description)
-export function Step1BasicInfo({ form }: { form: any }) {
-	const nameField = useField({
-		form,
-		name: "name",
-	})
-
-	const descriptionField = useField({
-		form,
-		name: "description",
-	})
-
-	return (
-		<StepContainer
-			title="Let's start with the basics"
-			description="Enter your name and optional description to help you find properties."
-		>
-			<div className="mx-auto max-w-md space-y-4">
-				<FormField label="Name" required error={nameField.state.meta.errors?.[0]}>
-					<Input
-						value={nameField.state.value}
-						onChange={(e) => nameField.handleChange(e.target.value)}
-						onBlur={nameField.handleBlur}
-						placeholder="Your name"
-						className="w-full"
-					/>
-				</FormField>
-
-				<FormField label="Description" error={descriptionField.state.meta.errors?.[0]}>
-					<Textarea
-						value={descriptionField.state.value || ""}
-						onChange={(e) => descriptionField.handleChange(e.target.value)}
-						onBlur={descriptionField.handleBlur}
-						placeholder="Optional: Add more details about you and what you're looking for..."
-						className="min-h-[80px] w-full"
-					/>
-				</FormField>
-			</div>
-		</StepContainer>
-	)
-}
 
 // Step 2: Location (City and Country)
 export function Step2Location({ form }: { form: any }) {

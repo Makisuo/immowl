@@ -27,7 +27,7 @@ export function SearchProfileWizardModal({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="max-h-[90vh] max-w-6xl overflow-y-auto">
+			<DialogContent className="max-h-[90vh] max-w-7xl overflow-y-auto">
 				<DialogHeader>
 					<DialogTitle>
 						{initialData ? "Edit Your Search Profile" : "Create Your Search Profile"}

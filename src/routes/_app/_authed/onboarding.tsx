@@ -18,8 +18,6 @@ function OnboardingPage() {
 	})
 
 	const handleComplete = async (data: {
-		name: string
-		description?: string
 		criteria: {
 			city: string
 			country: string
@@ -47,8 +45,6 @@ function OnboardingPage() {
 	}) => {
 		try {
 			await createSavedSearch.mutateAsync({
-				name: data.name,
-				description: data.description,
 				criteria: data.criteria,
 			})
 

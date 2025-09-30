@@ -29,22 +29,7 @@ export function PropertyMatchScore({ property }: PropertyMatchScoreProps) {
 	)
 
 	const saved = savedSearchData?.page?.[0] as any | undefined
-	const criteria =
-		saved?.criteria ??
-		(saved
-			? {
-					city: (saved as any).city,
-					country: (saved as any).country,
-					propertyType: (saved as any).propertyType,
-					minPrice: (saved as any).minPrice,
-					maxPrice: (saved as any).maxPrice,
-					bedrooms: (saved as any).bedrooms,
-					bathrooms: (saved as any).bathrooms,
-					amenities: (saved as any).amenities,
-					petFriendly: (saved as any).petFriendly,
-					furnished: (saved as any).furnished,
-				}
-			: undefined)
+	const criteria = saved?.criteria
 
 	// Derived preferences used by scoring functions
 	const preferences: UserPreferences = {

@@ -2,13 +2,12 @@ import { paginationOptsValidator } from "convex/server"
 import { v } from "convex/values"
 import { mutation, query } from "./_generated/server"
 import { getUser } from "./auth"
+import { generateSearchName } from "./utils/generateSearchName"
 import { propertyTypeValidator } from "./validators"
 
 // Create a new saved search from wizard (with nested criteria structure)
 export const createSavedSearchFromWizard = mutation({
 	args: {
-		name: v.string(),
-		description: v.optional(v.string()),
 		criteria: v.object({
 			city: v.string(),
 			country: v.string(),
@@ -41,6 +40,16 @@ export const createSavedSearchFromWizard = mutation({
 		const user = await getUser(ctx)
 		const now = Date.now()
 
+		// Auto-generate search name based on criteria
+		const name = generateSearchName({
+			city: args.criteria.city,
+			country: args.criteria.country,
+			propertyType: args.criteria.propertyType,
+			bedrooms: args.criteria.bedrooms,
+			minPrice: args.criteria.minPrice,
+			maxPrice: args.criteria.maxPrice,
+		})
+
 		// Normalize weights with defaults
 		const clampInt = (n: number) => Math.max(0, Math.min(100, Math.round(n)))
 		const normalizedWeights = {
@@ -56,8 +65,7 @@ export const createSavedSearchFromWizard = mutation({
 
 		const savedSearchId = await ctx.db.insert("savedSearches", {
 			userId: user._id,
-			name: args.name,
-			description: args.description,
+			name,
 			criteria: {
 				...args.criteria,
 				weights: normalizedWeights,
@@ -74,9 +82,6 @@ export const createSavedSearchFromWizard = mutation({
 // Create a new saved search
 export const createSavedSearch = mutation({
 	args: {
-		name: v.string(),
-		description: v.optional(v.string()),
-
 		// Search criteria
 		city: v.string(),
 		country: v.string(),
@@ -110,6 +115,16 @@ export const createSavedSearch = mutation({
 
 		const now = Date.now()
 
+		// Auto-generate search name based on criteria
+		const name = generateSearchName({
+			city: args.city,
+			country: args.country,
+			propertyType: args.propertyType,
+			bedrooms: args.bedrooms,
+			minPrice: args.minPrice,
+			maxPrice: args.maxPrice,
+		})
+
 		// Normalize grouped weights with defaults and boolean overrides (0/100 for booleans)
 		const clampInt = (n: number) => Math.max(0, Math.min(100, Math.round(n)))
 		const normalizedWeights = {
@@ -128,8 +143,7 @@ export const createSavedSearch = mutation({
 
 		const savedSearchId = await ctx.db.insert("savedSearches", {
 			userId: user._id,
-			name: args.name,
-			description: args.description,
+			name,
 
 			// Search criteria (nested)
 			criteria: {
@@ -163,7 +177,6 @@ export const updateSavedSearch = mutation({
 	args: {
 		searchId: v.id("savedSearches"),
 		name: v.optional(v.string()),
-		description: v.optional(v.string()),
 
 		// Search criteria
 		city: v.optional(v.string()),
@@ -211,7 +224,6 @@ export const updateSavedSearch = mutation({
 
 		// Only update provided fields (top-level)
 		if (args.name !== undefined) updates.name = args.name
-		if (args.description !== undefined) updates.description = args.description
 
 		// Build updated nested criteria (support legacy docs without `criteria`)
 		const baseCriteria: any = (savedSearch as any).criteria ?? {

@@ -219,8 +219,7 @@ export default defineSchema({
 
 	savedSearches: defineTable({
 		userId: v.id("users"),
-		name: v.string(), // User-defined name for the search
-		description: v.optional(v.string()), // Optional description
+		name: v.string(), // Auto-generated name for the search
 
 		// Search criteria grouped under a single object for extensibility
 		criteria: v.object({
