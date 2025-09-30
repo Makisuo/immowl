@@ -49,25 +49,29 @@ export function PropertyMatchScore({ property }: PropertyMatchScoreProps) {
 		maxSquareMeters: (criteria?.maxSquareMeters as number | undefined) ?? null,
 	}
 
-	// Extract weights from saved search (0-100 integers)
+	// Extract weights from saved search (0-100 integers), filtering out undefined values
 	const rawWeights = (criteria?.weights as any) ?? {}
-	const userWeights: Partial<CriteriaWeights> = {
-		price: rawWeights.price,
-		location: rawWeights.location,
-		bedrooms: rawWeights.bedrooms,
-		bathrooms: rawWeights.bathrooms,
-		propertyType: rawWeights.propertyType,
-		petFriendly: rawWeights.petFriendly,
-		furnished: rawWeights.furnished,
-		amenities: rawWeights.amenities,
-		size: rawWeights.size,
-	}
+	const userWeights: Partial<CriteriaWeights> = {}
+
+	// Only include defined weights to avoid overriding defaults with undefined
+	if (rawWeights.price !== undefined) userWeights.price = rawWeights.price
+	if (rawWeights.location !== undefined) userWeights.location = rawWeights.location
+	if (rawWeights.bedrooms !== undefined) userWeights.bedrooms = rawWeights.bedrooms
+	if (rawWeights.bathrooms !== undefined) userWeights.bathrooms = rawWeights.bathrooms
+	if (rawWeights.propertyType !== undefined) userWeights.propertyType = rawWeights.propertyType
+	if (rawWeights.petFriendly !== undefined) userWeights.petFriendly = rawWeights.petFriendly
+	if (rawWeights.furnished !== undefined) userWeights.furnished = rawWeights.furnished
+	if (rawWeights.amenities !== undefined) userWeights.amenities = rawWeights.amenities
+	if (rawWeights.size !== undefined) userWeights.size = rawWeights.size
 
 	const { isAuthenticated } = useAuth()
 
 	// Calculate match score using the new utility
 	const matchScore = calculateMatchScore(property, preferences, userWeights)
 	const { overall: overallScore, breakdown } = matchScore
+
+	// Check if no preferences are set (all breakdowns are null)
+	const hasAnyPreferences = Object.values(breakdown).some((score) => score !== null)
 
 	// Get individual scores for display (use 0 for null scores in UI)
 	const priceScore = breakdown.price ?? 0
@@ -95,6 +99,19 @@ export function PropertyMatchScore({ property }: PropertyMatchScoreProps) {
 						<p className="font-semibold text-lg">Login to unlock your match score</p>
 						<Link to="/sign-in">
 							<Button>Sign In</Button>
+						</Link>
+					</div>
+				</div>
+			)}
+			{!hasAnyPreferences && isAuthenticated && (
+				<div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm">
+					<div className="space-y-4 px-6 text-center">
+						<p className="font-semibold text-lg">Set up your preferences</p>
+						<p className="text-muted-foreground text-sm">
+							Configure your search criteria to see how well properties match your needs
+						</p>
+						<Link to="/profile">
+							<Button>Go to Profile</Button>
 						</Link>
 					</div>
 				</div>

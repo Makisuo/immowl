@@ -104,7 +104,8 @@ export function calculatePriceScore(
 	// If no budget preferences, don't score
 	if (maxBudget === null) return null
 
-	if (rent === 0) return 0
+	// If rent is 0, likely missing data - can't score
+	if (rent === 0) return null
 
 	// Check if below minimum budget (potential quality issue)
 	if (minBudget !== null && rent < minBudget) {
@@ -397,8 +398,15 @@ export function calculateMatchScore(
 		size: 5,
 	}
 
-	// Merge with user weights
-	const baseWeights = { ...defaultWeights, ...userWeights }
+	// Merge with user weights, filtering out undefined values to preserve defaults
+	const baseWeights: CriteriaWeights = { ...defaultWeights }
+	if (userWeights) {
+		for (const [key, value] of Object.entries(userWeights)) {
+			if (value !== undefined) {
+				baseWeights[key as keyof CriteriaWeights] = value
+			}
+		}
+	}
 
 	// Only include weights for configured criteria (non-null scores)
 	const activeWeights: Partial<CriteriaWeights> = {}
@@ -410,10 +418,19 @@ export function calculateMatchScore(
 
 	// Normalize weights to sum to 1
 	const totalWeight = Object.values(activeWeights).reduce((sum, w) => sum + w, 0)
+
+	// Handle case where no preferences are set or all weights are 0
+	if (totalWeight === 0) {
+		return {
+			overall: 0,
+			breakdown,
+			weights: baseWeights,
+		}
+	}
+
 	const normalizedWeights: Partial<CriteriaWeights> = {}
 	for (const [key, weight] of Object.entries(activeWeights)) {
-		normalizedWeights[key as keyof CriteriaWeights] =
-			totalWeight > 0 ? weight / totalWeight : 0
+		normalizedWeights[key as keyof CriteriaWeights] = weight / totalWeight
 	}
 
 	// Calculate weighted overall score
