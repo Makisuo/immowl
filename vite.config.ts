@@ -16,7 +16,7 @@ export default defineConfig({
 			projects: ["./tsconfig.json"],
 		}),
 		tanstackStart({
-			tsr: {
+			router: {
 				routeToken: "layout",
 			},
 		}),

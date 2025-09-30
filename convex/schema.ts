@@ -256,4 +256,42 @@ export default defineSchema({
 	})
 		.index("by_user", ["userId"])
 		.index("by_user_active", ["userId", "isActive"]),
+
+	userProfiles: defineTable({
+		userId: v.id("users"),
+
+		// User's apartment preferences with importance weights
+		preferences: v.object({
+			// Location preferences
+			city: v.optional(v.string()),
+			country: v.optional(v.string()),
+			locationImportance: v.number(), // 0-100
+
+			// Property details
+			propertyType: v.optional(propertyTypeValidator),
+			propertyTypeImportance: v.number(), // 0-100
+			bedrooms: v.optional(v.number()),
+			bedroomsImportance: v.number(), // 0-100
+			bathrooms: v.optional(v.number()),
+			bathroomsImportance: v.number(), // 0-100
+			minSquareMeters: v.optional(v.number()),
+			squareMetersImportance: v.number(), // 0-100
+
+			// Price range
+			minPrice: v.optional(v.number()),
+			maxPrice: v.optional(v.number()),
+			priceImportance: v.number(), // 0-100
+
+			// Lifestyle
+			petFriendly: v.optional(v.boolean()),
+			petFriendlyImportance: v.number(), // 0-100
+			furnished: v.optional(v.boolean()),
+			furnishedImportance: v.number(), // 0-100
+			amenities: v.optional(v.array(v.string())),
+			amenitiesImportance: v.number(), // 0-100
+		}),
+
+		// Metadata
+		lastModified: v.number(),
+	}).index("by_user", ["userId"]),
 })

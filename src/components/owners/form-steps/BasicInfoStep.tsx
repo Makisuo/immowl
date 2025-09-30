@@ -24,7 +24,7 @@ export function BasicInfoStep({ form }: BasicInfoStepProps) {
 							onChange={(e) => field.handleChange(e.target.value)}
 						/>
 						{field.state.meta.errors ? (
-							<p className="text-sm text-destructive">{field.state.meta.errors.join(", ")}</p>
+							<p className="text-destructive text-sm">{field.state.meta.errors.join(", ")}</p>
 						) : null}
 					</div>
 				)}
@@ -43,9 +43,9 @@ export function BasicInfoStep({ form }: BasicInfoStepProps) {
 							onChange={(e) => field.handleChange(e.target.value)}
 						/>
 						{field.state.meta.errors ? (
-							<p className="text-sm text-destructive">{field.state.meta.errors.join(", ")}</p>
+							<p className="text-destructive text-sm">{field.state.meta.errors.join(", ")}</p>
 						) : null}
-						<p className="text-sm text-muted-foreground">
+						<p className="text-muted-foreground text-sm">
 							{field.state.value.length}/1000 characters
 						</p>
 					</div>
@@ -69,7 +69,7 @@ export function BasicInfoStep({ form }: BasicInfoStepProps) {
 							</SelectContent>
 						</Select>
 						{field.state.meta.errors ? (
-							<p className="text-sm text-destructive">{field.state.meta.errors.join(", ")}</p>
+							<p className="text-destructive text-sm">{field.state.meta.errors.join(", ")}</p>
 						) : null}
 					</div>
 				)}

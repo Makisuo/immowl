@@ -8,8 +8,6 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { createServerRootRoute } from '@tanstack/react-start/server'
-
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthLayoutRouteImport } from './routes/_auth/layout'
 import { Route as AppLayoutRouteImport } from './routes/_app/layout'
@@ -20,6 +18,7 @@ import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-pass
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
 import { Route as AppSearchRouteImport } from './routes/_app/search'
 import { Route as AppAuthedLayoutRouteImport } from './routes/_app/_authed/layout'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AppPropertyPropertyIdRouteImport } from './routes/_app/property.$propertyId'
 import { Route as AppAuthedUserRouteImport } from './routes/_app/_authed/user'
 import { Route as AppAuthedSearchRequestsRouteImport } from './routes/_app/_authed/search-requests'
@@ -27,9 +26,6 @@ import { Route as AppAuthedSavedRouteImport } from './routes/_app/_authed/saved'
 import { Route as AppAuthedProfileRouteImport } from './routes/_app/_authed/profile'
 import { Route as AppAuthedOwnersRouteImport } from './routes/_app/_authed/owners'
 import { Route as AppAuthedSavedSearchSearchIdRouteImport } from './routes/_app/_authed/saved-search.$searchId'
-import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
-
-const rootServerRouteImport = createServerRootRoute()
 
 const AuthLayoutRoute = AuthLayoutRouteImport.update({
   id: '/_auth',
@@ -73,6 +69,11 @@ const AppAuthedLayoutRoute = AppAuthedLayoutRouteImport.update({
   id: '/_authed',
   getParentRoute: () => AppLayoutRoute,
 } as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppPropertyPropertyIdRoute = AppPropertyPropertyIdRouteImport.update({
   id: '/property/$propertyId',
   path: '/property/$propertyId',
@@ -109,11 +110,6 @@ const AppAuthedSavedSearchSearchIdRoute =
     path: '/saved-search/$searchId',
     getParentRoute: () => AppAuthedLayoutRoute,
   } as any)
-const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
-  id: '/api/auth/$',
-  path: '/api/auth/$',
-  getParentRoute: () => rootServerRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/search': typeof AppSearchRoute
@@ -128,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/search-requests': typeof AppAuthedSearchRequestsRoute
   '/user': typeof AppAuthedUserRoute
   '/property/$propertyId': typeof AppPropertyPropertyIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/saved-search/$searchId': typeof AppAuthedSavedSearchSearchIdRoute
 }
 export interface FileRoutesByTo {
@@ -143,6 +140,7 @@ export interface FileRoutesByTo {
   '/search-requests': typeof AppAuthedSearchRequestsRoute
   '/user': typeof AppAuthedUserRoute
   '/property/$propertyId': typeof AppPropertyPropertyIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/saved-search/$searchId': typeof AppAuthedSavedSearchSearchIdRoute
 }
 export interface FileRoutesById {
@@ -162,6 +160,7 @@ export interface FileRoutesById {
   '/_app/_authed/search-requests': typeof AppAuthedSearchRequestsRoute
   '/_app/_authed/user': typeof AppAuthedUserRoute
   '/_app/property/$propertyId': typeof AppPropertyPropertyIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/_app/_authed/saved-search/$searchId': typeof AppAuthedSavedSearchSearchIdRoute
 }
 export interface FileRouteTypes {
@@ -179,6 +178,7 @@ export interface FileRouteTypes {
     | '/search-requests'
     | '/user'
     | '/property/$propertyId'
+    | '/api/auth/$'
     | '/saved-search/$searchId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -194,6 +194,7 @@ export interface FileRouteTypes {
     | '/search-requests'
     | '/user'
     | '/property/$propertyId'
+    | '/api/auth/$'
     | '/saved-search/$searchId'
   id:
     | '__root__'
@@ -212,33 +213,14 @@ export interface FileRouteTypes {
     | '/_app/_authed/search-requests'
     | '/_app/_authed/user'
     | '/_app/property/$propertyId'
+    | '/api/auth/$'
     | '/_app/_authed/saved-search/$searchId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AppLayoutRoute: typeof AppLayoutRouteWithChildren
   AuthLayoutRoute: typeof AuthLayoutRouteWithChildren
-}
-export interface FileServerRoutesByFullPath {
-  '/api/auth/$': typeof ApiAuthSplatServerRoute
-}
-export interface FileServerRoutesByTo {
-  '/api/auth/$': typeof ApiAuthSplatServerRoute
-}
-export interface FileServerRoutesById {
-  __root__: typeof rootServerRouteImport
-  '/api/auth/$': typeof ApiAuthSplatServerRoute
-}
-export interface FileServerRouteTypes {
-  fileServerRoutesByFullPath: FileServerRoutesByFullPath
-  fullPaths: '/api/auth/$'
-  fileServerRoutesByTo: FileServerRoutesByTo
-  to: '/api/auth/$'
-  id: '__root__' | '/api/auth/$'
-  fileServerRoutesById: FileServerRoutesById
-}
-export interface RootServerRouteChildren {
-  ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -306,6 +288,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAuthedLayoutRouteImport
       parentRoute: typeof AppLayoutRoute
     }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app/property/$propertyId': {
       id: '/_app/property/$propertyId'
       path: '/property/$propertyId'
@@ -354,17 +343,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/saved-search/$searchId'
       preLoaderRoute: typeof AppAuthedSavedSearchSearchIdRouteImport
       parentRoute: typeof AppAuthedLayoutRoute
-    }
-  }
-}
-declare module '@tanstack/react-start/server' {
-  interface ServerFileRoutesByPath {
-    '/api/auth/$': {
-      id: '/api/auth/$'
-      path: '/api/auth/$'
-      fullPath: '/api/auth/$'
-      preLoaderRoute: typeof ApiAuthSplatServerRouteImport
-      parentRoute: typeof rootServerRouteImport
     }
   }
 }
@@ -430,13 +408,17 @@ const AuthLayoutRouteWithChildren = AuthLayoutRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   AppLayoutRoute: AppLayoutRouteWithChildren,
   AuthLayoutRoute: AuthLayoutRouteWithChildren,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-const rootServerRouteChildren: RootServerRouteChildren = {
-  ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
 }
-export const serverRouteTree = rootServerRouteImport
-  ._addFileChildren(rootServerRouteChildren)
-  ._addFileTypes<FileServerRouteTypes>()
