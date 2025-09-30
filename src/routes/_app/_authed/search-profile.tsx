@@ -202,7 +202,7 @@ function SearchRequestsPage() {
 						e.stopPropagation()
 						form.handleSubmit()
 					}}
-					className="space-y-16"
+					className="space-y-16 pb-28"
 				>
 					{/* Profile Completion - Sticky */}
 					<form.Subscribe
@@ -626,10 +626,14 @@ function SearchRequestsPage() {
 					</section>
 
 					{/* Submit Buttons */}
-					<div className="flex justify-end gap-4 pt-8">
-						<Button type="submit" size="lg" className="font-normal">
-							Save Profile
-						</Button>
+					<div className="fixed bottom-0 left-0 right-0 z-20 flex justify-end gap-4 border-t border-border/50 bg-background/95 p-4 backdrop-blur-sm">
+						<div className="container mx-auto max-w-4xl">
+							<div className="flex justify-end">
+								<Button type="submit" size="lg" className="font-normal shadow-lg">
+									Save Profile
+								</Button>
+							</div>
+						</div>
 					</div>
 				</form>
 			)}
