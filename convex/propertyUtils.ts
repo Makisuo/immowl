@@ -1,6 +1,5 @@
 import type { OrderedQuery, Query, QueryInitializer } from "convex/server"
 import type { DataModel } from "./_generated/dataModel"
-
 /**
  * Builds a query for properties based on provided filters.
  * This shared logic is used by both listProperties and getTotalCount to avoid duplication.
@@ -13,6 +12,8 @@ export function buildPropertyQuery(
 		country?: string
 		minPrice?: number
 		maxPrice?: number
+		minSquareMeters?: number
+		maxSquareMeters?: number
 		bedrooms?: number
 		bathrooms?: number
 		amenities?: string[]
@@ -60,31 +61,39 @@ export function buildPropertyQuery(
 	if (filters.minPrice || filters.maxPrice) {
 		filteredQuery = filteredQuery.filter((q) => {
 			let priceCondition = q.gt(q.field("monthlyRent.warm"), 0) // Base condition
-			
+
 			if (filters.minPrice) {
 				const minCondition = q.or(
 					q.gte(q.field("monthlyRent.warm"), filters.minPrice),
 					q.and(
 						q.not(q.field("monthlyRent.warm")),
-						q.gte(q.field("monthlyRent.cold"), filters.minPrice)
-					)
+						q.gte(q.field("monthlyRent.cold"), filters.minPrice),
+					),
 				)
 				priceCondition = q.and(priceCondition, minCondition)
 			}
-			
+
 			if (filters.maxPrice) {
 				const maxCondition = q.or(
 					q.lte(q.field("monthlyRent.warm"), filters.maxPrice),
 					q.and(
 						q.not(q.field("monthlyRent.warm")),
-						q.lte(q.field("monthlyRent.cold"), filters.maxPrice)
-					)
+						q.lte(q.field("monthlyRent.cold"), filters.maxPrice),
+					),
 				)
 				priceCondition = q.and(priceCondition, maxCondition)
 			}
-			
+
 			return priceCondition
 		})
+	}
+
+	// Size filters
+	if (filters.minSquareMeters !== undefined) {
+		filteredQuery = filteredQuery.filter((q) => q.gte(q.field("squareMeters"), filters.minSquareMeters!))
+	}
+	if (filters.maxSquareMeters !== undefined) {
+		filteredQuery = filteredQuery.filter((q) => q.lte(q.field("squareMeters"), filters.maxSquareMeters!))
 	}
 
 	// Bedroom filter
