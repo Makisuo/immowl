@@ -88,6 +88,35 @@ function PropertyDetails() {
 		}
 	}
 
+	const handleShare = async () => {
+		const url = window.location.href
+		const title = property?.title || "Property Listing"
+
+		// Try Web Share API first (mobile devices)
+		if (navigator.share) {
+			try {
+				await navigator.share({
+					title,
+					url,
+				})
+				toast.success("Property shared successfully")
+			} catch (error) {
+				// User cancelled the share, don't show error
+				if ((error as Error).name !== "AbortError") {
+					toast.error("Failed to share property")
+				}
+			}
+		} else {
+			// Fall back to clipboard
+			try {
+				await navigator.clipboard.writeText(url)
+				toast.success("Link copied to clipboard")
+			} catch (_error) {
+				toast.error("Failed to copy link")
+			}
+		}
+	}
+
 	if (isLoading) {
 		return <PropertyDetailsSkeleton />
 	}
@@ -146,7 +175,12 @@ function PropertyDetails() {
 				>
 					<Heart className={`h-4 w-4 ${isSaved ? "fill-red-500 text-red-500" : ""}`} />
 				</Button>
-				<Button variant="outline" size="icon" className="bg-background shadow-md hover:shadow-lg">
+				<Button
+					variant="outline"
+					size="icon"
+					onClick={handleShare}
+					className="bg-background shadow-md hover:shadow-lg"
+				>
 					<Share2 className="h-4 w-4" />
 				</Button>
 			</div>

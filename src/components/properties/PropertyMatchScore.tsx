@@ -3,7 +3,21 @@ import { convexQuery } from "@convex-dev/react-query"
 import { useQuery } from "@tanstack/react-query"
 import { api } from "convex/_generated/api"
 import { Link } from "@tanstack/react-router"
-import { AlertCircle, CheckCircle2, DollarSign, Home, MapPin, Ruler, TrendingUp, XCircle } from "lucide-react"
+import {
+	AlertCircle,
+	Bath,
+	Building,
+	CheckCircle2,
+	DollarSign,
+	Home,
+	MapPin,
+	PawPrint,
+	Ruler,
+	Sofa,
+	Sparkles,
+	TrendingUp,
+	XCircle,
+} from "lucide-react"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
@@ -77,7 +91,12 @@ export function PropertyMatchScore({ property }: PropertyMatchScoreProps) {
 	const priceScore = breakdown.price ?? 0
 	const sizeScore = breakdown.size ?? 0
 	const bedroomScore = breakdown.bedrooms ?? 0
+	const bathroomScore = breakdown.bathrooms ?? 0
 	const locationScore = breakdown.location ?? 0
+	const propertyTypeScore = breakdown.propertyType ?? 0
+	const petFriendlyScore = breakdown.petFriendly ?? 0
+	const furnishedScore = breakdown.furnished ?? 0
+	const amenitiesScore = breakdown.amenities ?? 0
 
 	// Determine match quality
 	const matchQualityData = getMatchQuality(overallScore)
@@ -138,60 +157,153 @@ export function PropertyMatchScore({ property }: PropertyMatchScoreProps) {
 				{/* Breakdown */}
 				<div className="space-y-3 border-t pt-2">
 					{/* Price */}
-					<div className="space-y-1">
-						<div className="flex items-center justify-between text-sm">
-							<span className="flex items-center gap-1.5">
-								<DollarSign className="h-3.5 w-3.5" />
-								Price
-							</span>
-							<span
-								className={
-									rent <= (preferences.maxBudget ?? Infinity)
-										? "text-green-600"
-										: "text-orange-600"
-								}
-							>
-								€{rent} / €{preferences.maxBudget ?? "-"}
-							</span>
+					{breakdown.price !== null && (
+						<div className="space-y-1">
+							<div className="flex items-center justify-between text-sm">
+								<span className="flex items-center gap-1.5">
+									<DollarSign className="h-3.5 w-3.5" />
+									Price
+								</span>
+								<span
+									className={
+										rent <= (preferences.maxBudget ?? Infinity)
+											? "text-green-600"
+											: "text-orange-600"
+									}
+								>
+									€{rent} / €{preferences.maxBudget ?? "-"}
+								</span>
+							</div>
+							<Progress value={priceScore} className="h-1.5" />
 						</div>
-						<Progress value={priceScore} className="h-1.5" />
-					</div>
+					)}
 
 					{/* Size */}
-					<div className="space-y-1">
-						<div className="flex items-center justify-between text-sm">
-							<span className="flex items-center gap-1.5">
-								<Ruler className="h-3.5 w-3.5" />
-								Size
-							</span>
-							<span>{Math.round(property.squareMeters)} m²</span>
+					{breakdown.size !== null && (
+						<div className="space-y-1">
+							<div className="flex items-center justify-between text-sm">
+								<span className="flex items-center gap-1.5">
+									<Ruler className="h-3.5 w-3.5" />
+									Size
+								</span>
+								<span>
+									{Math.round(property.squareMeters)} m² {preferences.minSquareMeters && `/ ${preferences.minSquareMeters}+ m²`}
+								</span>
+							</div>
+							<Progress value={sizeScore} className="h-1.5" />
 						</div>
-						<Progress value={sizeScore} className="h-1.5" />
-					</div>
+					)}
 
 					{/* Bedrooms */}
-					<div className="space-y-1">
-						<div className="flex items-center justify-between text-sm">
-							<span className="flex items-center gap-1.5">
-								<Home className="h-3.5 w-3.5" />
-								Bedrooms
-							</span>
-							<span>{property.rooms.bedrooms === 0 ? "Studio" : property.rooms.bedrooms}</span>
+					{breakdown.bedrooms !== null && (
+						<div className="space-y-1">
+							<div className="flex items-center justify-between text-sm">
+								<span className="flex items-center gap-1.5">
+									<Home className="h-3.5 w-3.5" />
+									Bedrooms
+								</span>
+								<span>
+									{property.rooms.bedrooms === 0 ? "Studio" : property.rooms.bedrooms}
+									{preferences.desiredBedrooms && ` / ${preferences.desiredBedrooms}+`}
+								</span>
+							</div>
+							<Progress value={bedroomScore} className="h-1.5" />
 						</div>
-						<Progress value={bedroomScore} className="h-1.5" />
-					</div>
+					)}
+
+					{/* Bathrooms */}
+					{breakdown.bathrooms !== null && (
+						<div className="space-y-1">
+							<div className="flex items-center justify-between text-sm">
+								<span className="flex items-center gap-1.5">
+									<Bath className="h-3.5 w-3.5" />
+									Bathrooms
+								</span>
+								<span>
+									{property.rooms.bathrooms} / {preferences.desiredBathrooms}+
+								</span>
+							</div>
+							<Progress value={bathroomScore} className="h-1.5" />
+						</div>
+					)}
 
 					{/* Location */}
-					<div className="space-y-1">
-						<div className="flex items-center justify-between text-sm">
-							<span className="flex items-center gap-1.5">
-								<MapPin className="h-3.5 w-3.5" />
-								Location
-							</span>
-							<span>{property.address.city}</span>
+					{breakdown.location !== null && (
+						<div className="space-y-1">
+							<div className="flex items-center justify-between text-sm">
+								<span className="flex items-center gap-1.5">
+									<MapPin className="h-3.5 w-3.5" />
+									Location
+								</span>
+								<span>{property.address.city}</span>
+							</div>
+							<Progress value={locationScore} className="h-1.5" />
 						</div>
-						<Progress value={locationScore} className="h-1.5" />
-					</div>
+					)}
+
+					{/* Property Type */}
+					{breakdown.propertyType !== null && (
+						<div className="space-y-1">
+							<div className="flex items-center justify-between text-sm">
+								<span className="flex items-center gap-1.5">
+									<Building className="h-3.5 w-3.5" />
+									Type
+								</span>
+								<span className="capitalize">
+									{property.propertyType} {preferences.preferredPropertyType && `/ ${preferences.preferredPropertyType}`}
+								</span>
+							</div>
+							<Progress value={propertyTypeScore} className="h-1.5" />
+						</div>
+					)}
+
+					{/* Pet Friendly */}
+					{breakdown.petFriendly !== null && (
+						<div className="space-y-1">
+							<div className="flex items-center justify-between text-sm">
+								<span className="flex items-center gap-1.5">
+									<PawPrint className="h-3.5 w-3.5" />
+									Pet Friendly
+								</span>
+								<span className={property.petFriendly ? "text-green-600" : "text-orange-600"}>
+									{property.petFriendly ? "Yes" : "No"}
+								</span>
+							</div>
+							<Progress value={petFriendlyScore} className="h-1.5" />
+						</div>
+					)}
+
+					{/* Furnished */}
+					{breakdown.furnished !== null && (
+						<div className="space-y-1">
+							<div className="flex items-center justify-between text-sm">
+								<span className="flex items-center gap-1.5">
+									<Sofa className="h-3.5 w-3.5" />
+									Furnished
+								</span>
+								<span className={property.furnished ? "text-green-600" : "text-muted-foreground"}>
+									{property.furnished ? "Yes" : "No"}
+								</span>
+							</div>
+							<Progress value={furnishedScore} className="h-1.5" />
+						</div>
+					)}
+
+					{/* Amenities */}
+					{breakdown.amenities !== null && (
+						<div className="space-y-1">
+							<div className="flex items-center justify-between text-sm">
+								<span className="flex items-center gap-1.5">
+									<Sparkles className="h-3.5 w-3.5" />
+									Amenities
+								</span>
+								<span>
+									{property.amenities?.length || 0} / {preferences.desiredAmenities.length}
+								</span>
+							</div>
+							<Progress value={amenitiesScore} className="h-1.5" />
+						</div>
+					)}
 				</div>
 
 				{/* Quick Insights */}

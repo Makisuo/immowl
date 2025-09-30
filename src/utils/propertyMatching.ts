@@ -143,9 +143,8 @@ export function calculatePriceScore(
 }
 
 /**
- * Proportional bedroom scoring with diminishing returns
- * - Exact match: 100
- * - More bedrooms: diminishing bonus (capped at 90)
+ * Proportional bedroom scoring
+ * - Exact match or more bedrooms: 100 (having more space is always good)
  * - Fewer bedrooms: proportional penalty
  */
 export function calculateBedroomScore(
@@ -154,13 +153,8 @@ export function calculateBedroomScore(
 ): number | null {
 	if (desiredBedrooms === null) return null
 
-	if (actualBedrooms === desiredBedrooms) return 100
-
-	if (actualBedrooms > desiredBedrooms) {
-		// More rooms - slight bonus with diminishing returns
-		const extra = actualBedrooms - desiredBedrooms
-		return Math.min(90, 85 + extra * 5)
-	}
+	// Having more or equal bedrooms is always perfect
+	if (actualBedrooms >= desiredBedrooms) return 100
 
 	// Fewer rooms - proportional penalty
 	const deficit = desiredBedrooms - actualBedrooms

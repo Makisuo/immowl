@@ -110,10 +110,14 @@ describe("Bedroom Scoring", () => {
 		expect(score).toBe(100);
 	});
 
-	test("returns good score for more bedrooms", () => {
+	test("returns 100 for more bedrooms (having more is always good)", () => {
 		const score = calculateBedroomScore(3, 2);
-		expect(score).toBeGreaterThanOrEqual(85);
-		expect(score).toBeLessThanOrEqual(90);
+		expect(score).toBe(100);
+	});
+
+	test("returns 100 for many more bedrooms", () => {
+		const score = calculateBedroomScore(5, 2);
+		expect(score).toBe(100);
 	});
 
 	test("penalizes fewer bedrooms", () => {
