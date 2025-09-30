@@ -2,8 +2,8 @@
 
 import { Workpool } from "@convex-dev/workpool"
 import { v } from "convex/values"
-import { internalAction } from "./_generated/server"
 import { components, internal } from "./_generated/api"
+import { internalAction } from "./_generated/server"
 
 const amenitiesPool = new Workpool(components.amenitiesWorkpool, {
 	maxParallelism: 1, // Respect Overpass API with one request at a time

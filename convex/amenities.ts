@@ -106,12 +106,11 @@ export const getPropertiesNeedingAmenities = internalQuery({
 		// to ensure we find all properties that need amenities
 		const needingAmenities = []
 
-		const query = ctx.db
-			.query("properties")
-			.withIndex("by_status", (q) => q.eq("status", "active"))
+		const query = ctx.db.query("properties").withIndex("by_status", (q) => q.eq("status", "active"))
 
 		for await (const property of query) {
-			const hasCoordinates = property.address.latitude !== undefined && property.address.longitude !== undefined
+			const hasCoordinates =
+				property.address.latitude !== undefined && property.address.longitude !== undefined
 			const hasAmenities = property.nearbyAmenities !== undefined
 
 			if (hasCoordinates && !hasAmenities) {

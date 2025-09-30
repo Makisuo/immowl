@@ -75,7 +75,7 @@ export function PropertySearch() {
 							</SelectTrigger>
 							<SelectContent className="z-[100]">
 								<SelectItem value="Berlin">Berlin</SelectItem>
-								<SelectItem value="Potsdam">Potsdam</SelectItem>
+								{/* <SelectItem value="Potsdam">Potsdam</SelectItem> */}
 							</SelectContent>
 						</Select>
 					</div>
@@ -93,10 +93,10 @@ export function PropertySearch() {
 								</div>
 							</SelectTrigger>
 							<SelectContent className="z-[100]">
-								<SelectItem value="apartment-rent">Wohnung Mieten</SelectItem>
-								<SelectItem value="apartment-buy">Wohnung Kaufen</SelectItem>
-								<SelectItem value="house-rent">Haus Mieten</SelectItem>
-								<SelectItem value="house-buy">Haus Kaufen</SelectItem>
+								<SelectItem value="apartment-rent">Rent Apartment</SelectItem>
+								{/* <SelectItem value="apartment-buy">Wohnung Kaufen</SelectItem> */}
+								{/* <SelectItem value="house-rent">Haus Mieten</SelectItem> */}
+								{/* <SelectItem value="house-buy">Haus Kaufen</SelectItem> */}
 							</SelectContent>
 						</Select>
 					</div>

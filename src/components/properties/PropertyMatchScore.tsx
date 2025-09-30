@@ -2,10 +2,13 @@ import type { Doc } from "convex/_generated/dataModel"
 import { convexQuery } from "@convex-dev/react-query"
 import { useQuery } from "@tanstack/react-query"
 import { api } from "convex/_generated/api"
+import { Link } from "@tanstack/react-router"
 import { AlertCircle, CheckCircle2, DollarSign, Home, MapPin, Ruler, TrendingUp, XCircle } from "lucide-react"
 import { Badge } from "~/components/ui/badge"
+import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { Progress } from "~/components/ui/progress"
+import { useAuth } from "~/hooks/use-auth"
 
 interface PropertyMatchScoreProps {
 	property: Doc<"properties">
@@ -20,20 +23,22 @@ export function PropertyMatchScore({ property }: PropertyMatchScoreProps) {
 	)
 
 	const saved = savedSearchData?.page?.[0] as any | undefined
-	const criteria = saved?.criteria ?? (saved
-		? {
-			city: (saved as any).city,
-			country: (saved as any).country,
-			propertyType: (saved as any).propertyType,
-			minPrice: (saved as any).minPrice,
-			maxPrice: (saved as any).maxPrice,
-			bedrooms: (saved as any).bedrooms,
-			bathrooms: (saved as any).bathrooms,
-			amenities: (saved as any).amenities,
-			petFriendly: (saved as any).petFriendly,
-			furnished: (saved as any).furnished,
-		}
-		: undefined)
+	const criteria =
+		saved?.criteria ??
+		(saved
+			? {
+					city: (saved as any).city,
+					country: (saved as any).country,
+					propertyType: (saved as any).propertyType,
+					minPrice: (saved as any).minPrice,
+					maxPrice: (saved as any).maxPrice,
+					bedrooms: (saved as any).bedrooms,
+					bathrooms: (saved as any).bathrooms,
+					amenities: (saved as any).amenities,
+					petFriendly: (saved as any).petFriendly,
+					furnished: (saved as any).furnished,
+				}
+			: undefined)
 
 	// Derived preferences used by scoring functions
 	const prefs = {
@@ -52,6 +57,8 @@ export function PropertyMatchScore({ property }: PropertyMatchScoreProps) {
 
 	// Extract weights from saved search (0-100 integers)
 	const rawWeights = (criteria?.weights as any) ?? {}
+	const { isAuthenticated } = useAuth()
+
 	// Calculate individual scores
 	const calculatePriceScore = () => {
 		const rent = property.monthlyRent.warm || property.monthlyRent.cold || 0
@@ -234,11 +241,21 @@ export function PropertyMatchScore({ property }: PropertyMatchScoreProps) {
 	const rent = property.monthlyRent.warm || property.monthlyRent.cold || 0
 
 	return (
-		<Card>
+		<Card className="relative overflow-hidden">
+			{!isAuthenticated && (
+				<div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm">
+					<div className="space-y-4 px-6 text-center">
+						<p className="font-semibold text-lg">Login to unlock your match score</p>
+						<Link to="/sign-in">
+							<Button>Sign In</Button>
+						</Link>
+					</div>
+				</div>
+			)}
 			<CardHeader className="pb-4">
 				<div className="flex items-center justify-between">
 					<CardTitle className="text-lg">Match Score</CardTitle>
-					<Badge variant="secondary" className={`${matchQuality.color} text-white border-0`}>
+					<Badge variant="secondary" className={`${matchQuality.color} border-0 text-white`}>
 						<MatchIcon className="mr-1 h-3 w-3" />
 						{matchQuality.label}
 					</Badge>
@@ -247,15 +264,15 @@ export function PropertyMatchScore({ property }: PropertyMatchScoreProps) {
 			<CardContent className="space-y-4">
 				{/* Overall Score */}
 				<div>
-					<div className="flex items-center justify-between mb-2">
-						<span className="text-2xl font-bold">{overallScore}%</span>
-						<span className="text-sm text-muted-foreground">Overall Match</span>
+					<div className="mb-2 flex items-center justify-between">
+						<span className="font-bold text-2xl">{overallScore}%</span>
+						<span className="text-muted-foreground text-sm">Overall Match</span>
 					</div>
 					<Progress value={overallScore} className="h-3" />
 				</div>
 
 				{/* Breakdown */}
-				<div className="space-y-3 pt-2 border-t">
+				<div className="space-y-3 border-t pt-2">
 					{/* Price */}
 					<div className="space-y-1">
 						<div className="flex items-center justify-between text-sm">
@@ -314,26 +331,26 @@ export function PropertyMatchScore({ property }: PropertyMatchScoreProps) {
 				</div>
 
 				{/* Quick Insights */}
-				<div className="pt-2 border-t">
+				<div className="border-t pt-2">
 					<div className="flex flex-wrap gap-1.5">
 						{prefs.maxBudget != null && rent <= prefs.maxBudget && (
-							<Badge variant="outline" className="text-green-600 border-green-200">
+							<Badge variant="outline" className="border-green-200 text-green-600">
 								Within Budget
 							</Badge>
 						)}
 						{prefs.desiredBedrooms != null &&
 							property.rooms.bedrooms === prefs.desiredBedrooms && (
-								<Badge variant="outline" className="text-blue-600 border-blue-200">
+								<Badge variant="outline" className="border-blue-200 text-blue-600">
 									Desired Rooms
 								</Badge>
 							)}
 						{property.furnished && prefs.prefersFurnished && (
-							<Badge variant="outline" className="text-purple-600 border-purple-200">
+							<Badge variant="outline" className="border-purple-200 text-purple-600">
 								Furnished
 							</Badge>
 						)}
 						{(!property.availableFrom || property.availableFrom <= Date.now()) && (
-							<Badge variant="outline" className="text-green-600 border-green-200">
+							<Badge variant="outline" className="border-green-200 text-green-600">
 								Available Now
 							</Badge>
 						)}

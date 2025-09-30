@@ -16,6 +16,11 @@ export function useMapKit({ onLoad, onError }: UseMapKitOptions = {}) {
 	const [error, setError] = useState<Error | null>(null)
 
 	useEffect(() => {
+		// Only run on client side
+		if (typeof window === "undefined") {
+			return
+		}
+
 		// Check if MapKit is already loaded
 		if (window.mapkit?.Map) {
 			setIsLoaded(true)
@@ -83,5 +88,5 @@ export function useMapKit({ onLoad, onError }: UseMapKitOptions = {}) {
 		}
 	}, [onLoad, onError])
 
-	return { isLoaded, error, mapkit: window.mapkit }
+	return { isLoaded, error, mapkit: typeof window !== "undefined" ? window.mapkit : undefined }
 }

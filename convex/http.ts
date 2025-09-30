@@ -19,31 +19,44 @@ http.route({
 		const result = await ctx.runAction(api.mapkit.generateToken, { origin })
 
 		if (result.error) {
-			return new Response(
-				JSON.stringify({ error: result.error }),
-				{
-					status: 500,
-					headers: {
-						"Content-Type": "application/json",
-						"Access-Control-Allow-Origin": "*",
-						"Access-Control-Allow-Methods": "GET, OPTIONS",
-					},
-				}
-			)
-		}
-
-		return new Response(
-			JSON.stringify({ token: result.token }),
-			{
-				status: 200,
+			return new Response(JSON.stringify({ error: result.error }), {
+				status: 500,
 				headers: {
 					"Content-Type": "application/json",
-					"Access-Control-Allow-Origin": origin,
+					"Access-Control-Allow-Origin": "*",
 					"Access-Control-Allow-Methods": "GET, OPTIONS",
-					"Cache-Control": "private, max-age=1500", // Cache for 25 minutes
 				},
-			}
-		)
+			})
+		}
+
+		return new Response(JSON.stringify({ token: result.token }), {
+			status: 200,
+			headers: {
+				"Content-Type": "application/json",
+				"Access-Control-Allow-Origin": origin,
+				"Access-Control-Allow-Methods": "GET, OPTIONS",
+				"Cache-Control": "private, max-age=1500", // Cache for 25 minutes
+			},
+		})
+	}),
+})
+
+// CORS preflight handler for MapKit token endpoint
+http.route({
+	path: "/mapkit-token",
+	method: "OPTIONS",
+	handler: httpAction(async (ctx, request) => {
+		const origin = request.headers.get("origin") || "*"
+
+		return new Response(null, {
+			status: 204,
+			headers: {
+				"Access-Control-Allow-Origin": origin,
+				"Access-Control-Allow-Methods": "GET, OPTIONS",
+				"Access-Control-Allow-Headers": "Content-Type",
+				"Access-Control-Max-Age": "86400",
+			},
+		})
 	}),
 })
 

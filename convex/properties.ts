@@ -61,70 +61,150 @@ const amenitiesList = [
 ]
 
 // City-specific data for realistic address generation
-const cityData: Record<string, {
-	streets: string[]
-	zipCodes: string[]
-	state: string
-	coordinates: { minLat: number; maxLat: number; minLng: number; maxLng: number }
-}> = {
+const cityData: Record<
+	string,
+	{
+		streets: string[]
+		zipCodes: string[]
+		state: string
+		coordinates: { minLat: number; maxLat: number; minLng: number; maxLng: number }
+	}
+> = {
 	Munich: {
 		streets: [
-			"Leopoldstraße", "Maximilianstraße", "Sendlinger Straße", "Kaufingerstraße",
-			"Theatinerstraße", "Schwabing", "Marienplatz", "Karlsplatz", "Odeonsplatz",
-			"Ludwigstraße", "Prinzregentenstraße", "Elisenstraße", "Arnulfstraße",
-			"Landsberger Straße", "Nymphenburger Straße", "Romanstraße", "Baaderstraße",
-			"Gärtnerplatz", "Frauenstraße", "Rosenheimer Straße"
+			"Leopoldstraße",
+			"Maximilianstraße",
+			"Sendlinger Straße",
+			"Kaufingerstraße",
+			"Theatinerstraße",
+			"Schwabing",
+			"Marienplatz",
+			"Karlsplatz",
+			"Odeonsplatz",
+			"Ludwigstraße",
+			"Prinzregentenstraße",
+			"Elisenstraße",
+			"Arnulfstraße",
+			"Landsberger Straße",
+			"Nymphenburger Straße",
+			"Romanstraße",
+			"Baaderstraße",
+			"Gärtnerplatz",
+			"Frauenstraße",
+			"Rosenheimer Straße",
 		],
 		zipCodes: ["80331", "80333", "80335", "80469", "80538", "80539", "80796", "80798", "80799", "80801"],
 		state: "Bavaria",
-		coordinates: { minLat: 48.0619, maxLat: 48.2482, minLng: 11.3608, maxLng: 11.7229 }
+		coordinates: { minLat: 48.0619, maxLat: 48.2482, minLng: 11.3608, maxLng: 11.7229 },
 	},
 	Berlin: {
 		streets: [
-			"Alexanderplatz", "Unter den Linden", "Friedrichstraße", "Kurfürstendamm",
-			"Karl-Marx-Allee", "Potsdamer Platz", "Brandenburger Tor", "Leipziger Straße",
-			"Oranienburger Straße", "Schönhauser Allee", "Warschauer Straße", "Kastanienallee",
-			"Prenzlauer Allee", "Sonnenallee", "Bergmannstraße", "Mehringdamm", "Torstraße",
-			"Rosenthaler Straße", "Invalidenstraße", "Eberswalder Straße"
+			"Alexanderplatz",
+			"Unter den Linden",
+			"Friedrichstraße",
+			"Kurfürstendamm",
+			"Karl-Marx-Allee",
+			"Potsdamer Platz",
+			"Brandenburger Tor",
+			"Leipziger Straße",
+			"Oranienburger Straße",
+			"Schönhauser Allee",
+			"Warschauer Straße",
+			"Kastanienallee",
+			"Prenzlauer Allee",
+			"Sonnenallee",
+			"Bergmannstraße",
+			"Mehringdamm",
+			"Torstraße",
+			"Rosenthaler Straße",
+			"Invalidenstraße",
+			"Eberswalder Straße",
 		],
 		zipCodes: ["10115", "10117", "10178", "10179", "10243", "10245", "10247", "10249", "10405", "10435"],
 		state: "Berlin",
-		coordinates: { minLat: 52.3382, maxLat: 52.6755, minLng: 13.0883, maxLng: 13.7611 }
+		coordinates: { minLat: 52.3382, maxLat: 52.6755, minLng: 13.0883, maxLng: 13.7611 },
 	},
 	Hamburg: {
 		streets: [
-			"Reeperbahn", "Mönckebergstraße", "Jungfernstieg", "Alsterarkaden", "Speicherstadt",
-			"HafenCity", "Große Bleichen", "Neuer Wall", "Ballindamm", "Gänsemarkt",
-			"Colonnaden", "Rothenbaumchaussee", "Grindelallee", "Eppendorfer Landstraße",
-			"Hoheluftchaussee", "Osterstraße", "Schulterblatt", "Susannenstraße",
-			"Lange Reihe", "Steindamm"
+			"Reeperbahn",
+			"Mönckebergstraße",
+			"Jungfernstieg",
+			"Alsterarkaden",
+			"Speicherstadt",
+			"HafenCity",
+			"Große Bleichen",
+			"Neuer Wall",
+			"Ballindamm",
+			"Gänsemarkt",
+			"Colonnaden",
+			"Rothenbaumchaussee",
+			"Grindelallee",
+			"Eppendorfer Landstraße",
+			"Hoheluftchaussee",
+			"Osterstraße",
+			"Schulterblatt",
+			"Susannenstraße",
+			"Lange Reihe",
+			"Steindamm",
 		],
 		zipCodes: ["20095", "20099", "20144", "20146", "20148", "20249", "20251", "20253", "20354", "20355"],
 		state: "Hamburg",
-		coordinates: { minLat: 53.3950, maxLat: 53.7499, minLng: 9.7383, maxLng: 10.3270 }
+		coordinates: { minLat: 53.395, maxLat: 53.7499, minLng: 9.7383, maxLng: 10.327 },
 	},
 	Frankfurt: {
 		streets: [
-			"Zeil", "Goethestraße", "Kaiserstraße", "Mainzer Landstraße", "Bockenheimer Landstraße",
-			"Berger Straße", "Schweizer Straße", "Freßgass", "Schillerstraße", "Große Eschenheimer Straße",
-			"Neue Mainzer Straße", "Taunusanlage", "Westendstraße", "Reuterweg", "Braubachstraße",
-			"Fahrgasse", "Saalgasse", "Friedberger Landstraße", "Hanauer Landstraße", "Textorstraße"
+			"Zeil",
+			"Goethestraße",
+			"Kaiserstraße",
+			"Mainzer Landstraße",
+			"Bockenheimer Landstraße",
+			"Berger Straße",
+			"Schweizer Straße",
+			"Freßgass",
+			"Schillerstraße",
+			"Große Eschenheimer Straße",
+			"Neue Mainzer Straße",
+			"Taunusanlage",
+			"Westendstraße",
+			"Reuterweg",
+			"Braubachstraße",
+			"Fahrgasse",
+			"Saalgasse",
+			"Friedberger Landstraße",
+			"Hanauer Landstraße",
+			"Textorstraße",
 		],
 		zipCodes: ["60311", "60313", "60314", "60316", "60318", "60320", "60322", "60325", "60326", "60329"],
 		state: "Hesse",
-		coordinates: { minLat: 50.0157, maxLat: 50.2271, minLng: 8.4729, maxLng: 8.8004 }
+		coordinates: { minLat: 50.0157, maxLat: 50.2271, minLng: 8.4729, maxLng: 8.8004 },
 	},
 	Cologne: {
 		streets: [
-			"Hohe Straße", "Schildergasse", "Ehrenstraße", "Aachener Straße", "Venloer Straße",
-			"Deutzer Brücke", "Severinstraße", "Friesenplatz", "Rudolfplatz", "Neumarkt",
-			"Heumarkt", "Domplatte", "Am Hof", "Eigelstein", "Luxemburger Straße",
-			"Ringe", "Mittelstraße", "Breite Straße", "Marsplatz", "Barbarossaplatz"
+			"Hohe Straße",
+			"Schildergasse",
+			"Ehrenstraße",
+			"Aachener Straße",
+			"Venloer Straße",
+			"Deutzer Brücke",
+			"Severinstraße",
+			"Friesenplatz",
+			"Rudolfplatz",
+			"Neumarkt",
+			"Heumarkt",
+			"Domplatte",
+			"Am Hof",
+			"Eigelstein",
+			"Luxemburger Straße",
+			"Ringe",
+			"Mittelstraße",
+			"Breite Straße",
+			"Marsplatz",
+			"Barbarossaplatz",
 		],
 		zipCodes: ["50667", "50668", "50670", "50672", "50674", "50676", "50677", "50678", "50679", "50733"],
 		state: "North Rhine-Westphalia",
-		coordinates: { minLat: 50.8333, maxLat: 51.0845, minLng: 6.7727, maxLng: 7.1619 }
-	}
+		coordinates: { minLat: 50.8333, maxLat: 51.0845, minLng: 6.7727, maxLng: 7.1619 },
+	},
 }
 
 /**
@@ -154,7 +234,7 @@ function generateCityAddress(city?: string): {
 			state: data.state,
 			zipCode: zipCode,
 			latitude: undefined,
-			longitude: undefined
+			longitude: undefined,
 		}
 	}
 
@@ -166,7 +246,7 @@ function generateCityAddress(city?: string): {
 		state: randState(),
 		zipCode: randZipCode(),
 		latitude: undefined,
-		longitude: undefined
+		longitude: undefined,
 	}
 }
 
@@ -175,8 +255,8 @@ function generateCityAddress(city?: string): {
  * Returns a mix of exterior and interior images
  */
 function getCuratedRealEstateImages(
-	propertyType: typeof propertyTypes[number],
-	count: number = 5
+	propertyType: (typeof propertyTypes)[number],
+	count: number = 5,
 ): string[] {
 	// Curated collection of real estate images from Unsplash
 	const houseImages = [
@@ -187,7 +267,7 @@ function getCuratedRealEstateImages(
 		"https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=800&h=600&q=80",
 		"https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=800&h=600&q=80",
 		"https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&h=600&q=80",
-		"https://images.unsplash.com/photo-1598228723793-52759bba239c?auto=format&fit=crop&w=800&h=600&q=80"
+		"https://images.unsplash.com/photo-1598228723793-52759bba239c?auto=format&fit=crop&w=800&h=600&q=80",
 	]
 
 	const apartmentImages = [
@@ -198,7 +278,7 @@ function getCuratedRealEstateImages(
 		"https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&h=600&q=80",
 		"https://images.unsplash.com/photo-1536376072261-38c75010e6c9?auto=format&fit=crop&w=800&h=600&q=80",
 		"https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=800&h=600&q=80",
-		"https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&h=600&q=80"
+		"https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&h=600&q=80",
 	]
 
 	const condoImages = [
@@ -209,7 +289,7 @@ function getCuratedRealEstateImages(
 		"https://images.unsplash.com/photo-1600210492493-0946911123ea?auto=format&fit=crop&w=800&h=600&q=80",
 		"https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=800&h=600&q=80",
 		"https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=800&h=600&q=80",
-		"https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&w=800&h=600&q=80"
+		"https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&w=800&h=600&q=80",
 	]
 
 	const townhouseImages = [
@@ -220,7 +300,7 @@ function getCuratedRealEstateImages(
 		"https://images.unsplash.com/photo-1599427303058-f04cbcf4756f?auto=format&fit=crop&w=800&h=600&q=80",
 		"https://images.unsplash.com/photo-1591474200742-8e512e6f98f8?auto=format&fit=crop&w=800&h=600&q=80",
 		"https://images.unsplash.com/photo-1613977257592-4871e5fcd7c4?auto=format&fit=crop&w=800&h=600&q=80",
-		"https://images.unsplash.com/photo-1628012209120-59c303676c92?auto=format&fit=crop&w=800&h=600&q=80"
+		"https://images.unsplash.com/photo-1628012209120-59c303676c92?auto=format&fit=crop&w=800&h=600&q=80",
 	]
 
 	const studioImages = [
@@ -231,7 +311,7 @@ function getCuratedRealEstateImages(
 		"https://images.unsplash.com/photo-1594398901394-4e34939a4fd0?auto=format&fit=crop&w=800&h=600&q=80",
 		"https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=800&h=600&q=80",
 		"https://images.unsplash.com/photo-1631889993959-41b4e9c6e3c5?auto=format&fit=crop&w=800&h=600&q=80",
-		"https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=800&h=600&q=80"
+		"https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=800&h=600&q=80",
 	]
 
 	const imageCollections = {
@@ -239,7 +319,7 @@ function getCuratedRealEstateImages(
 		apartment: apartmentImages,
 		condo: condoImages,
 		townhouse: townhouseImages,
-		studio: studioImages
+		studio: studioImages,
 	}
 
 	const collection = imageCollections[propertyType]
@@ -427,6 +507,70 @@ export const getPropertyById = query({
 		}
 
 		return property
+	},
+})
+
+export const getPropertiesForMap = query({
+	args: {
+		city: v.optional(v.string()),
+	},
+	returns: v.array(
+		v.object({
+			_id: v.id("properties"),
+			title: v.string(),
+			address: v.object({
+				street: v.string(),
+				city: v.string(),
+				latitude: v.number(),
+				longitude: v.number(),
+			}),
+			propertyType: propertyTypeValidator,
+			rooms: v.object({
+				bedrooms: v.number(),
+				bathrooms: v.number(),
+			}),
+			monthlyRent: v.object({
+				cold: v.optional(v.number()),
+				warm: v.optional(v.number()),
+			}),
+		}),
+	),
+	handler: async (ctx, args) => {
+		let query = ctx.db.query("properties").withIndex("by_status", (q) => q.eq("status", "active"))
+
+		if (args.city) {
+			query = ctx.db
+				.query("properties")
+				.withIndex("by_status_and_city", (q) =>
+					q.eq("status", "active").eq("address.city", args.city!),
+				)
+		}
+
+		const properties = await query.collect()
+
+		// Filter properties that have valid coordinates
+		const propertiesWithCoordinates = properties.filter(
+			(p) =>
+				p.address.latitude !== undefined &&
+				p.address.longitude !== undefined &&
+				p.address.latitude !== null &&
+				p.address.longitude !== null,
+		)
+
+		// Return only the necessary data for map display
+		return propertiesWithCoordinates.map((p) => ({
+			_id: p._id,
+			title: p.title,
+			address: {
+				street: p.address.street,
+				city: p.address.city,
+				latitude: p.address.latitude as number,
+				longitude: p.address.longitude as number,
+			},
+			propertyType: p.propertyType,
+			rooms: p.rooms,
+			monthlyRent: p.monthlyRent,
+		}))
 	},
 })
 

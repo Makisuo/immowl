@@ -1,5 +1,6 @@
 import { createFileRoute, Navigate, Outlet, redirect } from "@tanstack/react-router"
 import { Authenticated, AuthLoading, Unauthenticated } from "convex/react"
+import Threads from "~/components/shaders/threads"
 
 export const Route = createFileRoute("/_app/_authed")({
 	component: RouteComponent,
@@ -19,7 +20,16 @@ function RouteComponent() {
 			<Authenticated>
 				<Outlet />
 			</Authenticated>
-			<AuthLoading>Loading...</AuthLoading>
+			<AuthLoading>
+				<div style={{ width: "100%", height: "500px", position: "relative" }}>
+					<Threads
+						amplitude={2}
+						distance={0.3}
+						color={[0.1, 0.5, 1.0]}
+						enableMouseInteraction={false}
+					/>
+				</div>
+			</AuthLoading>
 		</div>
 	)
 }
