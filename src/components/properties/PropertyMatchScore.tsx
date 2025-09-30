@@ -1,4 +1,7 @@
 import type { Doc } from "convex/_generated/dataModel"
+import { convexQuery } from "@convex-dev/react-query"
+import { useQuery } from "@tanstack/react-query"
+import { api } from "convex/_generated/api"
 import { AlertCircle, CheckCircle2, DollarSign, Home, MapPin, Ruler, TrendingUp, XCircle } from "lucide-react"
 import { Badge } from "~/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
@@ -8,118 +11,214 @@ interface PropertyMatchScoreProps {
 	property: Doc<"properties">
 }
 
-// Mock user preferences for demonstration
-const MOCK_USER_PREFERENCES = {
-	maxBudget: 2000,
-	minBedrooms: 2,
-	maxBedrooms: 3,
-	minSquareMeters: 60,
-	maxSquareMeters: 80,
-	preferredCities: ["Berlin", "Munich", "Hamburg"],
-	requiresPetFriendly: false,
-	prefersFurnished: true,
-}
-
 export function PropertyMatchScore({ property }: PropertyMatchScoreProps) {
+	// Fetch user's first saved search (single profile model)
+	const { data: savedSearchData } = useQuery(
+		convexQuery(api.savedSearches.listUserSavedSearches, {
+			paginationOpts: { numItems: 1, cursor: null },
+		}),
+	)
+
+	const saved = savedSearchData?.page?.[0] as any | undefined
+	const criteria = saved?.criteria ?? (saved
+		? {
+			city: (saved as any).city,
+			country: (saved as any).country,
+			propertyType: (saved as any).propertyType,
+			minPrice: (saved as any).minPrice,
+			maxPrice: (saved as any).maxPrice,
+			bedrooms: (saved as any).bedrooms,
+			bathrooms: (saved as any).bathrooms,
+			amenities: (saved as any).amenities,
+			petFriendly: (saved as any).petFriendly,
+			furnished: (saved as any).furnished,
+		}
+		: undefined)
+
+	// Derived preferences used by scoring functions
+	const prefs = {
+		maxBudget: (criteria?.maxPrice as number | undefined) ?? null,
+		minBudget: (criteria?.minPrice as number | undefined) ?? null,
+		desiredBedrooms: (criteria?.bedrooms as number | undefined) ?? null,
+		desiredBathrooms: (criteria?.bathrooms as number | undefined) ?? null,
+		preferredCity: (criteria?.city as string | undefined) ?? null,
+		preferredPropertyType: (criteria?.propertyType as string | undefined) ?? null,
+		requiresPetFriendly: criteria?.petFriendly === true,
+		prefersFurnished: criteria?.furnished === true,
+		desiredAmenities: (criteria?.amenities as string[] | undefined) ?? [],
+		minSquareMeters: (criteria?.minSquareMeters as number | undefined) ?? null,
+		maxSquareMeters: (criteria?.maxSquareMeters as number | undefined) ?? null,
+	}
+
+	// Extract weights from saved search (0-100 integers)
+	const rawWeights = (criteria?.weights as any) ?? {}
 	// Calculate individual scores
 	const calculatePriceScore = () => {
 		const rent = property.monthlyRent.warm || property.monthlyRent.cold || 0
 		if (rent === 0) return 0
-		if (rent <= MOCK_USER_PREFERENCES.maxBudget) {
+		if (!prefs.maxBudget) return 70 // Neutral score when no budget specified
+		if (rent <= prefs.maxBudget) {
 			// Perfect if under budget, scale down as it approaches budget
-			return Math.min(100, 100 - (rent / MOCK_USER_PREFERENCES.maxBudget - 0.7) * 100)
+			return Math.min(100, 100 - (rent / prefs.maxBudget - 0.7) * 100)
 		}
 		// Over budget - reduce score proportionally
-		const overBudgetPercent =
-			((rent - MOCK_USER_PREFERENCES.maxBudget) / MOCK_USER_PREFERENCES.maxBudget) * 100
+		const overBudgetPercent = ((rent - prefs.maxBudget) / prefs.maxBudget) * 100
 		return Math.max(0, 100 - overBudgetPercent * 2)
 	}
 
 	const calculateSizeScore = () => {
 		const size = property.squareMeters
-		const { minSquareMeters, maxSquareMeters } = MOCK_USER_PREFERENCES
+		const minSM = prefs.minSquareMeters
+		const maxSM = prefs.maxSquareMeters
 
-		if (size >= minSquareMeters && size <= maxSquareMeters) {
-			return 100 // Perfect match
+		// If no size preferences, neutral score
+		if (minSM == null && maxSM == null) return 70
+
+		// Only min specified
+		if (minSM != null && maxSM == null) {
+			if (size >= minSM) return 100
+			const deficit = minSM - size
+			return Math.max(0, 100 - (deficit / Math.max(1, minSM)) * 100)
 		}
 
-		if (size < minSquareMeters) {
-			const deficit = minSquareMeters - size
-			return Math.max(0, 100 - (deficit / minSquareMeters) * 100)
+		// Only max specified
+		if (minSM == null && maxSM != null) {
+			if (size <= maxSM) return 100
+			const excess = size - maxSM
+			return Math.max(50, 100 - (excess / Math.max(1, maxSM)) * 50)
 		}
 
-		if (size > maxSquareMeters) {
-			const excess = size - maxSquareMeters
-			return Math.max(50, 100 - (excess / maxSquareMeters) * 50) // Less penalty for too big
+		// Both specified
+		if (minSM != null && maxSM != null) {
+			if (size >= minSM && size <= maxSM) return 100
+			if (size < minSM) {
+				const deficit = minSM - size
+				return Math.max(0, 100 - (deficit / Math.max(1, minSM)) * 100)
+			}
+			if (size > maxSM) {
+				const excess = size - maxSM
+				return Math.max(50, 100 - (excess / Math.max(1, maxSM)) * 50)
+			}
 		}
 
-		return 50
+		return 70
 	}
 
 	const calculateBedroomScore = () => {
 		const bedrooms = property.rooms.bedrooms
-		const { minBedrooms, maxBedrooms } = MOCK_USER_PREFERENCES
+		const desired = prefs.desiredBedrooms
+		if (desired == null) return 70 // Neutral when not specified
+		if (bedrooms === desired) return 100
+		if (bedrooms > desired) return 80 // More rooms is often acceptable
+		// Fewer than desired
+		return bedrooms === 0 ? 40 : 60
+	}
 
-		if (bedrooms >= minBedrooms && bedrooms <= maxBedrooms) {
-			return 100
-		}
-
-		if (bedrooms < minBedrooms) {
-			return bedrooms === 0 ? 40 : 70 // Studio gets lower score
-		}
-
-		if (bedrooms > maxBedrooms) {
-			return 80 // Not bad to have more rooms
-		}
-
-		return 50
+	const calculateBathroomScore = () => {
+		const bathrooms = property.rooms.bathrooms
+		const desired = prefs.desiredBathrooms
+		if (desired == null) return 70 // Neutral when not specified
+		if (bathrooms >= desired) return 100 // More is fine
+		// Fewer than desired
+		const deficit = desired - bathrooms
+		return Math.max(40, 100 - deficit * 30)
 	}
 
 	const calculateLocationScore = () => {
 		const city = property.address.city
-		if (MOCK_USER_PREFERENCES.preferredCities.includes(city)) {
+		if (prefs.preferredCity && prefs.preferredCity === city) {
 			return 100
 		}
 		// Could enhance with distance calculation in real implementation
 		return 60
 	}
 
+	const calculatePropertyTypeScore = () => {
+		if (!prefs.preferredPropertyType) return 70 // Neutral when not specified
+		if (property.propertyType === prefs.preferredPropertyType) return 100
+		return 50 // Mismatch
+	}
+
+	const calculatePetFriendlyScore = () => {
+		if (!prefs.requiresPetFriendly) return 70 // Neutral when not required
+		if (property.petFriendly) return 100
+		return 0 // Required but not available
+	}
+
+	const calculateFurnishedScore = () => {
+		if (!prefs.prefersFurnished) return 70 // Neutral when not preferred
+		if (property.furnished) return 100
+		return 50 // Preferred but not available
+	}
+
 	const calculateAmenitiesScore = () => {
 		let score = 70 // Base score
 
-		if (MOCK_USER_PREFERENCES.prefersFurnished && property.furnished) {
-			score += 15
-		}
-
-		if (MOCK_USER_PREFERENCES.requiresPetFriendly && !property.petFriendly) {
-			score -= 30
-		} else if (property.petFriendly) {
-			score += 5 // Bonus even if not required
-		}
-
-		// Bonus for amenities count
-		if (property.amenities && property.amenities.length > 0) {
-			score += Math.min(10, property.amenities.length * 2)
+		// Only count amenity overlap (pet/furnished handled separately)
+		if (prefs.desiredAmenities.length > 0 && property.amenities && property.amenities.length > 0) {
+			const matches = property.amenities.filter((a) => prefs.desiredAmenities.includes(a)).length
+			const matchRate = matches / prefs.desiredAmenities.length
+			score = 70 + matchRate * 30 // Scale from 70 to 100 based on match rate
 		}
 
 		return Math.min(100, Math.max(0, score))
 	}
 
-	// Calculate scores
+	// Calculate all scores
 	const priceScore = calculatePriceScore()
 	const sizeScore = calculateSizeScore()
 	const bedroomScore = calculateBedroomScore()
+	const bathroomScore = calculateBathroomScore()
 	const locationScore = calculateLocationScore()
+	const propertyTypeScore = calculatePropertyTypeScore()
+	const petFriendlyScore = calculatePetFriendlyScore()
+	const furnishedScore = calculateFurnishedScore()
 	const amenitiesScore = calculateAmenitiesScore()
 
-	// Calculate overall score (weighted average)
-	const overallScore = Math.round(
-		priceScore * 0.35 + // Price is most important
-			sizeScore * 0.2 +
-			bedroomScore * 0.2 +
-			locationScore * 0.15 +
-			amenitiesScore * 0.1,
-	)
+	// Build weight map with user weights or defaults
+	const weightMap: Record<string, number> = {
+		price: rawWeights.price ?? 35,
+		location: rawWeights.location ?? 15,
+		bedrooms: rawWeights.bedrooms ?? 20,
+		bathrooms: rawWeights.bathrooms ?? 10,
+		propertyType: rawWeights.propertyType ?? 5,
+		petFriendly: rawWeights.petFriendly ?? 5,
+		furnished: rawWeights.furnished ?? 5,
+		amenities: rawWeights.amenities ?? 5,
+	}
+
+	// Add size weight only if size criteria is set
+	if (prefs.minSquareMeters != null || prefs.maxSquareMeters != null) {
+		weightMap.size = 15
+	}
+
+	// Normalize weights to sum to 1
+	const totalWeight = Object.values(weightMap).reduce((sum, w) => sum + w, 0)
+	const normalizedWeights: Record<string, number> = {}
+	for (const [key, weight] of Object.entries(weightMap)) {
+		normalizedWeights[key] = totalWeight > 0 ? weight / totalWeight : 0
+	}
+
+	// Calculate weighted overall score
+	const scoreMap: Record<string, number> = {
+		price: priceScore,
+		location: locationScore,
+		bedrooms: bedroomScore,
+		bathrooms: bathroomScore,
+		propertyType: propertyTypeScore,
+		petFriendly: petFriendlyScore,
+		furnished: furnishedScore,
+		amenities: amenitiesScore,
+	}
+	if (weightMap.size) {
+		scoreMap.size = sizeScore
+	}
+
+	let overallScore = 0
+	for (const [key, score] of Object.entries(scoreMap)) {
+		overallScore += score * (normalizedWeights[key] ?? 0)
+	}
+	overallScore = Math.round(overallScore)
 
 	// Determine match quality
 	const getMatchQuality = (score: number) => {
@@ -166,12 +265,12 @@ export function PropertyMatchScore({ property }: PropertyMatchScoreProps) {
 							</span>
 							<span
 								className={
-									rent <= MOCK_USER_PREFERENCES.maxBudget
+									rent <= (prefs.maxBudget ?? Infinity)
 										? "text-green-600"
 										: "text-orange-600"
 								}
 							>
-								${rent} / ${MOCK_USER_PREFERENCES.maxBudget}
+								${rent} / ${prefs.maxBudget ?? "-"}
 							</span>
 						</div>
 						<Progress value={priceScore} className="h-1.5" />
@@ -217,28 +316,27 @@ export function PropertyMatchScore({ property }: PropertyMatchScoreProps) {
 				{/* Quick Insights */}
 				<div className="pt-2 border-t">
 					<div className="flex flex-wrap gap-1.5">
-						{rent <= MOCK_USER_PREFERENCES.maxBudget && (
+						{prefs.maxBudget != null && rent <= prefs.maxBudget && (
 							<Badge variant="outline" className="text-green-600 border-green-200">
 								Within Budget
 							</Badge>
 						)}
-						{property.rooms.bedrooms >= MOCK_USER_PREFERENCES.minBedrooms &&
-							property.rooms.bedrooms <= MOCK_USER_PREFERENCES.maxBedrooms && (
+						{prefs.desiredBedrooms != null &&
+							property.rooms.bedrooms === prefs.desiredBedrooms && (
 								<Badge variant="outline" className="text-blue-600 border-blue-200">
-									Ideal Size
+									Desired Rooms
 								</Badge>
 							)}
-						{property.furnished && MOCK_USER_PREFERENCES.prefersFurnished && (
+						{property.furnished && prefs.prefersFurnished && (
 							<Badge variant="outline" className="text-purple-600 border-purple-200">
 								Furnished
 							</Badge>
 						)}
-						{!property.availableFrom ||
-							(property.availableFrom <= Date.now() && (
-								<Badge variant="outline" className="text-green-600 border-green-200">
-									Available Now
-								</Badge>
-							))}
+						{(!property.availableFrom || property.availableFrom <= Date.now()) && (
+							<Badge variant="outline" className="text-green-600 border-green-200">
+								Available Now
+							</Badge>
+						)}
 					</div>
 				</div>
 			</CardContent>
