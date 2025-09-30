@@ -18,7 +18,7 @@ import { cn } from "~/lib/utils"
 
 const menuItems = [
 	{ name: "Search", href: "/search" },
-	{ name: "Search Profile", href: "/search-profile" },
+	{ name: "Profile", href: "/profile" },
 	{ name: "Saved", href: "/saved" },
 ]
 
@@ -141,7 +141,7 @@ export const AppHeader = () => {
 											</DropdownMenuLabel>
 											<DropdownMenuSeparator />
 											<DropdownMenuItem asChild>
-												<Link to="/search-profile" className="cursor-pointer">
+												<Link to="/profile" className="cursor-pointer">
 													<Search className="mr-2 h-4 w-4" />
 													<span>Search Profile</span>
 												</Link>

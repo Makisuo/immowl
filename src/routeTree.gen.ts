@@ -21,7 +21,6 @@ import { Route as AppAuthedLayoutRouteImport } from './routes/_app/_authed/layou
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AppPropertyPropertyIdRouteImport } from './routes/_app/property.$propertyId'
 import { Route as AppAuthedUserRouteImport } from './routes/_app/_authed/user'
-import { Route as AppAuthedSearchProfileRouteImport } from './routes/_app/_authed/search-profile'
 import { Route as AppAuthedSavedRouteImport } from './routes/_app/_authed/saved'
 import { Route as AppAuthedProfileRouteImport } from './routes/_app/_authed/profile'
 import { Route as AppAuthedOwnersRouteImport } from './routes/_app/_authed/owners'
@@ -84,11 +83,6 @@ const AppAuthedUserRoute = AppAuthedUserRouteImport.update({
   path: '/user',
   getParentRoute: () => AppAuthedLayoutRoute,
 } as any)
-const AppAuthedSearchProfileRoute = AppAuthedSearchProfileRouteImport.update({
-  id: '/search-profile',
-  path: '/search-profile',
-  getParentRoute: () => AppAuthedLayoutRoute,
-} as any)
 const AppAuthedSavedRoute = AppAuthedSavedRouteImport.update({
   id: '/saved',
   path: '/saved',
@@ -121,7 +115,6 @@ export interface FileRoutesByFullPath {
   '/owners': typeof AppAuthedOwnersRoute
   '/profile': typeof AppAuthedProfileRoute
   '/saved': typeof AppAuthedSavedRoute
-  '/search-profile': typeof AppAuthedSearchProfileRoute
   '/user': typeof AppAuthedUserRoute
   '/property/$propertyId': typeof AppPropertyPropertyIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -137,7 +130,6 @@ export interface FileRoutesByTo {
   '/owners': typeof AppAuthedOwnersRoute
   '/profile': typeof AppAuthedProfileRoute
   '/saved': typeof AppAuthedSavedRoute
-  '/search-profile': typeof AppAuthedSearchProfileRoute
   '/user': typeof AppAuthedUserRoute
   '/property/$propertyId': typeof AppPropertyPropertyIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -157,7 +149,6 @@ export interface FileRoutesById {
   '/_app/_authed/owners': typeof AppAuthedOwnersRoute
   '/_app/_authed/profile': typeof AppAuthedProfileRoute
   '/_app/_authed/saved': typeof AppAuthedSavedRoute
-  '/_app/_authed/search-profile': typeof AppAuthedSearchProfileRoute
   '/_app/_authed/user': typeof AppAuthedUserRoute
   '/_app/property/$propertyId': typeof AppPropertyPropertyIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -175,7 +166,6 @@ export interface FileRouteTypes {
     | '/owners'
     | '/profile'
     | '/saved'
-    | '/search-profile'
     | '/user'
     | '/property/$propertyId'
     | '/api/auth/$'
@@ -191,7 +181,6 @@ export interface FileRouteTypes {
     | '/owners'
     | '/profile'
     | '/saved'
-    | '/search-profile'
     | '/user'
     | '/property/$propertyId'
     | '/api/auth/$'
@@ -210,7 +199,6 @@ export interface FileRouteTypes {
     | '/_app/_authed/owners'
     | '/_app/_authed/profile'
     | '/_app/_authed/saved'
-    | '/_app/_authed/search-profile'
     | '/_app/_authed/user'
     | '/_app/property/$propertyId'
     | '/api/auth/$'
@@ -308,13 +296,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAuthedUserRouteImport
       parentRoute: typeof AppAuthedLayoutRoute
     }
-    '/_app/_authed/search-profile': {
-      id: '/_app/_authed/search-profile'
-      path: '/search-profile'
-      fullPath: '/search-profile'
-      preLoaderRoute: typeof AppAuthedSearchProfileRouteImport
-      parentRoute: typeof AppAuthedLayoutRoute
-    }
     '/_app/_authed/saved': {
       id: '/_app/_authed/saved'
       path: '/saved'
@@ -351,7 +332,6 @@ interface AppAuthedLayoutRouteChildren {
   AppAuthedOwnersRoute: typeof AppAuthedOwnersRoute
   AppAuthedProfileRoute: typeof AppAuthedProfileRoute
   AppAuthedSavedRoute: typeof AppAuthedSavedRoute
-  AppAuthedSearchProfileRoute: typeof AppAuthedSearchProfileRoute
   AppAuthedUserRoute: typeof AppAuthedUserRoute
 }
 
@@ -360,7 +340,6 @@ const AppAuthedLayoutRouteChildren: AppAuthedLayoutRouteChildren = {
   AppAuthedOwnersRoute: AppAuthedOwnersRoute,
   AppAuthedProfileRoute: AppAuthedProfileRoute,
   AppAuthedSavedRoute: AppAuthedSavedRoute,
-  AppAuthedSearchProfileRoute: AppAuthedSearchProfileRoute,
   AppAuthedUserRoute: AppAuthedUserRoute,
 }
 
