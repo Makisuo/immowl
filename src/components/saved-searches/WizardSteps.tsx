@@ -75,7 +75,8 @@ export function Step2Location({ form }: { form: any }) {
 							value={countryField.state.value}
 							onChange={(e) => countryField.handleChange(e.target.value)}
 							onBlur={countryField.handleBlur}
-							placeholder="e.g., Germany, Austria, Switzerland"
+							placeholder="Germany (Fixed)"
+							disabled
 						/>
 					</FormField>
 				</div>

@@ -82,7 +82,7 @@ export function SavedSearchWizard({ onComplete, initialData }: SavedSearchWizard
 	const defaultValues: WizardFormData = {
 		criteria: {
 			city: initialData?.criteria?.city || "",
-			country: initialData?.criteria?.country || "",
+			country: initialData?.criteria?.country || "DE",
 			propertyType: initialData?.criteria?.propertyType,
 			minPrice: initialData?.criteria?.minPrice,
 			maxPrice: initialData?.criteria?.maxPrice,
