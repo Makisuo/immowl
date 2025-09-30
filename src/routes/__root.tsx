@@ -15,6 +15,7 @@ import type { ConvexReactClient } from "convex/react"
 import type * as React from "react"
 import { Toaster } from "sonner"
 import { authClient } from "~/lib/auth.client"
+
 import appCss from "~/styles/app.css?url"
 
 const fetchAuth = createServerFn({ method: "GET" }).handler(async (_ctx) => {
