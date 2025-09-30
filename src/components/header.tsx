@@ -139,13 +139,7 @@ export const AppHeader = () => {
 													</p>
 												</div>
 											</DropdownMenuLabel>
-											<DropdownMenuSeparator />
-											<DropdownMenuItem asChild>
-												<Link to="/profile" className="cursor-pointer">
-													<Search className="mr-2 h-4 w-4" />
-													<span>Search Profile</span>
-												</Link>
-											</DropdownMenuItem>
+										
 											<DropdownMenuItem asChild>
 												<Link
 													to="/saved"
