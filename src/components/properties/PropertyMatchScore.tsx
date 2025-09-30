@@ -9,6 +9,12 @@ import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { Progress } from "~/components/ui/progress"
 import { useAuth } from "~/hooks/use-auth"
+import {
+	calculateMatchScore,
+	getMatchQuality,
+	type UserPreferences,
+	type CriteriaWeights,
+} from "~/utils/propertyMatching"
 
 interface PropertyMatchScoreProps {
 	property: Doc<"properties">
@@ -41,12 +47,15 @@ export function PropertyMatchScore({ property }: PropertyMatchScoreProps) {
 			: undefined)
 
 	// Derived preferences used by scoring functions
-	const prefs = {
+	const preferences: UserPreferences = {
 		maxBudget: (criteria?.maxPrice as number | undefined) ?? null,
 		minBudget: (criteria?.minPrice as number | undefined) ?? null,
 		desiredBedrooms: (criteria?.bedrooms as number | undefined) ?? null,
 		desiredBathrooms: (criteria?.bathrooms as number | undefined) ?? null,
 		preferredCity: (criteria?.city as string | undefined) ?? null,
+		preferredLatitude: null, // Could be added to saved search in future
+		preferredLongitude: null,
+		maxDistanceKm: 30, // Default 30km radius
 		preferredPropertyType: (criteria?.propertyType as string | undefined) ?? null,
 		requiresPetFriendly: criteria?.petFriendly === true,
 		prefersFurnished: criteria?.furnished === true,
@@ -57,186 +66,39 @@ export function PropertyMatchScore({ property }: PropertyMatchScoreProps) {
 
 	// Extract weights from saved search (0-100 integers)
 	const rawWeights = (criteria?.weights as any) ?? {}
+	const userWeights: Partial<CriteriaWeights> = {
+		price: rawWeights.price,
+		location: rawWeights.location,
+		bedrooms: rawWeights.bedrooms,
+		bathrooms: rawWeights.bathrooms,
+		propertyType: rawWeights.propertyType,
+		petFriendly: rawWeights.petFriendly,
+		furnished: rawWeights.furnished,
+		amenities: rawWeights.amenities,
+		size: rawWeights.size,
+	}
+
 	const { isAuthenticated } = useAuth()
 
-	// Calculate individual scores
-	const calculatePriceScore = () => {
-		const rent = property.monthlyRent.warm || property.monthlyRent.cold || 0
-		if (rent === 0) return 0
-		if (!prefs.maxBudget) return 70 // Neutral score when no budget specified
-		if (rent <= prefs.maxBudget) {
-			// Perfect if under budget, scale down as it approaches budget
-			return Math.min(100, 100 - (rent / prefs.maxBudget - 0.7) * 100)
-		}
-		// Over budget - reduce score proportionally
-		const overBudgetPercent = ((rent - prefs.maxBudget) / prefs.maxBudget) * 100
-		return Math.max(0, 100 - overBudgetPercent * 2)
-	}
+	// Calculate match score using the new utility
+	const matchScore = calculateMatchScore(property, preferences, userWeights)
+	const { overall: overallScore, breakdown } = matchScore
 
-	const calculateSizeScore = () => {
-		const size = property.squareMeters
-		const minSM = prefs.minSquareMeters
-		const maxSM = prefs.maxSquareMeters
-
-		// If no size preferences, neutral score
-		if (minSM == null && maxSM == null) return 70
-
-		// Only min specified
-		if (minSM != null && maxSM == null) {
-			if (size >= minSM) return 100
-			const deficit = minSM - size
-			return Math.max(0, 100 - (deficit / Math.max(1, minSM)) * 100)
-		}
-
-		// Only max specified
-		if (minSM == null && maxSM != null) {
-			if (size <= maxSM) return 100
-			const excess = size - maxSM
-			return Math.max(50, 100 - (excess / Math.max(1, maxSM)) * 50)
-		}
-
-		// Both specified
-		if (minSM != null && maxSM != null) {
-			if (size >= minSM && size <= maxSM) return 100
-			if (size < minSM) {
-				const deficit = minSM - size
-				return Math.max(0, 100 - (deficit / Math.max(1, minSM)) * 100)
-			}
-			if (size > maxSM) {
-				const excess = size - maxSM
-				return Math.max(50, 100 - (excess / Math.max(1, maxSM)) * 50)
-			}
-		}
-
-		return 70
-	}
-
-	const calculateBedroomScore = () => {
-		const bedrooms = property.rooms.bedrooms
-		const desired = prefs.desiredBedrooms
-		if (desired == null) return 70 // Neutral when not specified
-		if (bedrooms === desired) return 100
-		if (bedrooms > desired) return 80 // More rooms is often acceptable
-		// Fewer than desired
-		return bedrooms === 0 ? 40 : 60
-	}
-
-	const calculateBathroomScore = () => {
-		const bathrooms = property.rooms.bathrooms
-		const desired = prefs.desiredBathrooms
-		if (desired == null) return 70 // Neutral when not specified
-		if (bathrooms >= desired) return 100 // More is fine
-		// Fewer than desired
-		const deficit = desired - bathrooms
-		return Math.max(40, 100 - deficit * 30)
-	}
-
-	const calculateLocationScore = () => {
-		const city = property.address.city
-		if (prefs.preferredCity && prefs.preferredCity === city) {
-			return 100
-		}
-		// Could enhance with distance calculation in real implementation
-		return 60
-	}
-
-	const calculatePropertyTypeScore = () => {
-		if (!prefs.preferredPropertyType) return 70 // Neutral when not specified
-		if (property.propertyType === prefs.preferredPropertyType) return 100
-		return 50 // Mismatch
-	}
-
-	const calculatePetFriendlyScore = () => {
-		if (!prefs.requiresPetFriendly) return 70 // Neutral when not required
-		if (property.petFriendly) return 100
-		return 0 // Required but not available
-	}
-
-	const calculateFurnishedScore = () => {
-		if (!prefs.prefersFurnished) return 70 // Neutral when not preferred
-		if (property.furnished) return 100
-		return 50 // Preferred but not available
-	}
-
-	const calculateAmenitiesScore = () => {
-		let score = 70 // Base score
-
-		// Only count amenity overlap (pet/furnished handled separately)
-		if (prefs.desiredAmenities.length > 0 && property.amenities && property.amenities.length > 0) {
-			const matches = property.amenities.filter((a) => prefs.desiredAmenities.includes(a)).length
-			const matchRate = matches / prefs.desiredAmenities.length
-			score = 70 + matchRate * 30 // Scale from 70 to 100 based on match rate
-		}
-
-		return Math.min(100, Math.max(0, score))
-	}
-
-	// Calculate all scores
-	const priceScore = calculatePriceScore()
-	const sizeScore = calculateSizeScore()
-	const bedroomScore = calculateBedroomScore()
-	const bathroomScore = calculateBathroomScore()
-	const locationScore = calculateLocationScore()
-	const propertyTypeScore = calculatePropertyTypeScore()
-	const petFriendlyScore = calculatePetFriendlyScore()
-	const furnishedScore = calculateFurnishedScore()
-	const amenitiesScore = calculateAmenitiesScore()
-
-	// Build weight map with user weights or defaults
-	const weightMap: Record<string, number> = {
-		price: rawWeights.price ?? 35,
-		location: rawWeights.location ?? 15,
-		bedrooms: rawWeights.bedrooms ?? 20,
-		bathrooms: rawWeights.bathrooms ?? 10,
-		propertyType: rawWeights.propertyType ?? 5,
-		petFriendly: rawWeights.petFriendly ?? 5,
-		furnished: rawWeights.furnished ?? 5,
-		amenities: rawWeights.amenities ?? 5,
-	}
-
-	// Add size weight only if size criteria is set
-	if (prefs.minSquareMeters != null || prefs.maxSquareMeters != null) {
-		weightMap.size = 15
-	}
-
-	// Normalize weights to sum to 1
-	const totalWeight = Object.values(weightMap).reduce((sum, w) => sum + w, 0)
-	const normalizedWeights: Record<string, number> = {}
-	for (const [key, weight] of Object.entries(weightMap)) {
-		normalizedWeights[key] = totalWeight > 0 ? weight / totalWeight : 0
-	}
-
-	// Calculate weighted overall score
-	const scoreMap: Record<string, number> = {
-		price: priceScore,
-		location: locationScore,
-		bedrooms: bedroomScore,
-		bathrooms: bathroomScore,
-		propertyType: propertyTypeScore,
-		petFriendly: petFriendlyScore,
-		furnished: furnishedScore,
-		amenities: amenitiesScore,
-	}
-	if (weightMap.size) {
-		scoreMap.size = sizeScore
-	}
-
-	let overallScore = 0
-	for (const [key, score] of Object.entries(scoreMap)) {
-		overallScore += score * (normalizedWeights[key] ?? 0)
-	}
-	overallScore = Math.round(overallScore)
+	// Get individual scores for display (use 0 for null scores in UI)
+	const priceScore = breakdown.price ?? 0
+	const sizeScore = breakdown.size ?? 0
+	const bedroomScore = breakdown.bedrooms ?? 0
+	const locationScore = breakdown.location ?? 0
 
 	// Determine match quality
-	const getMatchQuality = (score: number) => {
-		if (score >= 85) return { label: "Excellent Match", color: "bg-green-500", icon: CheckCircle2 }
-		if (score >= 70) return { label: "Good Match", color: "bg-blue-500", icon: TrendingUp }
-		if (score >= 50) return { label: "Fair Match", color: "bg-yellow-500", icon: AlertCircle }
-		return { label: "Poor Match", color: "bg-red-500", icon: XCircle }
+	const matchQualityData = getMatchQuality(overallScore)
+	const getMatchIcon = (label: string) => {
+		if (label === "Excellent Match") return CheckCircle2
+		if (label === "Good Match") return TrendingUp
+		if (label === "Fair Match") return AlertCircle
+		return XCircle
 	}
-
-	const matchQuality = getMatchQuality(overallScore)
-	const MatchIcon = matchQuality.icon
+	const MatchIcon = getMatchIcon(matchQualityData.label)
 
 	const rent = property.monthlyRent.warm || property.monthlyRent.cold || 0
 
@@ -255,9 +117,9 @@ export function PropertyMatchScore({ property }: PropertyMatchScoreProps) {
 			<CardHeader className="pb-4">
 				<div className="flex items-center justify-between">
 					<CardTitle className="text-lg">Match Score</CardTitle>
-					<Badge variant="secondary" className={`${matchQuality.color} border-0 text-white`}>
+					<Badge variant="secondary" className={`${matchQualityData.color} border-0 text-white`}>
 						<MatchIcon className="mr-1 h-3 w-3" />
-						{matchQuality.label}
+						{matchQualityData.label}
 					</Badge>
 				</div>
 			</CardHeader>
@@ -282,12 +144,12 @@ export function PropertyMatchScore({ property }: PropertyMatchScoreProps) {
 							</span>
 							<span
 								className={
-									rent <= (prefs.maxBudget ?? Infinity)
+									rent <= (preferences.maxBudget ?? Infinity)
 										? "text-green-600"
 										: "text-orange-600"
 								}
 							>
-								${rent} / ${prefs.maxBudget ?? "-"}
+								€{rent} / €{preferences.maxBudget ?? "-"}
 							</span>
 						</div>
 						<Progress value={priceScore} className="h-1.5" />
@@ -333,18 +195,18 @@ export function PropertyMatchScore({ property }: PropertyMatchScoreProps) {
 				{/* Quick Insights */}
 				<div className="border-t pt-2">
 					<div className="flex flex-wrap gap-1.5">
-						{prefs.maxBudget != null && rent <= prefs.maxBudget && (
+						{preferences.maxBudget != null && rent <= preferences.maxBudget && (
 							<Badge variant="outline" className="border-green-200 text-green-600">
 								Within Budget
 							</Badge>
 						)}
-						{prefs.desiredBedrooms != null &&
-							property.rooms.bedrooms === prefs.desiredBedrooms && (
+						{preferences.desiredBedrooms != null &&
+							property.rooms.bedrooms === preferences.desiredBedrooms && (
 								<Badge variant="outline" className="border-blue-200 text-blue-600">
 									Desired Rooms
 								</Badge>
 							)}
-						{property.furnished && prefs.prefersFurnished && (
+						{property.furnished && preferences.prefersFurnished && (
 							<Badge variant="outline" className="border-purple-200 text-purple-600">
 								Furnished
 							</Badge>
