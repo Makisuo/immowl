@@ -3,13 +3,13 @@ import { useForm } from "@tanstack/react-form"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { api } from "convex/_generated/api"
-import { Plus, Sparkles } from "lucide-react"
+import { Filter, Plus, Sparkles } from "lucide-react"
 import { useMemo, useState } from "react"
 import { toast } from "sonner"
 
 import { SearchProfileWizardModal } from "~/components/saved-searches/SearchProfileWizardModal"
 import { Button } from "~/components/ui/button"
-import { Card, CardContent } from "~/components/ui/card"
+import { Card, CardContent, CardHeader } from "~/components/ui/card"
 import { Checkbox } from "~/components/ui/checkbox"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
@@ -159,18 +159,58 @@ function SearchRequestsPage() {
 		<div className="container mx-auto max-w-4xl px-4 py-8">
 			{/* Header */}
 			<div className="mb-12">
-				<div className="space-y-1">
-					<h1 className="font-light text-3xl tracking-tight">Search Profile</h1>
-					<p className="text-muted-foreground text-sm">
-						{existingSearch
-							? "Your personalized search preferences for finding properties"
-							: "Create your search profile to find the perfect property"}
-					</p>
+				<div className="flex items-center gap-3">
+					<Filter className="h-6 w-6 text-blue-600" />
+					<div>
+						<h1 className="font-light text-2xl tracking-tight sm:text-3xl">Search Profile</h1>
+						<p className="mt-1 text-muted-foreground text-sm">
+							{existingSearch
+								? "Your personalized search preferences for finding properties"
+								: "Create your search profile to find the perfect property"}
+						</p>
+					</div>
 				</div>
 			</div>
 
 			{/* Loading State */}
-			{isLoading && <div className="text-muted-foreground text-sm">Loading your search profile...</div>}
+			{isLoading && (
+				<div className="space-y-4">
+					{/* Profile Completion Skeleton */}
+					<Card className="animate-pulse">
+						<CardContent className="pt-6">
+							<div className="space-y-3">
+								<div className="flex items-center justify-between">
+									<div className="space-y-2">
+										<div className="h-4 w-32 rounded bg-muted"></div>
+										<div className="h-3 w-48 rounded bg-muted"></div>
+									</div>
+									<div className="h-8 w-12 rounded bg-muted"></div>
+								</div>
+								<div className="h-2 rounded-full bg-muted"></div>
+							</div>
+						</CardContent>
+					</Card>
+
+					{/* Form Sections Skeleton */}
+					{Array.from({ length: 5 }).map((_, i) => (
+						<Card key={i} className="animate-pulse">
+							<CardHeader>
+								<div className="h-6 w-1/3 rounded bg-muted"></div>
+								<div className="mt-2 h-4 w-2/3 rounded bg-muted"></div>
+							</CardHeader>
+							<CardContent>
+								<div className="space-y-4">
+									<div className="grid gap-4 md:grid-cols-2">
+										<div className="h-10 rounded bg-muted"></div>
+										<div className="h-10 rounded bg-muted"></div>
+									</div>
+									<div className="h-10 rounded bg-muted"></div>
+								</div>
+							</CardContent>
+						</Card>
+					))}
+				</div>
+			)}
 
 			{/* Error State */}
 			{error && <div className="text-destructive text-sm">Failed to load your search profile.</div>}
