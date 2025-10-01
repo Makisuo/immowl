@@ -1,13 +1,12 @@
 import { convexQuery, useConvexMutation } from "@convex-dev/react-query"
 import { useForm } from "@tanstack/react-form"
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { api } from "convex/_generated/api"
 import { Plus, Sparkles } from "lucide-react"
-import { useMemo, useState } from "react"
+import { useMemo } from "react"
 import { toast } from "sonner"
 
-import { SearchProfileWizardModal } from "~/components/saved-searches/SearchProfileWizardModal"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader } from "~/components/ui/card"
 import { Checkbox } from "~/components/ui/checkbox"
@@ -39,7 +38,7 @@ export const Route = createFileRoute("/_app/_authed/profile")({
 })
 
 function SearchRequestsPage() {
-	const [isModalOpen, setIsModalOpen] = useState(false)
+	const navigate = useNavigate()
 
 	const { data, isLoading, error } = useQuery(
 		convexQuery(api.savedSearches.listUserSavedSearches, {
@@ -49,9 +48,6 @@ function SearchRequestsPage() {
 
 	const existingSearch = data?.page?.[0] as any | undefined
 
-	const createSavedSearch = useMutation({
-		mutationFn: useConvexMutation(api.savedSearches.createSavedSearchFromWizard),
-	})
 	const updateSavedSearch = useMutation({
 		mutationFn: useConvexMutation(api.savedSearches.updateSavedSearch),
 	})
@@ -125,38 +121,6 @@ function SearchRequestsPage() {
 		},
 	})
 
-	const handleModalSubmit = async (payload: any) => {
-		try {
-			if (existingSearch?._id) {
-				// Map nested payload from wizard to flat update args
-				await updateSavedSearch.mutateAsync({
-					searchId: existingSearch._id,
-					name: payload.name,
-					city: payload.criteria.city,
-					country: payload.criteria.country,
-					propertyType: payload.criteria.propertyType,
-					minPrice: payload.criteria.minPrice,
-					maxPrice: payload.criteria.maxPrice,
-					minSquareMeters: payload.criteria.minSquareMeters,
-					maxSquareMeters: payload.criteria.maxSquareMeters,
-					bedrooms: payload.criteria.bedrooms,
-					bathrooms: payload.criteria.bathrooms,
-					amenities: payload.criteria.amenities,
-					petFriendly: payload.criteria.petFriendly,
-					furnished: payload.criteria.furnished,
-					weights: payload.criteria.weights,
-				})
-				toast.success("Search profile updated")
-			} else {
-				await createSavedSearch.mutateAsync(payload)
-				toast.success("Search profile created")
-			}
-		} catch (e) {
-			console.error(e)
-			toast.error("Failed to save search profile")
-		}
-	}
-
 	return (
 		<div className="container mx-auto max-w-4xl px-4 py-8">
 			{/* Header */}
@@ -225,7 +189,7 @@ function SearchRequestsPage() {
 						<p className="mb-6 text-muted-foreground text-sm">
 							Create your search profile to get personalized property matches and notifications.
 						</p>
-						<Button onClick={() => setIsModalOpen(true)} size="lg">
+						<Button onClick={() => navigate({ to: "/onboarding" })} size="lg">
 							<Plus className="mr-2 h-4 w-4" />
 							Create Search Profile
 						</Button>
@@ -676,34 +640,6 @@ function SearchRequestsPage() {
 					</div>
 				</form>
 			)}
-
-			{/* Wizard Modal */}
-			<SearchProfileWizardModal
-				open={isModalOpen}
-				onOpenChange={setIsModalOpen}
-				onComplete={handleModalSubmit}
-				initialData={
-					existingSearch
-						? {
-								name: existingSearch.name,
-								description: existingSearch.description,
-								criteria: existingSearch.criteria ?? {
-									city: (existingSearch as any).city,
-									country: (existingSearch as any).country,
-									propertyType: (existingSearch as any).propertyType,
-									minPrice: (existingSearch as any).minPrice,
-									bedrooms: (existingSearch as any).bedrooms,
-									bathrooms: (existingSearch as any).bathrooms,
-									amenities: (existingSearch as any).amenities,
-									petFriendly: (existingSearch as any).petFriendly,
-									furnished: (existingSearch as any).furnished,
-									weights:
-										(existingSearch as any).criteria?.weights ?? (existingSearch as any).weights,
-								},
-							}
-						: undefined
-				}
-			/>
 		</div>
 	)
 }
